@@ -1,13 +1,15 @@
 {
     "name": "variant",
-    "abstract": "A short description",
-    "description": "A long description",
+    "abstract": "Variant data type for PostgreSQL",
+    "description": "A data type that allows storing data from any other type and remembering what the original type was",
     "version": "0.0.1",
-    "maintainer": "The maintainer's name",
-    "license": "postgresql",
+    "maintainer": "Jim Nasby <jim.nasby@BlueTreble.com>",
+    "license": {
+        "BSD 2 Clause": "http://opensource.org/licenses/bsd-license.php"
+    }
     "provides": {
         "variant": {
-            "abstract": "A short description",
+            "abstract": "Variant data type for PostgreSQL",
             "file": "sql/variant.sql",
             "docfile": "doc/variant.md",
             "version": "0.0.1"
@@ -15,7 +17,7 @@
     },
     "release_status": "unstable",
 
-    "generated_by": "The maintainer's name",
+    "generated_by": "Jim Nasby",
 
 
     "meta-spec": {
