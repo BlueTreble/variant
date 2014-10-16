@@ -1,53 +1,53 @@
 {
-    "name": "variant",
-    "abstract": "Variant data type for PostgreSQL",
-    "description": "A data type that allows storing data from any other type and remembering what the original type was",
-    "version": "0.0.1",
-    "maintainer": "Jim Nasby <jim.nasby@BlueTreble.com>",
-    "license": {
+    "name": "variant"
+    , "abstract": "Variant data type for PostgreSQL"
+    , "description": "A data type that allows storing data from any other type and remembering what the original type was"
+    , "version": "0.0.1"
+    , "maintainer": "Jim Nasby <jim.nasby@BlueTreble.com>"
+    , "license": {
         "BSD 2 Clause": "http://opensource.org/licenses/bsd-license.php"
-    },
+    }
 
-    "provides": {
+    , "provides": {
         "variant": {
-            "abstract": "Variant data type for PostgreSQL",
-            "file": "sql/variant.sql",
-            "docfile": "doc/variant.md",
-            "version": "0.0.1"
+            "abstract": "Variant data type for PostgreSQL"
+            , "file": "sql/variant.sql"
+            , "docfile": "doc/variant.md"
+            , "version": "0.0.1"
         }
-    },
+    }
 
-    "prereqs": {
+    , "prereqs": {
         "test": {
             "requires": {
                 "pgTAP": 0
             }
         }
-    },
+    }
 
 
-    "release_status": "unstable",
+    , "release_status": "unstable"
 
-    "generated_by": "Jim Nasby",
+    , "generated_by": "Jim Nasby"
 
-    "tags": [ "variant", "type", "variable data type" ],
+    , "tags": [ "variant", "type", "variable data type" ]
 
-    "resources": {
-        "homepage": "http://github.com/decibel/variant/",
-        "bugtracker": {
+    , "resources": {
+        "homepage": "http://github.com/decibel/variant/"
+        , "bugtracker": {
             "web": "http://github.com/decibel/variant/issues"
-        },
-        "repository": {
-            "url": "git://github.com/decibel/variant.git",
-            "web": "http://github.com/decibel/variant/",
-            "type": "git"
         }
-    },
+        , "repository": {
+            "url": "git://github.com/decibel/variant.git"
+            , "web": "http://github.com/decibel/variant/"
+            , "type": "git"
+        }
+    }
 
-    "meta-spec": {
-        "version": "1.0.0",
-        "url": "http://pgxn.org/meta/spec.txt"
-    },
+    , "meta-spec": {
+        "version": "1.0.0"
+        , "url": "http://pgxn.org/meta/spec.txt"
+    }
 
-    "X_vi": "vi: expandtab ts=4 sw=4"
+    , "X_vi": "vi: expandtab ts=4 sw=4"
 }
