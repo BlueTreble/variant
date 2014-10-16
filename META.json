@@ -6,7 +6,8 @@
     "maintainer": "Jim Nasby <jim.nasby@BlueTreble.com>",
     "license": {
         "BSD 2 Clause": "http://opensource.org/licenses/bsd-license.php"
-    }
+    },
+
     "provides": {
         "variant": {
             "abstract": "Variant data type for PostgreSQL",
@@ -34,18 +35,19 @@
     "resources": {
         "homepage": "http://github.com/decibel/variant/",
         "bugtracker": {
-            "web": "http://github.com/decibel/variant/issues",
+            "web": "http://github.com/decibel/variant/issues"
         },
         "repository": {
             "url": "git://github.com/decibel/variant.git",
             "web": "http://github.com/decibel/variant/",
             "type": "git"
-        },
-    }
+        }
+    },
+
     "meta-spec": {
         "version": "1.0.0",
         "url": "http://pgxn.org/meta/spec.txt"
-    }
-}
+    },
 
-# vi: expandtab ts=4 sw=4
+    "X_vi": "vi: expandtab ts=4 sw=4"
+}
