@@ -15,13 +15,37 @@
             "version": "0.0.1"
         }
     },
+
+    "prereqs": {
+        "test": {
+            "requires": {
+                "pgTAP": 0
+            }
+        }
+    },
+
+
     "release_status": "unstable",
 
     "generated_by": "Jim Nasby",
 
+    "tags": [ "variant", "type", "variable data type" ],
 
+    "resources": {
+        "homepage": "http://github.com/decibel/variant/",
+        "bugtracker": {
+            "web": "http://github.com/decibel/variant/issues",
+        },
+        "repository": {
+            "url": "git://github.com/decibel/variant.git",
+            "web": "http://github.com/decibel/variant/",
+            "type": "git"
+        },
+    }
     "meta-spec": {
         "version": "1.0.0",
         "url": "http://pgxn.org/meta/spec.txt"
     }
 }
+
+# vi: expandtab ts=4 sw=4
