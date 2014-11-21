@@ -4,6 +4,7 @@
 #include "access/htup_details.h"
 #include "parser/parse_type.h"
 #include "utils/builtins.h"
+#include "utils/datum.h"
 #include "executor/executor.h"
 #include "executor/spi.h"
 #include "utils/typcache.h"
@@ -13,9 +14,15 @@
 static Oid getIntOid();
 static char * get_cstring(Oid intTypeOid, MemoryContext ctx, Datum dat);
 typedef struct {
-	Oid		typeOid;
-	Datum	data;
+	int32		vl_len_;		/* varlena header (do not touch directly!) */
+	Oid		typeOid;			/* OID of original data type */
 } VariantData;
+
+typedef VariantData *Variant;
+
+#define VHDRSZ				(sizeof(VariantData))
+#define VDATAPTR(x)		( (Datum *) ( (Variant *)(x) + 1 ) )
+
 
 /*
  * You can include more files here if needed.
@@ -40,6 +47,7 @@ Datum
 variant_in(PG_FUNCTION_ARGS)
 {
 	char					 *input = PG_GETARG_CSTRING(0);
+	Variant					variant;
 	Datum						composite;
 	HeapTupleHeader	composite_tuple;
 	bool						isnull;
@@ -58,6 +66,9 @@ variant_in(PG_FUNCTION_ARGS)
 	bytea					 *result;
 	char					 *tmp;
 	Datum					  tmpDatum;
+	Datum					  orgDatum;
+	int16 					resultTypLen;
+	bool 						resultTypByVal;
 
 	if (!SPI_connect()) {
 		do_pop = true;
@@ -126,12 +137,27 @@ variant_in(PG_FUNCTION_ARGS)
 	memcpy(VARDATA(result), &composite, len);
 	elog(LOG, "result size %u", VARSIZE(result));
 
+	getTypeInputInfo(orgTypeOid, &typiofunc, &typioparam);
+	fmgr_info_cxt(typiofunc, &proc, fcinfo->flinfo->fn_mcxt);
+	orgDatum=InputFunctionCall(&proc, text_to_cstring(orgData), typioparam, typmod);
+	get_typlenbyval(orgTypeOid, &resultTypLen, &resultTypByVal);
+	len = datumGetSize(orgDatum, resultTypByVal, resultTypLen);
+	if (resultTypLen == -1)
+		tmpDatum = PointerGetDatum(PG_DETOAST_DATUM_COPY(orgDatum));
+	else
+		tmpDatum = datumCopy(orgDatum, resultTypByVal, resultTypLen);
+
+	variant = (Variant) SPI_palloc(len + VHDRSZ);
+	SET_VARSIZE(variant, len);
+	variant->typeOid = orgTypeOid;
+	memcpy((char *)VDATAPTR(variant), (char *)tmpDatum, len);
+
   if (do_pop)
 		SPI_pop();
 	else
 		SPI_finish();
 
-	PG_RETURN_BYTEA_P(result);
+	PG_RETURN_POINTER(variant);
 }
 
 char *
@@ -153,8 +179,8 @@ PG_FUNCTION_INFO_V1(variant_out);
 Datum
 variant_out(PG_FUNCTION_ARGS)
 {
-	bytea					 *input = PG_GETARG_BYTEA_P(0);
-	Datum					 *input_datum;
+	Datum						input_datum = PG_GETARG_DATUM(0);
+	Variant					input = (Variant) PG_DETOAST_DATUM_COPY(input_datum);
 	char					 *output;
 	bool						do_pop = false;
 	Oid							intTypeOid = InvalidOid;
@@ -162,33 +188,25 @@ variant_out(PG_FUNCTION_ARGS)
 	bool						isvarlena;
 	FmgrInfo	 			proc;
 	char	*tmp;
+	char					 *orgTypeName = format_type_be(input->typeOid);
+	text					 *orgData;
+	StringInfoData	out;
 
-	input_datum = (Datum *) palloc0(VARSIZE(input));
-	memcpy(input_datum, VARDATA(input), VARSIZE(input));
+
 	elog(LOG, "input size=%u", VARSIZE(input));
 
-	if (!SPI_connect()) {
-		do_pop = true;
-		SPI_push();
-	}
-
-	intTypeOid = getIntOid();
-
-
-	tmp=get_cstring(intTypeOid, fcinfo->flinfo->fn_mcxt, *input_datum);
-	elog(LOG, "(orgData) input: %s, size %u", tmp, VARSIZE(input));
-
 	/* Simply call record output function for our internal type */
-	getTypeOutputInfo(intTypeOid, &typiofunc, &isvarlena);
+	getTypeOutputInfo(input->typeOid, &typiofunc, &isvarlena);
 	fmgr_info_cxt(typiofunc, &proc, fcinfo->flinfo->fn_mcxt);
-	output = OutputFunctionCall(&proc, *input_datum);
+	tmp = OutputFunctionCall(&proc, *VDATAPTR(input));
 
-  if (do_pop)
-		SPI_pop();
-	else
-		SPI_finish();
+	initStringInfo(&out);
 
-	PG_RETURN_CSTRING(output);
+	appendStringInfo(&out, "(%s,%s)", orgTypeName, tmp);
+
+	tmp=out.data;
+
+	PG_RETURN_CSTRING(tmp);
 }
 
 Oid
