@@ -25,72 +25,26 @@ CREATE VIEW _variant.variant_casts AS
     WHERE source = 'variant' OR target = 'variant'
 ;
 
-/*
-CREATE VIEW _variants.types
-
-CREATE VIEW variant.defined_casts AS
-;
-
-CREATE FUNCTION variant.update_casts()
-  RETURNS void
-  LANGUAGE plpgsql
-  AS $body$
-DECLARE
-BEGIN
-END
-$body$
-;
-*/
-
--- I'd much prefer to create a domain on top of a composite type, but Postgres doesn't allow that :(
-CREATE DOMAIN variant.variant AS text[];
 CREATE TYPE _variant._variant AS ( original_type regtype, data text );
 
-CREATE FUNCTION _variant.sanity(
-  p_in _variant._variant
-) RETURNS boolean LANGUAGE plpgsql IMMUTABLE AS $body$
-DECLARE
-BEGIN
+CREATE TYPE variant.variant;
+CREATE OR REPLACE FUNCTION _variant._variant_in(cstring)
+RETURNS variant.variant
+LANGUAGE c IMMUTABLE STRICT
+--AS 'MODULE_PATHNAME';
+--AS '$libdir/variant';
+AS '$libdir/variant', 'variant_in';
 
-  /*
-   * We check the correctness of the supplied type by attempting to cast back to that type.
-   */
+CREATE OR REPLACE FUNCTION _variant._variant_out(variant.variant)
+RETURNS cstring
+LANGUAGE c IMMUTABLE STRICT
+--AS 'MODULE_PATHNAME';
+AS '$libdir/variant', 'variant_out';
 
-  RAISE DEBUG 'validate using %', $$SELECT $$ || quote_literal( p_in[1] ) || $$::$$ || p_in[2];
-  EXECUTE $$SELECT $$ || quote_literal( p_in[1] ) || $$::$$ || p_in[2];
-
-  -- If our input wasn't valid we'd have an error already
-  RETURN true;
-END
-$body$;
-
-CREATE FUNCTION test(
-  p_in _variant._variant
-) RETURNS boolean LANGUAGE plpgsql IMMUTABLE AS $body$
-DECLARE
-BEGIN
-
-  /*
-   * We check the correctness of the supplied type by attempting to cast back to that type.
-   */
-
-  RAISE DEBUG 'validate';
-
-  -- If our input wasn't valid we'd have an error already
-  RETURN true;
-END
-$body$;
-
---CREATE OR REPLACE FUNCTION test(variant.variant) RETURNS boolean LANGUAGE sql IMMUTABLE AS 'SELECT true';
-
-ALTER DOMAIN variant.variant
-  --ADD CHECK( _variant.sanity( VALUE ) )
-  ADD CHECK( test(VALUE) )
-;
-CREATE CAST (variant.variant AS _variant._variant) WITH INOUT AS IMPLICIT;
-
-CREATE FUNCTION _variant.to_text(variant.variant) RETURNS text IMMUTABLE LANGUAGE sql AS 'SELECT $1[1]::text';
-CREATE CAST( variant.variant AS text ) WITH FUNCTION _variant.to_text( variant.variant) AS ASSIGNMENT;
+CREATE TYPE variant.variant(
+  INPUT = _variant._variant_in
+  , OUTPUT = _variant._variant_out
+);
 
 
 -- vi: expandtab sw=2 ts=2

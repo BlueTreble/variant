@@ -4,8 +4,8 @@ BEGIN;
 \i sql/variant.sql
 
 SET client_min_messages = DEBUG;
-SELECT '{text,test}'::variant.variant;
-SELECT '{text,test}'::variant.variant::text;
+SELECT '(text,test)'::variant.variant;
+SELECT '(text,test)'::variant.variant::text;
 
 \pset format unaligned
 \pset tuples_only true
