@@ -1,3 +1,4 @@
+#include "c.h"
 #include "postgres.h"
 #include "fmgr.h"
 #include "lib/stringinfo.h"
@@ -21,7 +22,7 @@ typedef struct {
 typedef VariantData *Variant;
 
 #define VHDRSZ				(sizeof(VariantData))
-#define VDATAPTR(x)		( (Datum *) ( (Variant *)(x) + 1 ) )
+#define VDATAPTR(x)		( (Pointer) ( (x) + 1 ) )
 
 
 /*
@@ -47,7 +48,6 @@ Datum
 variant_in(PG_FUNCTION_ARGS)
 {
 	char					 *input = PG_GETARG_CSTRING(0);
-	Variant					variant;
 	Datum						composite;
 	HeapTupleHeader	composite_tuple;
 	bool						isnull;
@@ -63,12 +63,17 @@ variant_in(PG_FUNCTION_ARGS)
 	bool						do_pop = false;
 	int							ret;
 	Size						len;
+	Variant					var;
 	bytea					 *result;
 	char					 *tmp;
 	Datum					  tmpDatum;
 	Datum					  orgDatum;
 	int16 					resultTypLen;
 	bool 						resultTypByVal;
+	int16		typlen;
+	bool		typbyval;
+	char		typalign;
+	char		typdelim;
 
 	if (!SPI_connect()) {
 		do_pop = true;
@@ -137,27 +142,55 @@ variant_in(PG_FUNCTION_ARGS)
 	memcpy(VARDATA(result), &composite, len);
 	elog(LOG, "result size %u", VARSIZE(result));
 
-	getTypeInputInfo(orgTypeOid, &typiofunc, &typioparam);
+	get_type_io_data(orgTypeOid,
+						 IOFunc_input,
+						 &resultTypLen,
+						 &resultTypByVal,
+						 &typalign,
+						 &typdelim,
+						 &typioparam,
+						 &typiofunc);
+
+
 	fmgr_info_cxt(typiofunc, &proc, fcinfo->flinfo->fn_mcxt);
 	orgDatum=InputFunctionCall(&proc, text_to_cstring(orgData), typioparam, typmod);
+	/*
 	get_typlenbyval(orgTypeOid, &resultTypLen, &resultTypByVal);
-	len = datumGetSize(orgDatum, resultTypByVal, resultTypLen);
+	*/
 	if (resultTypLen == -1)
 		tmpDatum = PointerGetDatum(PG_DETOAST_DATUM_COPY(orgDatum));
 	else
 		tmpDatum = datumCopy(orgDatum, resultTypByVal, resultTypLen);
+	len = datumGetSize(tmpDatum, resultTypByVal, resultTypLen);
 
-	variant = (Variant) SPI_palloc(len + VHDRSZ);
-	SET_VARSIZE(variant, len);
-	variant->typeOid = orgTypeOid;
-	memcpy((char *)VDATAPTR(variant), (char *)tmpDatum, len);
+	var = (Variant) MemoryContextAllocZero(fcinfo->flinfo->fn_mcxt, len + VHDRSZ);
+	Pointer ptr;
+	ptr = VDATAPTR(var);
+	Pointer ptr2 = (Pointer) att_align_pointer(ptr, typalign, resultTypLen, ptr);
+	if( ptr != ptr2 )
+		elog(ERROR, "ptr %p doesn't align to %p", ptr, ptr2);
+
+	SET_VARSIZE(var, len + VHDRSZ);
+	var->typeOid = orgTypeOid;
+
+	elog(LOG, "VDATAPTR %p, tmpDatum %p, len %zu, VHDRSZ %zu", (void *)VDATAPTR(var), (void *)tmpDatum, len, VHDRSZ);
+	memcpy((char *)VDATAPTR(var), (char *)tmpDatum, len);
+	text *tmptext=(text *)VDATAPTR(var);
+	elog(LOG, "text %s", text_to_cstring(tmptext));
+	/*
+
+	elog(LOG, "var %p, var->data %p, tmpDatum %p, len %zu, VHDRSZ %zu", var, &(var->data), (void *)tmpDatum, len, VHDRSZ);
+	memcpy(&(var->data), &tmpDatum, len);
+	text *tmptext=(text *)var->data;
+	elog(LOG, "tmptext %p", tmptext);
+	*/
 
   if (do_pop)
 		SPI_pop();
 	else
 		SPI_finish();
 
-	PG_RETURN_POINTER(variant);
+	PG_RETURN_POINTER(var);
 }
 
 char *
@@ -190,15 +223,18 @@ variant_out(PG_FUNCTION_ARGS)
 	char	*tmp;
 	char					 *orgTypeName = format_type_be(input->typeOid);
 	text					 *orgData;
+	Datum					 *orgDatum = (Datum *) VDATAPTR(input);
 	StringInfoData	out;
 
 
 	elog(LOG, "input size=%u", VARSIZE(input));
+	text *tmptext=(text *)orgDatum;
+	elog(LOG, "text %s", text_to_cstring(tmptext));
 
 	/* Simply call record output function for our internal type */
 	getTypeOutputInfo(input->typeOid, &typiofunc, &isvarlena);
 	fmgr_info_cxt(typiofunc, &proc, fcinfo->flinfo->fn_mcxt);
-	tmp = OutputFunctionCall(&proc, *VDATAPTR(input));
+	tmp = OutputFunctionCall(&proc, orgDatum);
 
 	initStringInfo(&out);
 
