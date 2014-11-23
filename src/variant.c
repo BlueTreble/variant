@@ -38,7 +38,6 @@ typedef VariantData *Variant;
 
 static VariantCache * get_cache(FunctionCallInfo fcinfo, Oid origTypId, IOFuncSelector func);
 static Oid getIntOid();
-static char * get_cstring(Oid intTypeOid, MemoryContext ctx, Datum dat);
 
 
 /*
@@ -70,7 +69,6 @@ variant_in(PG_FUNCTION_ARGS)
 	int32					typmod = 0;
 	Oid						orgTypeOid;
 	text					*orgData;
-	bool					do_pop = false;
 	Size					len;
 	Variant				var;
 	Datum				  tmpDatum;
@@ -126,21 +124,6 @@ variant_in(PG_FUNCTION_ARGS)
 	}
 
 	PG_RETURN_POINTER(var);
-}
-
-char *
-get_cstring(Oid intTypeOid, MemoryContext ctx, Datum dat)
-{
-	char					 *output;
-	Oid							typIoFunc;
-	bool						isvarlena;
-	FmgrInfo	 			proc;
-
-	getTypeOutputInfo(intTypeOid, &typIoFunc, &isvarlena);
-	fmgr_info_cxt(typIoFunc, &proc, ctx);
-	output = OutputFunctionCall(&proc, dat);
-
-	return output;
 }
 
 PG_FUNCTION_INFO_V1(variant_out);
