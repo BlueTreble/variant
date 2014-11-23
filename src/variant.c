@@ -67,7 +67,7 @@ variant_in(PG_FUNCTION_ARGS)
 	bytea					 *result;
 	char					 *tmp;
 	Datum					  tmpDatum;
-	Datum					  orgDatum;
+	Datum					  org_datum;
 	int16 					resultTypLen;
 	bool 						resultTypByVal;
 	int16		typlen;
@@ -153,14 +153,14 @@ variant_in(PG_FUNCTION_ARGS)
 
 
 	fmgr_info_cxt(typiofunc, &proc, fcinfo->flinfo->fn_mcxt);
-	orgDatum=InputFunctionCall(&proc, text_to_cstring(orgData), typioparam, typmod);
+	org_datum=InputFunctionCall(&proc, text_to_cstring(orgData), typioparam, typmod);
 	/*
 	get_typlenbyval(orgTypeOid, &resultTypLen, &resultTypByVal);
 	*/
 	if (resultTypLen == -1)
-		tmpDatum = PointerGetDatum(PG_DETOAST_DATUM_COPY(orgDatum));
+		tmpDatum = PointerGetDatum(PG_DETOAST_DATUM_COPY(org_datum));
 	else
-		tmpDatum = datumCopy(orgDatum, resultTypByVal, resultTypLen);
+		tmpDatum = datumCopy(org_datum, resultTypByVal, resultTypLen);
 	len = datumGetSize(tmpDatum, resultTypByVal, resultTypLen);
 
 	var = (Variant) MemoryContextAllocZero(fcinfo->flinfo->fn_mcxt, len + VHDRSZ);
@@ -214,35 +214,69 @@ variant_out(PG_FUNCTION_ARGS)
 {
 	Datum						input_datum = PG_GETARG_DATUM(0);
 	Variant					input = (Variant) PG_DETOAST_DATUM_COPY(input_datum);
-	char					 *output;
-	bool						do_pop = false;
 	Oid							intTypeOid = InvalidOid;
 	Oid							typiofunc;
 	bool						isvarlena;
+	bool						need_quote;
 	FmgrInfo	 			proc;
-	char	*tmp;
-	char					 *orgTypeName = format_type_be(input->typeOid);
-	text					 *orgData;
-	Datum					 *orgDatum = (Datum *) VDATAPTR(input);
+	char					 *tmp;
+	char					 *org_cstring;
 	StringInfoData	out;
 
-
-	elog(LOG, "input size=%u", VARSIZE(input));
-	text *tmptext=(text *)orgDatum;
-	elog(LOG, "text %s", text_to_cstring(tmptext));
-
-	/* Simply call record output function for our internal type */
+	/* Get cstring of original data */
 	getTypeOutputInfo(input->typeOid, &typiofunc, &isvarlena);
 	fmgr_info_cxt(typiofunc, &proc, fcinfo->flinfo->fn_mcxt);
-	tmp = OutputFunctionCall(&proc, orgDatum);
+	org_cstring = OutputFunctionCall(&proc, VDATAPTR(input));
 
+	/*
+	 * Detect whether we need double quotes for this value
+	 *
+	 * Stolen then modified from record_out
+	 */
+	need_quote = (org_cstring[0] == '\0' ); /* force quotes for empty string */
+	if( !need_quote )
+	{
+		for (tmp = org_cstring; *tmp; tmp++)
+		{
+			char		ch = *tmp;
+
+			if (ch == '"' || ch == '\\' ||
+				ch == '(' || ch == ')' || ch == ',' ||
+				isspace((unsigned char) ch))
+			{
+				need_quote = true;
+				break;
+			}
+		}
+	}
+
+	/* And emit the string */
 	initStringInfo(&out);
 
-	appendStringInfo(&out, "(%s,%s)", orgTypeName, tmp);
+	/* format_type_by handles quoting for us */
+	appendStringInfoChar(&out, '(');
+	appendStringInfoString(&out, format_type_be(input->typeOid));
+	appendStringInfoChar(&out, ',');
 
-	tmp=out.data;
+	if (!need_quote)
+		appendStringInfoString(&out, org_cstring);
+	else
+	{
+		appendStringInfoChar(&out, '"');
+		for (tmp = org_cstring; *tmp; tmp++)
+		{
+			char		ch = *tmp;
 
-	PG_RETURN_CSTRING(tmp);
+			if (ch == '"' || ch == '\\')
+				appendStringInfoCharMacro(&out, ch);
+			appendStringInfoCharMacro(&out, ch);
+		}
+		appendStringInfoChar(&out, '"');
+	}
+
+	appendStringInfoChar(&out, ')');
+
+	PG_RETURN_CSTRING(out.data);
 }
 
 Oid
