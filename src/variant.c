@@ -229,7 +229,7 @@ get_cache(FunctionCallInfo fcinfo, Oid origTypId, IOFuncSelector func)
 		if (func == IOFunc_output)
 		{
 			char *t = format_type_be(cache->typId);
-			cache->outString = MemoryContextAlloc(fcinfo->flinfo->fn_mcxt, strlen(t) + 2);
+			cache->outString = MemoryContextAlloc(fcinfo->flinfo->fn_mcxt, strlen(t) + 3); /* "(", ",", and "\0" */
 			sprintf(cache->outString, "(%s,", t);
 		}
 		else
