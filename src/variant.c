@@ -132,26 +132,34 @@ variant_out(PG_FUNCTION_ARGS)
 	vi = make_variant_int(input, fcinfo, IOFunc_output);
 	cache = GetCache(fcinfo);
 
-	org_cstring = OutputFunctionCall(&cache->proc, vi->data);
-
-	/*
-	 * Detect whether we need double quotes for this value
-	 *
-	 * Stolen then modified from record_out
-	 */
-	need_quote = (org_cstring[0] == '\0' ); /* force quotes for empty string */
-	if( !need_quote )
+	if(vi->isnull)
 	{
-		for (tmp = org_cstring; *tmp; tmp++)
-		{
-			char		ch = *tmp;
+		*org_cstring = 0;
+		need_quote = false;
+	}
+	else
+	{
+		org_cstring = OutputFunctionCall(&cache->proc, vi->data);
 
-			if (ch == '"' || ch == '\\' ||
-				ch == '(' || ch == ')' || ch == ',' ||
-				isspace((unsigned char) ch))
+		/*
+		 * Detect whether we need double quotes for this value
+		 *
+		 * Stolen then modified from record_out.
+		 */
+		need_quote = (org_cstring[0] == '\0' ); /* force quotes for empty string */
+		if( !need_quote )
+		{
+			for (tmp = org_cstring; *tmp; tmp++)
 			{
-				need_quote = true;
-				break;
+				char		ch = *tmp;
+
+				if (ch == '"' || ch == '\\' ||
+					ch == '(' || ch == ')' || ch == ',' ||
+					isspace((unsigned char) ch))
+				{
+					need_quote = true;
+					break;
+				}
 			}
 		}
 	}
@@ -201,14 +209,15 @@ make_variant_int(Variant v, FunctionCallInfo fcinfo, IOFuncSelector func)
 	vi = palloc(sizeof(VariantDataInt));
 
 	vi->typid = get_oid(v, &flags);
-	vi->isnull = flags & VAR_ISNULL;
+	vi->isnull = (flags & VAR_ISNULL ? true : false);
 
 	cache = get_cache(fcinfo, vi->typid, func);
 
 	/* by-value type, or fixed-length pass-by-reference */
 	if( cache->typbyval || cache->typlen >= 1)
 	{
-		vi->data = fetch_att(VDATAPTR(v), cache->typbyval, cache->typlen);
+		if(!vi->isnull)
+			vi->data = fetch_att(VDATAPTR(v), cache->typbyval, cache->typlen);
 		return vi;
 	}
 
@@ -286,7 +295,7 @@ make_variant(VariantInt vi, FunctionCallInfo fcinfo, IOFuncSelector func)
 		else
 		{
 			/* full 4-byte header varlena */
-			data_length = VARSIZE(data_ptr);
+			data_length -= VARHDRSZ;
 			data_ptr = VARDATA(data_ptr);
 		}
 	}
