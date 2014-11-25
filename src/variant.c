@@ -1,3 +1,15 @@
+/*
+ *
+ * variant.c:
+ * 		I/O and support functions for the variant data type
+ *
+ * We use two different structures to represent variant types. VariantData is
+ * the structure that is passed around to the rest of the database. It's geared
+ * towards space efficiency rather than ease of access. VariantDataInt is an
+ * easier-to-use structure that we use internally.
+ *
+ */
+
 #include "c.h"
 #include "postgres.h"
 #include "fmgr.h"
@@ -15,30 +27,34 @@
 /* fn_extra cache entry */
 typedef struct VariantCache
 {
-	FmgrInfo	proc;				/* lookup result for typiofunc */
+	FmgrInfo				proc;				/* lookup result for typiofunc */
 	/* Information for original type */
-	Oid				typId;
-	Oid				typIoParam;
-	int16 		typLen;
-	bool 			typByVal;
-	char			typAlign;
-	char			*outString;	/* Initial part of output string. NULL for input functions. */
+	Oid							typid;
+	Oid							typioparam;
+	int16 					typlen;
+	bool 						typbyval;
+	char						typalign;
+	IOFuncSelector	IOfunc; /* We should always either be in or out; make sure we're not mixing. */
+	char						*outString;	/* Initial part of output string. NULL for input functions. */
 } VariantCache;
 
+#define GetCache(fcinfo) ((VariantCache *) fcinfo->flinfo->fn_extra)
 
-typedef struct {
-	int32		vl_len_;		/* varlena header (do not touch directly!) */
-	Oid		typeOid;			/* OID of original data type */
-} VariantData;
-
-typedef VariantData *Variant;
-
-#define VHDRSZ				(sizeof(VariantData))
-#define VDATAPTR(x)		( (Pointer) ( (x) + 1 ) )
+typedef union
+{
+	struct
+	{
+		char		flags;  /* Our flags *AND* Oid Data. You can't reference this field without using the var bitmasks */
+		char		pad[3];
+	} packed;
+	Oid		typid;			/* OID of original data type */
+} PackedOid;
 
 static VariantCache * get_cache(FunctionCallInfo fcinfo, Oid origTypId, IOFuncSelector func);
 static Oid getIntOid();
-
+static Oid get_oid(Variant v, uint *flags);
+static VariantInt make_variant_int(Variant v, FunctionCallInfo fcinfo, IOFuncSelector func);
+static Variant make_variant(VariantInt vi, FunctionCallInfo fcinfo, IOFuncSelector func);
 
 /*
  * You can include more files here if needed.
@@ -67,12 +83,9 @@ variant_in(PG_FUNCTION_ARGS)
 	bool					isnull;
 	Oid						intTypeOid = InvalidOid;
 	int32					typmod = 0;
-	Oid						orgTypeOid;
 	text					*orgData;
-	Size					len;
-	Variant				var;
-	Datum				  tmpDatum;
-	Datum				  org_datum;
+	VariantDataInt	vdi;
+	VariantInt		vi = &vdi;
 
 	/* Eventually getting rid of this crap, so segregate it */
 		intTypeOid = getIntOid();
@@ -80,72 +93,46 @@ variant_in(PG_FUNCTION_ARGS)
 		FmgrInfo	 		proc;
 		Datum						composite;
 		HeapTupleHeader	composite_tuple;
-		Oid							typIoParam;
+		Oid							typioparam;
 		Oid							typIoFunc;
 
 		/* Cast input data to our internal composite type */
-		getTypeInputInfo(intTypeOid, &typIoFunc, &typIoParam);
+		getTypeInputInfo(intTypeOid, &typIoFunc, &typioparam);
 		fmgr_info_cxt(typIoFunc, &proc, fcinfo->flinfo->fn_mcxt);
-		composite=InputFunctionCall(&proc, input, typIoParam, typmod);
+		composite=InputFunctionCall(&proc, input, typioparam, typmod);
 
 		/* Extract data from internal composite type */
 		composite_tuple=DatumGetHeapTupleHeader(composite);
-		orgTypeOid = (Oid) GetAttributeByNum( composite_tuple, 1, &isnull );
+		vi->typid = (Oid) GetAttributeByNum( composite_tuple, 1, &isnull );
 		if (isnull)
 			elog(ERROR, "original_type of variant must not be NULL");
-		orgData = (text *) GetAttributeByNum( composite_tuple, 2, &isnull );
+		orgData = (text *) GetAttributeByNum( composite_tuple, 2, &vi->isnull );
 	/* End crap */
 
-	cache = get_cache(fcinfo, orgTypeOid, IOFunc_input);
-	org_datum=InputFunctionCall(&cache->proc, text_to_cstring(orgData), cache->typIoParam, typmod); // TODO: Use real original typmod
-	tmpDatum = datumCopy(org_datum, cache->typByVal, cache->typLen);
-	len = datumGetSize(tmpDatum, cache->typByVal, cache->typLen);
+	cache = get_cache(fcinfo, vi->typid, IOFunc_input);
 
-	var = (Variant) MemoryContextAllocZero(fcinfo->flinfo->fn_mcxt, len + VHDRSZ);
-	SET_VARSIZE(var, len + VHDRSZ);
-	var->typeOid = orgTypeOid;
+	if (!vi->isnull)
+		vi->data = InputFunctionCall(&cache->proc, text_to_cstring(orgData), cache->typioparam, typmod); // TODO: Use real original typmod
 
-	Pointer ptr;
-	ptr = VDATAPTR(var);
-
-	/* We don't know what we could get passed, so best not to make this an asert */
-	{
-		Pointer ptr2 = (Pointer) att_align_pointer(ptr, cache->typAlign, cache->typLen, ptr);
-		if( ptr != ptr2 )
-			elog(ERROR, "ptr %p doesn't align to %p", ptr, ptr2);
-	}
-
-	if (cache->typByVal) {
-		elog(LOG, "VDATAPTR %p, tmpDatum %p, len %zu, VHDRSZ %zu", (void *)VDATAPTR(var), &tmpDatum, len, VHDRSZ);
-		memcpy(ptr, &tmpDatum, len);
-	} else {
-		elog(LOG, "VDATAPTR %p, tmpDatum %p, len %zu, VHDRSZ %zu", (void *)VDATAPTR(var), (Pointer) tmpDatum, len, VHDRSZ);
-		memcpy(ptr, (Pointer) tmpDatum, len);
-	}
-
-	PG_RETURN_POINTER(var);
+	PG_RETURN_VARIANT( make_variant(vi, fcinfo, IOFunc_input) );
 }
 
 PG_FUNCTION_INFO_V1(variant_out);
 Datum
 variant_out(PG_FUNCTION_ARGS)
 {
+	Variant				input = PG_GETARG_VARIANT(0);
 	VariantCache	*cache;
-	Datum					input_datum = PG_GETARG_DATUM(0);
-	Variant				input = (Variant) PG_DETOAST_DATUM_COPY(input_datum);
-	Oid						orgTypeOid = input->typeOid;
-	Datum					orig_datum;
 	bool					need_quote;
 	char					*tmp;
 	char					*org_cstring;
 	StringInfoData	out;
+	VariantInt		vi;
 
-	cache = get_cache(fcinfo, orgTypeOid, IOFunc_output);
-	if( cache->typByVal )
-		orig_datum = *VDATAPTR(input);
-	else
-		orig_datum = (Datum) VDATAPTR(input);
-	org_cstring = OutputFunctionCall(&cache->proc, orig_datum);
+	vi = make_variant_int(input, fcinfo, IOFunc_output);
+	cache = GetCache(fcinfo);
+
+	org_cstring = OutputFunctionCall(&cache->proc, vi->data);
 
 	/*
 	 * Detect whether we need double quotes for this value
@@ -195,6 +182,198 @@ variant_out(PG_FUNCTION_ARGS)
 }
 
 /*
+ * make_variant_int: Converts our external (Variant) representation to a VariantInt.
+ */
+static VariantInt
+make_variant_int(Variant v, FunctionCallInfo fcinfo, IOFuncSelector func)
+{
+	VariantCache	*cache;
+	VariantInt		vi;
+	Size 					len;
+	Pointer 			ptr;
+	uint					flags;
+
+	
+	/* Ensure v is fully detoasted */
+	Assert(!VARATT_IS_EXTENDED(v));
+
+	/* May need to be careful about what context this stuff is palloc'd in */
+	vi = palloc(sizeof(VariantDataInt));
+
+	vi->typid = get_oid(v, &flags);
+	vi->isnull = flags & VAR_ISNULL;
+
+	cache = get_cache(fcinfo, vi->typid, func);
+
+	/* by-value type, or fixed-length pass-by-reference */
+	if( cache->typbyval || cache->typlen >= 1)
+	{
+		vi->data = fetch_att(VDATAPTR(v), cache->typbyval, cache->typlen);
+		return vi;
+	}
+
+	/* Make sure we know we're dealing with either varlena or cstring */
+	if (cache->typlen > -1 || cache->typlen < -2)
+		elog(ERROR, "unknown typlen %i for typid %u", cache->typlen, cache->typid);
+
+	/* we don't store a varlena header for varlena data; instead we compute
+	 * it's size based on ours:
+	 *
+	 * Our size - our header size - overflow byte (if present)
+	 *
+	 * For cstring, we don't store the trailing NUL
+	 */
+	len = VARSIZE(v) - VHDRSZ - (flags & VAR_OVERFLOW ? 1 : 0);
+
+	if (cache->typlen == -1) /* varlena */
+	{
+		ptr = palloc0(len + VARHDRSZ);
+		SET_VARSIZE(ptr, len + VARHDRSZ);
+		memcpy(VARDATA(ptr), VDATAPTR(v), len);
+	}
+	else /* cstring */
+	{
+		ptr = palloc0(len + 1); /* Need space for NUL terminator */
+		memcpy(ptr, VDATAPTR(v), len);
+	}
+	vi->data = PointerGetDatum(ptr);
+
+	return vi;
+}
+
+/*
+ * Create an external variant from our internal representation
+ */
+static Variant
+make_variant(VariantInt vi, FunctionCallInfo fcinfo, IOFuncSelector func)
+{
+	VariantCache	*cache;
+	Variant				v;
+	bool					oid_overflow=OID_TOO_LARGE(vi->typid);
+	Size					len, data_length;
+	Pointer				data_ptr = 0;
+	uint					flags = 0;
+
+	cache = get_cache(fcinfo, vi->typid, func);
+	Assert(cache->typid = vi->typid);
+
+	if(vi->isnull)
+	{
+		flags |= VAR_ISNULL;
+		data_length = 0;
+	}
+	else if(cache->typlen == -1) /* varlena */
+	{
+		/*
+		 * Short varlena is OK, but we need to make sure it's not external. It's OK
+		 * to leave compressed varlena's alone too, but detoast_packed will
+		 * uncompress them. We'll just follow rangetype.c's lead here.
+		 */
+		vi->data = PointerGetDatum( PG_DETOAST_DATUM_PACKED(vi->data) );
+		data_ptr = DatumGetPointer(vi->data);
+
+		/*
+		 * Because we don't store varlena aligned or with it's header, our
+		 * data_length is simply the varlena length.
+		 */
+		data_length = VARSIZE(vi->data);
+
+		if (VARATT_IS_SHORT(vi->data))
+		{
+			data_length -= VARHDRSZ_SHORT;
+			data_ptr = VARDATA_SHORT(data_ptr);
+		}
+		else
+		{
+			/* full 4-byte header varlena */
+			data_length = VARSIZE(data_ptr);
+			data_ptr = VARDATA(data_ptr);
+		}
+	}
+	else if(cache->typlen == -2) /* cstring */
+	{
+		data_length = strlen(DatumGetCString(vi->data)); /* We don't store NUL terminator */
+		data_ptr = DatumGetPointer(vi->data);
+	}
+	else /* att_addlength_datum() sanity-checks for us */
+	{
+		data_length = VHDRSZ; /* Start with header size to make sure alignment is correct */
+		data_length = att_align_datum(data_length, cache->typalign, cache->typlen, vi->data);
+		data_length = att_addlength_datum(data_length, cache->typlen, vi->data);
+		data_length -= VHDRSZ;
+
+		if(!cache->typbyval) /* fixed length, pass by reference */
+			data_ptr = DatumGetPointer(vi->data);
+	}
+
+	/* If typid is too large then we need an extra byte */
+	len = VHDRSZ + data_length + (oid_overflow ? sizeof(char) : 0);
+
+	v = palloc0(len);
+	SET_VARSIZE(v, len);
+	v->pOid = vi->typid;
+
+	if(oid_overflow)
+	{
+		flags |= VAR_OVERFLOW;
+
+		/* Reset high pOid byte to zero */
+		v->pOid &= 0x00FFFFFF;
+
+		/* Store high byte of OID at the end of our structure */
+		*((char *) v + len - sizeof(char)) = vi->typid >> 24;
+	}
+
+	/*
+	 * Be careful not to overwrite the valid OID data
+	 */
+	v->pOid |= flags;
+	Assert( get_oid(v, &flags) == vi->typid );
+
+	if(!vi->isnull)
+	{
+		if(cache->typbyval)
+		{
+			Pointer p = (char *) att_align_nominal(VDATAPTR(v), cache->typalign);
+			store_att_byval(p, vi->data, cache->typlen);
+		}
+		else
+			memcpy(VDATAPTR(v), data_ptr, data_length);
+	}
+
+	return v;
+}
+
+/*
+ * get_oid: Returns actual Oid from a Variant
+ */
+static Oid
+get_oid(Variant v, uint *flags)
+{
+	*flags = v->pOid & (~OID_MASK);
+
+	if(*flags & VAR_OVERFLOW)
+	{
+		char	e;
+		Oid		o;
+
+		/* fetch the extra byte from datum's last byte */
+		e = *((char *) v + VARSIZE(v) - 1);
+
+		o = ((uint) e) << 24;
+		o = v->pOid & 0x00FFFFFF;
+		return o;
+	}
+	else
+		return v->pOid & OID_MASK;
+}
+
+static char
+get_extra(Variant v)
+{
+}
+
+/*
  * get_cache: get/set cached info
  */
 static VariantCache *
@@ -202,33 +381,41 @@ get_cache(FunctionCallInfo fcinfo, Oid origTypId, IOFuncSelector func)
 {
 	VariantCache *cache = (VariantCache *) fcinfo->flinfo->fn_extra;
 
-	if (cache == NULL || cache->typId != origTypId)
+	/* IO type should always be the same, so assert that. But if we're not an assert build just force a reset. */
+	if (cache != NULL && cache->typid == origTypId && cache->IOfunc != func)
+	{
+		Assert(false);
+		cache->typid ^= origTypId;
+	}
+
+	if (cache == NULL || cache->typid != origTypId)
 	{
 		char						typDelim;
 		Oid							typIoFunc;
 
 		/*
-		 * We can get different OIDs in one call, so don't needlessly Alloc
+		 * We can get different OIDs in one call, so don't needlessly palloc
 		 */
 		if (cache == NULL)
 			cache = (VariantCache *) MemoryContextAlloc(fcinfo->flinfo->fn_mcxt,
 												   sizeof(VariantCache));
 
-		cache->typId = origTypId;
+		cache->typid = origTypId;
+		cache->IOfunc = func;
 
-		get_type_io_data(cache->typId,
+		get_type_io_data(cache->typid,
 							 func,
-							 &cache->typLen,
-							 &cache->typByVal,
-							 &cache->typAlign,
+							 &cache->typlen,
+							 &cache->typbyval,
+							 &cache->typalign,
 							 &typDelim,
-							 &cache->typIoParam,
+							 &cache->typioparam,
 							 &typIoFunc);
 		fmgr_info_cxt(typIoFunc, &cache->proc, fcinfo->flinfo->fn_mcxt);
 
-		if (func == IOFunc_output)
+		if (func == IOFunc_output || func == IOFunc_send)
 		{
-			char *t = format_type_be(cache->typId);
+			char *t = format_type_be(cache->typid);
 			cache->outString = MemoryContextAlloc(fcinfo->flinfo->fn_mcxt, strlen(t) + 3); /* "(", ",", and "\0" */
 			sprintf(cache->outString, "(%s,", t);
 		}
