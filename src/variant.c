@@ -132,12 +132,11 @@ variant_out(PG_FUNCTION_ARGS)
 	vi = make_variant_int(input, fcinfo, IOFunc_output);
 	cache = GetCache(fcinfo);
 
-	if(vi->isnull)
-	{
-		*org_cstring = 0;
-		need_quote = false;
-	}
-	else
+	/* Start building string */
+	initStringInfo(&out);
+	appendStringInfoString(&out, cache->outString);
+
+	if(!vi->isnull)
 	{
 		org_cstring = OutputFunctionCall(&cache->proc, vi->data);
 
@@ -162,26 +161,22 @@ variant_out(PG_FUNCTION_ARGS)
 				}
 			}
 		}
-	}
 
-	/* And emit the string */
-	initStringInfo(&out);
-	appendStringInfoString(&out, cache->outString);
-
-	if (!need_quote)
-		appendStringInfoString(&out, org_cstring);
-	else
-	{
-		appendStringInfoChar(&out, '"');
-		for (tmp = org_cstring; *tmp; tmp++)
+		if (!need_quote)
+			appendStringInfoString(&out, org_cstring);
+		else
 		{
-			char		ch = *tmp;
+			appendStringInfoChar(&out, '"');
+			for (tmp = org_cstring; *tmp; tmp++)
+			{
+				char		ch = *tmp;
 
-			if (ch == '"' || ch == '\\')
+				if (ch == '"' || ch == '\\')
+					appendStringInfoCharMacro(&out, ch);
 				appendStringInfoCharMacro(&out, ch);
-			appendStringInfoCharMacro(&out, ch);
+			}
+			appendStringInfoChar(&out, '"');
 		}
-		appendStringInfoChar(&out, '"');
 	}
 
 	appendStringInfoChar(&out, ')');
@@ -375,11 +370,6 @@ get_oid(Variant v, uint *flags)
 	}
 	else
 		return v->pOid & OID_MASK;
-}
-
-static char
-get_extra(Variant v)
-{
 }
 
 /*
