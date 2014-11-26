@@ -133,5 +133,5 @@ The `variant` data type has no dependencies other than PostgreSQL.
 Copyright and License
 ---------------------
 
-Copyright (c) 2014 The maintainer's name.
+Copyright (c) 2014 Jim Nasby, Blue Treble Consulting http://BlueTreble.com
 

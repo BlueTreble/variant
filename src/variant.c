@@ -8,6 +8,7 @@
  * towards space efficiency rather than ease of access. VariantDataInt is an
  * easier-to-use structure that we use internally.
  *
+ * Copyright (c) 2014 Jim Nasby, Blue Treble Consulting http://BlueTreble.com
  */
 
 #include "c.h"
