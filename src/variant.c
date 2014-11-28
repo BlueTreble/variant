@@ -85,8 +85,7 @@ variant_in(PG_FUNCTION_ARGS)
 	Oid						intTypeOid = InvalidOid;
 	int32					typmod = 0;
 	text					*orgData;
-	VariantDataInt	vdi;
-	VariantInt		vi = &vdi;
+	VariantInt		vi = palloc0(sizeof(*vi));
 
 	/* Eventually getting rid of this crap, so segregate it */
 		intTypeOid = getIntOid();
@@ -202,7 +201,7 @@ make_variant_int(Variant v, FunctionCallInfo fcinfo, IOFuncSelector func)
 	Assert(!VARATT_IS_EXTENDED(v));
 
 	/* May need to be careful about what context this stuff is palloc'd in */
-	vi = palloc(sizeof(VariantDataInt));
+	vi = palloc0(sizeof(VariantDataInt));
 
 	vi->typid = get_oid(v, &flags);
 	vi->isnull = (flags & VAR_ISNULL ? true : false);
