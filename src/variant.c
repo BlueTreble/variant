@@ -192,7 +192,7 @@ make_variant_int(Variant v, FunctionCallInfo fcinfo, IOFuncSelector func)
 {
 	VariantCache	*cache;
 	VariantInt		vi;
-	Size 					len;
+	long 					len; /* long instead of size_t because we're subtracting */
 	Pointer 			ptr;
 	uint					flags;
 
@@ -228,6 +228,8 @@ make_variant_int(Variant v, FunctionCallInfo fcinfo, IOFuncSelector func)
 	 * For cstring, we don't store the trailing NUL
 	 */
 	len = VARSIZE(v) - VHDRSZ - (flags & VAR_OVERFLOW ? 1 : 0);
+	if( len < 0 )
+		elog(ERROR, "Negative len %i", len);
 
 	if (cache->typlen == -1) /* varlena */
 	{
@@ -254,7 +256,7 @@ make_variant(VariantInt vi, FunctionCallInfo fcinfo, IOFuncSelector func)
 	VariantCache	*cache;
 	Variant				v;
 	bool					oid_overflow=OID_TOO_LARGE(vi->typid);
-	Size					len, data_length;
+	long					len, data_length; /* long because we subtract */
 	Pointer				data_ptr = 0;
 	uint					flags = 0;
 
@@ -280,19 +282,12 @@ make_variant(VariantInt vi, FunctionCallInfo fcinfo, IOFuncSelector func)
 		 * Because we don't store varlena aligned or with it's header, our
 		 * data_length is simply the varlena length.
 		 */
-		data_length = VARSIZE(vi->data);
+		data_length = VARSIZE_ANY_EXHDR(vi->data);
 
 		if (VARATT_IS_SHORT(vi->data))
-		{
-			data_length -= VARHDRSZ_SHORT;
 			data_ptr = VARDATA_SHORT(data_ptr);
-		}
 		else
-		{
-			/* full 4-byte header varlena */
-			data_length -= VARHDRSZ;
 			data_ptr = VARDATA(data_ptr);
-		}
 	}
 	else if(cache->typlen == -2) /* cstring */
 	{
@@ -309,9 +304,13 @@ make_variant(VariantInt vi, FunctionCallInfo fcinfo, IOFuncSelector func)
 		if(!cache->typbyval) /* fixed length, pass by reference */
 			data_ptr = DatumGetPointer(vi->data);
 	}
+	if( data_length < 0 )
+		elog(ERROR, "Negative data_length %i", data_length);
 
 	/* If typid is too large then we need an extra byte */
 	len = VHDRSZ + data_length + (oid_overflow ? sizeof(char) : 0);
+	if( len < 0 )
+		elog(ERROR, "Negative len %i", len);
 
 	v = palloc0(len);
 	SET_VARSIZE(v, len);
