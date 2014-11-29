@@ -223,7 +223,7 @@ make_variant_int(Variant v, FunctionCallInfo fcinfo, IOFuncSelector func)
 	 */
 	len = VARSIZE(v) - VHDRSZ - (flags & VAR_OVERFLOW ? 1 : 0);
 	if( len < 0 )
-		elog(ERROR, "Negative len %i", len);
+		elog(ERROR, "Negative len %li", len);
 
 	if (cache->typlen == -1) /* varlena */
 	{
@@ -295,12 +295,12 @@ make_variant(VariantInt vi, FunctionCallInfo fcinfo, IOFuncSelector func)
 			data_ptr = DatumGetPointer(vi->data);
 	}
 	if( data_length < 0 )
-		elog(ERROR, "Negative data_length %i", data_length);
+		elog(ERROR, "Negative data_length %li", data_length);
 
 	/* If typid is too large then we need an extra byte */
 	len = VHDRSZ + data_length + (oid_overflow ? sizeof(char) : 0);
 	if( len < 0 )
-		elog(ERROR, "Negative len %i", len);
+		elog(ERROR, "Negative len %li", len);
 
 	v = palloc0(len);
 	SET_VARSIZE(v, len);
