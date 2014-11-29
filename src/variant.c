@@ -109,6 +109,40 @@ variant_in(PG_FUNCTION_ARGS)
 	PG_RETURN_VARIANT( make_variant(vi, fcinfo, IOFunc_input) );
 }
 
+/*
+ * variant_cast_in: Cast an arbitrary type to a variant
+ *
+ * Arguments:
+ * 	Original data
+ * 	Original typmod
+ *
+ * Returns:
+ * 	Variant
+ */
+PG_FUNCTION_INFO_V1(variant_cast_in);
+Datum
+variant_cast_in(PG_FUNCTION_ARGS)
+{
+	VariantInt			vi = palloc0(sizeof(*vi));
+
+	vi->isnull = PG_ARGISNULL(0);
+	vi->typid = get_fn_expr_argtype(fcinfo->flinfo, 0);
+
+	Assert(!fcinfo->flinfo->fn_strict); /* Must be callable on NULL input */
+
+	if (!OidIsValid(vi->typid))
+		elog(ERROR, "could not determine data type of input");
+	if( PG_ARGISNULL(1) )
+		elog( ERROR, "Original typemod must not be NULL" );
+	// vi->typmod = PG_GETARG_INT32(1);
+
+	if( !vi->isnull )
+		vi->data = PG_GETARG_DATUM(0);
+
+	/* Since we're casting in, we'll call for INFunc_input, even though we don't need it */
+	PG_RETURN_VARIANT( make_variant(vi, fcinfo, IOFunc_input) );
+}
+
 PG_FUNCTION_INFO_V1(variant_out);
 Datum
 variant_out(PG_FUNCTION_ARGS)
@@ -176,6 +210,73 @@ variant_out(PG_FUNCTION_ARGS)
 	appendStringInfoChar(&out, ')');
 
 	PG_RETURN_CSTRING(out.data);
+}
+
+/*
+ * variant_cast_out: Cast a variant to some other type
+ *
+ * This function is defined as accepting (variant, anyelement). The second
+ * argument is used strictly to determine what type we need to cast to. An
+ * alternative would be to accept an OID input, but this seems cleaner.
+ */
+PG_FUNCTION_INFO_V1(variant_cast_out);
+Datum
+variant_cast_out(PG_FUNCTION_ARGS)
+{
+	Oid							targettypid = get_fn_expr_rettype(fcinfo->flinfo);
+	VariantInt			vi;
+	Datum						out;
+
+	if( PG_ARGISNULL(0) )
+		PG_RETURN_NULL();
+
+	vi = make_variant_int(PG_GETARG_VARIANT(0), fcinfo, IOFunc_output);
+
+	/* If original was NULL then we MUST return NULL */
+	if( vi->isnull )
+		PG_RETURN_NULL();
+
+	/* If our types match exactly we can just return */
+	if( vi->typid == targettypid )
+		PG_RETURN_DATUM(vi->data);
+
+	/* Keep cruft localized to just here */
+		bool						do_pop;
+		int							ret;
+		bool						isnull;
+		MemoryContext		cctx;
+		HeapTuple				tup;
+		StringInfoData	cmdd;
+		StringInfo			cmd = &cmdd;
+		char						*nulls = " ";
+
+		cctx = CurrentMemoryContext;
+		if (!SPI_connect()) {
+			do_pop = true;
+			SPI_push();
+		}
+
+		initStringInfo(cmd);
+		appendStringInfo( cmd, "SELECT $1::%s", format_type_be(targettypid) );
+		/* command, nargs, Oid *argument_types, *values, *nulls, read_only, count */
+		if( !(ret =SPI_execute_with_args( cmd->data, 1, &vi->typid, &vi->data, nulls, true, 0 )) )
+			elog( ERROR, "SPI_execute_with_args returned %s", SPI_result_code_string(ret));
+
+		/* Make a copy of result Datum in previous memory context */
+		MemoryContextSwitchTo(cctx);
+		tup = heap_copytuple(SPI_tuptable->vals[0]);
+		
+		out = heap_getattr(tup, 1, SPI_tuptable->tupdesc, &isnull);
+		// getTypeOutputInfo(typoid, &foutoid, &typisvarlena);
+
+		/* Remember this frees everything palloc'd since our connect/push call */
+		if (do_pop)
+			SPI_pop();
+		else
+			SPI_finish();
+	/* End cruft */
+
+	PG_RETURN_DATUM(out);
 }
 
 /*
