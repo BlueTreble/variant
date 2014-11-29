@@ -77,6 +77,8 @@ variant_in(PG_FUNCTION_ARGS)
 	text					*orgData;
 	VariantInt		vi = palloc0(sizeof(*vi));
 
+	Assert(fcinfo->flinfo->fn_strict); /* Must be strict */
+
 	/* Eventually getting rid of this crap, so segregate it */
 		intTypeOid = getIntOid();
 
@@ -118,6 +120,8 @@ variant_out(PG_FUNCTION_ARGS)
 	char					*org_cstring;
 	StringInfoData	out;
 	VariantInt		vi;
+
+	Assert(fcinfo->flinfo->fn_strict); /* Must be strict */
 
 	vi = make_variant_int(input, fcinfo, IOFunc_output);
 	cache = GetCache(fcinfo);
