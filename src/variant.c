@@ -277,11 +277,7 @@ make_variant(VariantInt vi, FunctionCallInfo fcinfo, IOFuncSelector func)
 		 * data_length is simply the varlena length.
 		 */
 		data_length = VARSIZE_ANY_EXHDR(vi->data);
-
-		if (VARATT_IS_SHORT(vi->data))
-			data_ptr = VARDATA_SHORT(data_ptr);
-		else
-			data_ptr = VARDATA(data_ptr);
+		data_ptr = VARDATA_ANY(data_ptr);
 	}
 	else if(cache->typlen == -2) /* cstring */
 	{
