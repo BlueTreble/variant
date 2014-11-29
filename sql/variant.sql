@@ -34,14 +34,16 @@ CREATE TYPE variant.variant(
 
 GRANT USAGE ON SCHEMA variant TO public;
 
-CREATE OR REPLACE VIEW _variant.types AS
-  SELECT oid::regtype AS type_name
+CREATE OR REPLACE VIEW _variant.allowed_types AS
+  SELECT t.oid::regtype AS type_name
       , 'variant.variant'::regtype AS source
       , 'variant.variant'::regtype AS target
-    FROM pg_catalog.pg_type
+    FROM pg_catalog.pg_type t
+      LEFT JOIN pg_catalog.pg_type e ON e.oid = t.typelem
     WHERE true
-      AND typisdefined
-      AND typrelid = 0 -- We don't currently support composite types
+      AND t.typisdefined
+      AND t.typtype != 'c' -- We don't currently support composite types
+      AND (e.typtype IS NULL OR e.typtype != 'c' ) -- Or arrays of composite types
 ;
 
 CREATE OR REPLACE VIEW _variant.casts AS
@@ -60,7 +62,7 @@ CREATE OR REPLACE VIEW _variant.casts AS
     FROM pg_catalog.pg_cast c
 ;
 
-CREATE OR REPLACE VIEW _variant.variant_casts AS
+CREATE OR REPLACE VIEW variant.variant_casts AS
   SELECT *
     FROM _variant.casts
     WHERE false
@@ -68,16 +70,26 @@ CREATE OR REPLACE VIEW _variant.variant_casts AS
       OR target = 'variant.variant'::regtype
 ;
 
+CREATE OR REPLACE VIEW _variant.missing_casts_to AS
+  SELECT t.type_name AS source, target
+    FROM _variant.allowed_types t
+  EXCEPT
+  SELECT source, target FROM variant.variant_casts
+;
+
+CREATE OR REPLACE VIEW _variant.missing_casts_from AS
+  SELECT source, t.type_name AS target
+    FROM _variant.allowed_types t
+  EXCEPT
+  SELECT source, target FROM variant.variant_casts
+;
+
 CREATE OR REPLACE VIEW variant.missing_casts AS
-  SELECT t.source, t.type_name AS target, 'TO' AS direction
-    FROM _variant.types t
-      LEFT JOIN _variant.casts c USING( source )
-    WHERE c.source IS NULL
+  SELECT *, 'TO' AS direction
+    FROM _variant.missing_casts_to
   UNION ALL
-  SELECT t.type_name AS source, t.target, 'FROM'
-    FROM _variant.types t
-      LEFT JOIN _variant.casts c USING( target )
-    WHERE c.target IS NULL
+  SELECT *, 'FROM' AS direction
+    FROM _variant.missing_casts_from
 ;
 
 CREATE OR REPLACE FUNCTION _variant.exec(
