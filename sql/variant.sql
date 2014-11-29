@@ -103,23 +103,49 @@ $f$;
 
 CREATE OR REPLACE FUNCTION _variant.create_cast_in(
   p_source    regtype
-  , p_target  regtype
-) RETURNS void LANGUAGE sql AS $f$
-SELECT
-_variant.exec(
-  format(
-    $sql$CREATE FUNCTION _variant.cast_in(
-    i %s
-    , typmod int
-  ) RETURNS %s LANGUAGE sql IMMUTABLE AS $cast_func$
-    SELECT _variant.cast_in( %s, $1, $2 )
-$cast_func$
-    $sql$
-    , $1 -- i data type
-    , $2 -- return type
-    , $1::oid -- cast_in first parameter
-  )
-)
+) RETURNS void LANGUAGE plpgsql AS $f$
+BEGIN
+  PERFORM _variant.exec(
+    format(
+      $sql$CREATE OR REPLACE FUNCTION _variant.cast_in(
+      i %s
+      , typmod int
+    ) RETURNS variant.variant LANGUAGE c IMMUTABLE AS '$libdir/variant', 'variant_cast_in'
+      $sql$
+      , p_source -- i data type
+    )
+  );
+  PERFORM _variant.exec(
+    format( 'CREATE CAST( %s AS variant.variant ) WITH FUNCTION _variant.cast_in( %1$s, int ) AS ASSIGNMENT'
+      , p_source
+    )
+  );
+END
+$f$;
+
+CREATE OR REPLACE FUNCTION _variant.create_cast_out(
+  p_target    regtype
+) RETURNS void LANGUAGE plpgsql AS $f$
+DECLARE
+  v_function_name name := 'cast_to_' || regexp_replace( p_target::text, '[\. "]', '_' ); -- Replace invarid identifier characters with '_'
+BEGIN
+  PERFORM _variant.exec(
+    format(
+      $sql$CREATE OR REPLACE FUNCTION _variant.%s(
+      v variant.variant
+    ) RETURNS %1s LANGUAGE c IMMUTABLE AS '$libdir/variant', 'variant_cast_out'
+      $sql$
+      , v_function_name
+      , p_target
+    )
+  );
+  PERFORM _variant.exec(
+    format( 'CREATE CAST( variant.variant AS %s) WITH FUNCTION _variant.%s( variant.variant ) AS ASSIGNMENT'
+      , p_target
+      , v_function_name
+    )
+  );
+END
 $f$;
 
 CREATE OR REPLACE FUNCTION variant.create_casts()
