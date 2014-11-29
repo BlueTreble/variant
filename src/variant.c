@@ -41,16 +41,6 @@ typedef struct VariantCache
 
 #define GetCache(fcinfo) ((VariantCache *) fcinfo->flinfo->fn_extra)
 
-typedef union
-{
-	struct
-	{
-		char		flags;  /* Our flags *AND* Oid Data. You can't reference this field without using the var bitmasks */
-		char		pad[3];
-	} packed;
-	Oid		typid;			/* OID of original data type */
-} PackedOid;
-
 static VariantCache * get_cache(FunctionCallInfo fcinfo, Oid origTypId, IOFuncSelector func);
 static Oid getIntOid();
 static Oid get_oid(Variant v, uint *flags);
