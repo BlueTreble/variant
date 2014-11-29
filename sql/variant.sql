@@ -70,14 +70,14 @@ CREATE OR REPLACE VIEW variant.variant_casts AS
       OR target = 'variant.variant'::regtype
 ;
 
-CREATE OR REPLACE VIEW _variant.missing_casts_to AS
+CREATE OR REPLACE VIEW _variant.missing_casts_in AS
   SELECT t.type_name AS source, target
     FROM _variant.allowed_types t
   EXCEPT
   SELECT source, target FROM variant.variant_casts
 ;
 
-CREATE OR REPLACE VIEW _variant.missing_casts_from AS
+CREATE OR REPLACE VIEW _variant.missing_casts_out AS
   SELECT source, t.type_name AS target
     FROM _variant.allowed_types t
   EXCEPT
@@ -85,11 +85,11 @@ CREATE OR REPLACE VIEW _variant.missing_casts_from AS
 ;
 
 CREATE OR REPLACE VIEW variant.missing_casts AS
-  SELECT *, 'TO' AS direction
-    FROM _variant.missing_casts_to
+  SELECT *, 'IN' AS direction
+    FROM _variant.missing_casts_in
   UNION ALL
-  SELECT *, 'FROM' AS direction
-    FROM _variant.missing_casts_from
+  SELECT *, 'OUT' AS direction
+    FROM _variant.missing_casts_out
 ;
 
 CREATE OR REPLACE FUNCTION _variant.exec(
@@ -156,9 +156,13 @@ DECLARE
 BEGIN
   FOR r IN SELECT * FROM variant.missing_casts
   LOOP
-    sql := format( $sql$CREATE CAST %s AS %s
-        WITH FUNCTION _variant.cast
-      $sql$ );
+    IF r.direction = 'IN' THEN
+      PERFORM _variant.create_cast_in( r.source );
+    ELSE IF r.direction = 'OUT' THEN
+      PERFORM _variant.create_cast_out( r.target );
+    ELSE
+      RAISE ERROR, 'Unknown cast direction "%"', r.direction;
+    END IF;
   END LOOP;
 END
 $f$;
