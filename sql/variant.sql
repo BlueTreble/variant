@@ -29,6 +29,7 @@ AS '$libdir/variant', 'variant_out';
 CREATE TYPE variant.variant(
   INPUT = _variant._variant_in
   , OUTPUT = _variant._variant_out
+  , STORAGE = extended
 );
 
 GRANT USAGE ON SCHEMA variant TO public;
