@@ -31,6 +31,7 @@ typedef struct VariantCache
 	FmgrInfo				proc;				/* lookup result for typiofunc */
 	/* Information for original type */
 	Oid							typid;
+	int							typmod;
 	Oid							typioparam;
 	int16 					typlen;
 	bool 						typbyval;
@@ -41,7 +42,7 @@ typedef struct VariantCache
 
 #define GetCache(fcinfo) ((VariantCache *) fcinfo->flinfo->fn_extra)
 
-static VariantCache * get_cache(FunctionCallInfo fcinfo, Oid origTypId, IOFuncSelector func);
+static VariantCache * get_cache(FunctionCallInfo fcinfo, VariantInt vi, IOFuncSelector func);
 static Oid getIntOid();
 static Oid get_oid(Variant v, uint *flags);
 static VariantInt make_variant_int(Variant v, FunctionCallInfo fcinfo, IOFuncSelector func);
@@ -74,6 +75,7 @@ variant_in(PG_FUNCTION_ARGS)
 	bool					isnull;
 	Oid						intTypeOid = InvalidOid;
 	int32					typmod = 0;
+	text					*orgType;
 	text					*orgData;
 	VariantInt		vi = palloc0(sizeof(*vi));
 
@@ -95,16 +97,19 @@ variant_in(PG_FUNCTION_ARGS)
 
 		/* Extract data from internal composite type */
 		composite_tuple=DatumGetHeapTupleHeader(composite);
-		vi->typid = (Oid) GetAttributeByNum( composite_tuple, 1, &isnull );
+		orgType = (text *) GetAttributeByNum( composite_tuple, 1, &isnull );
 		if (isnull)
 			elog(ERROR, "original_type of variant must not be NULL");
 		orgData = (text *) GetAttributeByNum( composite_tuple, 2, &vi->isnull );
 	/* End crap */
 
-	cache = get_cache(fcinfo, vi->typid, IOFunc_input);
+	parseTypeString(text_to_cstring(orgType), &vi->typid, &vi->typmod, false);
+
+	cache = get_cache(fcinfo, vi, IOFunc_input);
 
 	if (!vi->isnull)
-		vi->data = InputFunctionCall(&cache->proc, text_to_cstring(orgData), cache->typioparam, typmod); // TODO: Use real original typmod
+		/* Actually need to be using stringTypeDatum(Type tp, char *string, int32 atttypmod) */
+		vi->data = InputFunctionCall(&cache->proc, text_to_cstring(orgData), cache->typioparam, vi->typmod);
 
 	PG_RETURN_VARIANT( make_variant(vi, fcinfo, IOFunc_input) );
 }
@@ -134,7 +139,7 @@ variant_cast_in(PG_FUNCTION_ARGS)
 		elog(ERROR, "could not determine data type of input");
 	if( PG_ARGISNULL(1) )
 		elog( ERROR, "Original typemod must not be NULL" );
-	// vi->typmod = PG_GETARG_INT32(1);
+	vi->typmod = PG_GETARG_INT32(1);
 
 	if( !vi->isnull )
 		vi->data = PG_GETARG_DATUM(0);
@@ -299,9 +304,10 @@ make_variant_int(Variant v, FunctionCallInfo fcinfo, IOFuncSelector func)
 	vi = palloc0(sizeof(VariantDataInt));
 
 	vi->typid = get_oid(v, &flags);
+	vi->typmod = v->typmod;
 	vi->isnull = (flags & VAR_ISNULL ? true : false);
 
-	cache = get_cache(fcinfo, vi->typid, func);
+	cache = get_cache(fcinfo, vi, func);
 
 	/* by-value type, or fixed-length pass-by-reference */
 	if( cache->typbyval || cache->typlen >= 1)
@@ -355,7 +361,7 @@ make_variant(VariantInt vi, FunctionCallInfo fcinfo, IOFuncSelector func)
 	Pointer				data_ptr = 0;
 	uint					flags = 0;
 
-	cache = get_cache(fcinfo, vi->typid, func);
+	cache = get_cache(fcinfo, vi, func);
 	Assert(cache->typid = vi->typid);
 
 	if(vi->isnull)
@@ -406,6 +412,7 @@ make_variant(VariantInt vi, FunctionCallInfo fcinfo, IOFuncSelector func)
 	v = palloc0(len);
 	SET_VARSIZE(v, len);
 	v->pOid = vi->typid;
+	v->typmod = vi->typmod;
 
 	if(oid_overflow)
 	{
@@ -466,18 +473,18 @@ get_oid(Variant v, uint *flags)
  * get_cache: get/set cached info
  */
 static VariantCache *
-get_cache(FunctionCallInfo fcinfo, Oid origTypId, IOFuncSelector func)
+get_cache(FunctionCallInfo fcinfo, VariantInt vi, IOFuncSelector func)
 {
 	VariantCache *cache = (VariantCache *) fcinfo->flinfo->fn_extra;
 
 	/* IO type should always be the same, so assert that. But if we're not an assert build just force a reset. */
-	if (cache != NULL && cache->typid == origTypId && cache->IOfunc != func)
+	if (cache != NULL && cache->typid == vi->typid && cache->typmod == vi->typmod && cache->IOfunc != func)
 	{
 		Assert(false);
-		cache->typid ^= origTypId;
+		cache->typid ^= vi->typid;
 	}
 
-	if (cache == NULL || cache->typid != origTypId)
+	if (cache == NULL || cache->typid != vi->typid || cache->typmod != vi->typmod)
 	{
 		char						typDelim;
 		Oid							typIoFunc;
@@ -489,7 +496,8 @@ get_cache(FunctionCallInfo fcinfo, Oid origTypId, IOFuncSelector func)
 			cache = (VariantCache *) MemoryContextAlloc(fcinfo->flinfo->fn_mcxt,
 												   sizeof(VariantCache));
 
-		cache->typid = origTypId;
+		cache->typid = vi->typid;
+		cache->typmod = vi->typmod;
 		cache->IOfunc = func;
 
 		get_type_io_data(cache->typid,
@@ -504,7 +512,7 @@ get_cache(FunctionCallInfo fcinfo, Oid origTypId, IOFuncSelector func)
 
 		if (func == IOFunc_output || func == IOFunc_send)
 		{
-			char *t = format_type_be(cache->typid);
+			char *t = format_type_with_typemod(cache->typid, cache->typmod);
 			cache->outString = MemoryContextAlloc(fcinfo->flinfo->fn_mcxt, strlen(t) + 3); /* "(", ",", and "\0" */
 			sprintf(cache->outString, "(%s,", t);
 		}

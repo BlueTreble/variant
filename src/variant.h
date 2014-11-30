@@ -9,6 +9,7 @@ typedef struct
 {
 	int32				vl_len_;		/* varlena header (do not touch directly!) */
 	Oid					pOid;				/* Not a plain OID! */
+    int                 typmod;
 } VariantData;
 typedef VariantData *Variant;
 
@@ -23,7 +24,9 @@ typedef VariantData *Variant;
  *
  * Currently we also have a flag to indicate whether the data we were handed is
  * NULL or not. *This is not the same as the variant being NULL!* We support
- * being handed "(int,)", which means we have an int that is NULL.
+ * being handed "(int,)", which means we have an int that is NULL. Note that
+ * default cast logic will never call a cast function on a null input, so
+ * actually supporting this is someone difficult.
  *
  * Funally, VAR_VERSION is used as an internal version indicator. Currently we
  * only support version 0, but if we didn't reserve space for a version
@@ -45,11 +48,18 @@ typedef VariantData *Variant;
 #define VHDRSZ				(sizeof(VariantData))
 #define VDATAPTR(x)		( (Pointer) ( (x) + 1 ) )
 
-/* Easier to use internal representation. */
+/*
+ * Easier to use internal representation. All the fields represent the state of
+ * the original data we were handed.
+ */
 typedef struct {
 	Datum					data;
 	Oid						typid;
-	bool					isnull;		/* This is the only flag we care about internally */
+    int                     typmod;
+    bool                    havetypmod;
+
+    /* This is the only flag from VariantData that we care about internally. */
+	bool					isnull;
 } VariantDataInt;
 typedef VariantDataInt *VariantInt;
 

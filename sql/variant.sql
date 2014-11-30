@@ -13,7 +13,7 @@ SET client_min_messages = warning;
 CREATE SCHEMA _variant;
 CREATE SCHEMA variant;
 
-CREATE TYPE _variant._variant AS ( original_type regtype, data text );
+CREATE TYPE _variant._variant AS ( original_type text, data text );
 
 CREATE TYPE variant.variant;
 CREATE OR REPLACE FUNCTION _variant._variant_in(cstring)
@@ -44,6 +44,8 @@ CREATE OR REPLACE VIEW _variant.allowed_types AS
       AND t.typisdefined
       AND t.typtype != 'c' -- We don't currently support composite types
       AND (e.typtype IS NULL OR e.typtype != 'c' ) -- Or arrays of composite types
+      AND t.typtype != 'p' -- Or pseudotypes
+      AND t.typtype != 'd' -- You can't cast to or from domains :(
 ;
 
 CREATE OR REPLACE VIEW _variant.casts AS
@@ -75,6 +77,8 @@ CREATE OR REPLACE VIEW _variant.missing_casts_in AS
     FROM _variant.allowed_types t
   EXCEPT
   SELECT source, target FROM variant.variant_casts
+  EXCEPT
+  SELECT 'variant.variant', 'variant.variant'
 ;
 
 CREATE OR REPLACE VIEW _variant.missing_casts_out AS
@@ -82,6 +86,8 @@ CREATE OR REPLACE VIEW _variant.missing_casts_out AS
     FROM _variant.allowed_types t
   EXCEPT
   SELECT source, target FROM variant.variant_casts
+  EXCEPT
+  SELECT 'variant.variant', 'variant.variant'
 ;
 
 CREATE OR REPLACE VIEW variant.missing_casts AS
@@ -110,13 +116,14 @@ BEGIN
       $sql$CREATE OR REPLACE FUNCTION _variant.cast_in(
       i %s
       , typmod int
+      , explicit boolean
     ) RETURNS variant.variant LANGUAGE c IMMUTABLE AS '$libdir/variant', 'variant_cast_in'
       $sql$
       , p_source -- i data type
     )
   );
   PERFORM _variant.exec(
-    format( 'CREATE CAST( %s AS variant.variant ) WITH FUNCTION _variant.cast_in( %1$s, int ) AS ASSIGNMENT'
+    format( 'CREATE CAST( %s AS variant.variant ) WITH FUNCTION _variant.cast_in( %1$s, int, boolean ) AS ASSIGNMENT'
       , p_source
     )
   );
@@ -127,7 +134,18 @@ CREATE OR REPLACE FUNCTION _variant.create_cast_out(
   p_target    regtype
 ) RETURNS void LANGUAGE plpgsql AS $f$
 DECLARE
-  v_function_name name := 'cast_to_' || regexp_replace( p_target::text, '[\. "]', '_' ); -- Replace invarid identifier characters with '_'
+  v_function_name name :=
+    'cast_to_'
+    || regexp_replace(
+          CASE WHEN p_target::text LIKE '%[]'
+            THEN '_' || regexp_replace( p_target::text, '\[]$', '' )
+          ELSE p_target::text
+          END
+          , '[\. "]' -- Replace invarid identifier characters with '_'
+          , '_'
+          , 'g' -- Replace globally
+        )
+  ;
 BEGIN
   PERFORM _variant.exec(
     format(
@@ -154,14 +172,15 @@ DECLARE
   r variant.missing_casts;
   sql text;
 BEGIN
-  FOR r IN SELECT * FROM variant.missing_casts
+  FOR r IN
+    SELECT * FROM variant.missing_casts
   LOOP
     IF r.direction = 'IN' THEN
       PERFORM _variant.create_cast_in( r.source );
-    ELSE IF r.direction = 'OUT' THEN
+    ELSIF r.direction = 'OUT' THEN
       PERFORM _variant.create_cast_out( r.target );
     ELSE
-      RAISE ERROR, 'Unknown cast direction "%"', r.direction;
+      RAISE EXCEPTION 'Unknown cast direction "%"', r.direction;
     END IF;
   END LOOP;
 END
