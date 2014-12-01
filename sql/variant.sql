@@ -186,4 +186,7 @@ BEGIN
 END
 $f$;
 
+-- Automagically create casts for everything we support
+SELECT variant.create_casts();
+
 -- vi: expandtab sw=2 ts=2
