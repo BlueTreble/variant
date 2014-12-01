@@ -189,4 +189,34 @@ $f$;
 -- Automagically create casts for everything we support
 SELECT variant.create_casts();
 
+CREATE TABLE _variant._registered(
+  variant_typmod    SERIAL        PRIMARY KEY
+      CONSTRAINT variant_typemod_minimum_value CHECK( variant_typmod >= -1 )
+  , variant_name    varchar(100)  NOT NULL UNIQUE
+);
+INSERT INTO _variant._registered VALUES( -1, 'DEFAULT' );
+
+CREATE VIEW variant.registered AS SELECT * FROM _variant._registered;
+
+CREATE OR REPLACE FUNCTION variant.register(
+  p_variant_name _variant._registered.variant_name%TYPE
+) RETURNS _variant._registered.variant_typmod%TYPE
+LANGUAGE plpgsql AS $func$
+DECLARE
+  ret _variant._registered.variant_typmod%TYPE;
+BEGIN
+  IF p_variant_name IS NULL THEN
+    RAISE EXCEPTION 'variant_name may not be NULL';
+  END IF;
+
+  INSERT INTO _variant._registered( variant_name )
+    VALUES( p_variant_name )
+    RETURNING variant_typmod
+    INTO ret
+  ;
+
+  RETURN ret;
+END
+$func$;
+
 -- vi: expandtab sw=2 ts=2

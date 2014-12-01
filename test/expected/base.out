@@ -1,3 +1,13 @@
 \set ECHO 0
-1..1
-ok 1
+ create_casts 
+--------------
+ 
+(1 row)
+
+(text,test)
+test
+1..4
+ok 1 - cast to text
+ok 2 - valid variant(DEFAULT)
+ok 3
+ok 4 - test variant correctly added
