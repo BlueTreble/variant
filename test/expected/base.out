@@ -6,8 +6,9 @@
 
 (text,test)
 test
-1..4
+1..5
 ok 1 - cast to text
-ok 2 - valid variant(DEFAULT)
-ok 3
-ok 4 - test variant correctly added
+ok 2 - Check equality
+ok 3 - valid variant(DEFAULT)
+ok 4 - Register variant
+ok 5 - test variant correctly added

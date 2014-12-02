@@ -14,20 +14,18 @@ SELECT '(text,test)'::variant.variant;
 SELECT '(text,test)'::variant.variant::text;
 
 
-SELECT plan(4);
-
-/*
-SELECT is(
-    '(text,test)'::variant.variant
-    , '(text,test)'
-    , 'variant_in'
-);
-*/
+SELECT plan(5);
 
 SELECT is(
     '(text,test)'::variant.variant::text
     , 'test'
     , 'cast to text'
+);
+
+SELECT is(
+    '(text,test)'::variant.variant
+    , '(text,test)'
+    , 'Check equality'
 );
 
 SELECT row_eq(
@@ -36,7 +34,10 @@ SELECT row_eq(
     , 'valid variant(DEFAULT)'
 );
 
-SELECT lives_ok( $test$CREATE TEMP TABLE variant_typmod AS SELECT * FROM variant.register( 'test variant' )$test$ );
+SELECT lives_ok(
+    $test$CREATE TEMP TABLE variant_typmod AS SELECT * FROM variant.register( 'test variant' )$test$
+    , 'Register variant'
+);
 SELECT bag_eq(
     $$SELECT * FROM variant.registered WHERE variant_typmod IN (SELECT * FROM variant_typmod)$$
     , $$SELECT *, 'test variant'::text FROM variant_typmod$$
