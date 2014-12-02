@@ -42,11 +42,14 @@ typedef struct VariantCache
 
 #define GetCache(fcinfo) ((VariantCache *) fcinfo->flinfo->fn_extra)
 
+static int variant_cmp_int(FunctionCallInfo fcinfo);
+static VariantInt make_variant_int(Variant v, FunctionCallInfo fcinfo, IOFuncSelector func);
+static Variant make_variant(VariantInt vi, FunctionCallInfo fcinfo, IOFuncSelector func);
 static VariantCache * get_cache(FunctionCallInfo fcinfo, VariantInt vi, IOFuncSelector func);
 static Oid getIntOid();
 static Oid get_oid(Variant v, uint *flags);
-static VariantInt make_variant_int(Variant v, FunctionCallInfo fcinfo, IOFuncSelector func);
-static Variant make_variant(VariantInt vi, FunctionCallInfo fcinfo, IOFuncSelector func);
+static bool _SPI_conn();
+static void _SPI_disc(bool pop);
 
 /*
  * You can include more files here if needed.

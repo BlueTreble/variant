@@ -12,6 +12,7 @@ SET client_min_messages = warning;
 
 CREATE SCHEMA _variant;
 CREATE SCHEMA variant;
+GRANT USAGE ON SCHEMA variant TO public;
 
 CREATE TYPE _variant._variant AS ( original_type text, data text );
 
@@ -32,7 +33,6 @@ CREATE TYPE variant.variant(
   , STORAGE = extended
 );
 
-GRANT USAGE ON SCHEMA variant TO public;
 
 CREATE OR REPLACE VIEW _variant.allowed_types AS
   SELECT t.oid::regtype AS type_name

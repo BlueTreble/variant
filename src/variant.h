@@ -2,9 +2,6 @@
  * Copyright (c) 2014 Jim Nasby, Blue Treble Consulting http://BlueTreble.com
  */
 
-extern Datum variant_in(PG_FUNCTION_ARGS);
-extern Datum variant_out(PG_FUNCTION_ARGS);
-
 typedef struct
 {
 	int32				vl_len_;		/* varlena header (do not touch directly!) */
