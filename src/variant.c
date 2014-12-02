@@ -256,10 +256,7 @@ variant_cast_out(PG_FUNCTION_ARGS)
 		char						*nulls = " ";
 
 		cctx = CurrentMemoryContext;
-		if (!SPI_connect()) {
-			do_pop = true;
-			SPI_push();
-		}
+		do_pop = _SPI_conn();
 
 		initStringInfo(cmd);
 		appendStringInfo( cmd, "SELECT $1::%s", format_type_be(targettypid) );
@@ -275,10 +272,7 @@ variant_cast_out(PG_FUNCTION_ARGS)
 		// getTypeOutputInfo(typoid, &foutoid, &typisvarlena);
 
 		/* Remember this frees everything palloc'd since our connect/push call */
-		if (do_pop)
-			SPI_pop();
-		else
-			SPI_finish();
+		_SPI_disc(do_pop);
 	/* End cruft */
 
 	PG_RETURN_DATUM(out);
@@ -534,10 +528,7 @@ getIntOid()
 	bool	isnull;
 	bool	do_pop = false;
 
-	if (!SPI_connect()) {
-		do_pop = true;
-		SPI_push();
-	}
+	do_pop = _SPI_conn();
 
 	/*
 	 * Get OID of our internal data type. This is necessary because record_in and
@@ -549,11 +540,28 @@ getIntOid()
 	out = DatumGetObjectId( heap_getattr(SPI_tuptable->vals[0], 1, SPI_tuptable->tupdesc, &isnull) );
 
 	/* Remember this frees everything palloc'd since our connect/push call */
-	if (do_pop)
-		SPI_pop();
-	else
-		SPI_finish();
+	_SPI_disc(do_pop);
 
 	return out;
 }
+
+static bool
+_SPI_conn()
+{
+	if( SPI_connect() )
+		return false;
+
+	SPI_push();
+	return true;
+}
+
+static void
+_SPI_disc(bool pop)
+{
+	if(pop)
+		SPI_pop();
+	else
+		SPI_finish();
+}
+
 // vi: noexpandtab sw=2 ts=2
