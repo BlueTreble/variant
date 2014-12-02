@@ -33,6 +33,15 @@ CREATE TYPE variant.variant(
   , STORAGE = extended
 );
 
+CREATE OR REPLACE FUNCTION _variant.variant_eq(variant.variant, variant.variant)
+  RETURNS boolean LANGUAGE c IMMUTABLE AS '$libdir/variant', 'variant_eq';
+
+CREATE OPERATOR = (
+  PROCEDURE = _variant.variant_eq
+  , LEFTARG = variant.variant
+  , RIGHTARG = variant.variant
+  , COMMUTATOR = =
+);
 
 CREATE OR REPLACE VIEW _variant.allowed_types AS
   SELECT t.oid::regtype AS type_name

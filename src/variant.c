@@ -281,6 +281,137 @@ variant_cast_out(PG_FUNCTION_ARGS)
 	PG_RETURN_DATUM(out);
 }
 
+PG_FUNCTION_INFO_V1(variant_cmp);
+Datum
+variant_cmp(PG_FUNCTION_ARGS)
+{
+	PG_RETURN_INT32(variant_cmp_int(fcinfo));
+}
+
+PG_FUNCTION_INFO_V1(variant_eq);
+Datum
+variant_eq(PG_FUNCTION_ARGS)
+{
+	int ret = variant_cmp_int(fcinfo);
+
+	if(fcinfo->isnull)
+		PG_RETURN_NULL();
+
+	PG_RETURN_BOOL(ret == 0);
+}
+
+/*
+ * variant_image_eq: Are two variants identical on a binary level?
+ *
+ * Returns true iff a variant completely identical to another; same type and
+ * everything.
+ */
+PG_FUNCTION_INFO_V1(variant_image_eq);
+Datum
+variant_image_eq(PG_FUNCTION_ARGS)
+{
+	Variant	l = (Variant) PG_GETARG_DATUM(0);
+	Variant	r = (Variant) PG_GETARG_DATUM(1);
+	int			cmp;
+
+	/*
+	 * To avoid detoasting we use _ANY variations on VAR*, but that means we must
+	 * make sure to use VARSIZE_ANY_EXHDR, *not* VARSIZE_ANY!
+	 */
+	if(VARSIZE_ANY_EXHDR(l) != VARSIZE_ANY_EXHDR(r))
+		PG_RETURN_BOOL(false);
+	
+	/*
+	 * At this point we need to detoast. We could theoretically leave data
+	 * compressed, but since there's no direct support for that we don't bother.
+	 */
+	l = (Variant) PG_DETOAST_DATUM_PACKED(l);
+	r = (Variant) PG_DETOAST_DATUM_PACKED(r);
+	cmp = memcmp(VARDATA_ANY(l), VARDATA_ANY(r), VARSIZE_ANY_EXHDR(l));
+
+	PG_FREE_IF_COPY(l, 0);
+	PG_FREE_IF_COPY(r, 1);
+
+	PG_RETURN_BOOL( cmp = 0 ? true : false);
+}
+
+/*
+ ********************
+ * SUPPORT FUNCTIONS
+ ********************
+ */
+
+/*
+ * variant_cmp_int: Are two variants identical on a binary level?
+ *
+ * Returns true iff a variant completely identical to another; same type and
+ * everything.
+ */
+static int
+variant_cmp_int(FunctionCallInfo fcinfo)
+{
+	Variant			l = PG_GETARG_VARIANT(0);
+	Variant			r = PG_GETARG_VARIANT(1);
+	VariantInt	li;
+	VariantInt	ri;
+	int					result;
+
+	/*
+	 * Presumably if both inputs are binary equal then they are in fact equal.
+	 * Note that we're not trying to play tricks with not detoasting or
+	 * un-packing, unlike variant_image_eq().
+	 */
+	if(VARSIZE(l) == VARSIZE(r)
+			&& memcmp(l, r, VARSIZE(l)) == 0)
+		return 0;
+
+	/*
+	 * We don't care about IO function but must specify something
+	 *
+	 * TODO: Improve caching so it will handle more than just one type :(
+	 */
+	li = make_variant_int(l, fcinfo, IOFunc_input);
+	ri = make_variant_int(r, fcinfo, IOFunc_input);
+
+	/* TODO: If both variants are of the same type try comparing directly */
+		/* TODO: Support Transform_null_equals */
+
+	/* Do comparison via SPI */
+	/* TODO: cache this */
+	{
+		bool				do_pop;
+		int					ret;
+		char				*cmd;
+		Oid					types[2];
+		Datum				values[2];
+		bool				nulls[2];
+
+		do_pop = _SPI_conn();
+
+		cmd = "SELECT CASE WHEN $1 = $2 THEN 0 ELSE WHEN $1 < $2 THEN -1 ELSE 0 END::int";
+		types[0] = li->typid;
+		values[0] = li->data;
+		nulls[0] = li->isnull;
+		types[1] = ri->typid;
+		values[1] = ri->data;
+		nulls[1] = ri->isnull;
+
+		if( !(ret = SPI_execute_with_args(
+						cmd, 2, types, values, nulls,
+						true, /* read-only */
+						0 /* count */
+					)) )
+			elog( ERROR, "SPI_execute_with_args returned %s", SPI_result_code_string(ret));
+
+		result = DatumGetObjectId( heap_getattr(SPI_tuptable->vals[0], 1, SPI_tuptable->tupdesc, &fcinfo->isnull) );
+
+		_SPI_disc(do_pop);
+	}
+
+	return result;
+}
+
+
 /*
  * make_variant_int: Converts our external (Variant) representation to a VariantInt.
  */
