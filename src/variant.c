@@ -212,7 +212,7 @@ variant_lt(PG_FUNCTION_ARGS)
 	if(fcinfo->isnull)
 		PG_RETURN_NULL();
 
-	PG_RETURN_BOOL(ret == -1);
+	PG_RETURN_BOOL(ret < 0);
 }
 PG_FUNCTION_INFO_V1(variant_le);
 Datum
@@ -223,7 +223,7 @@ variant_le(PG_FUNCTION_ARGS)
 	if(fcinfo->isnull)
 		PG_RETURN_NULL();
 
-	PG_RETURN_BOOL(ret < 1);
+	PG_RETURN_BOOL(ret <= 0);
 }
 
 PG_FUNCTION_INFO_V1(variant_eq);
@@ -258,7 +258,7 @@ variant_ge(PG_FUNCTION_ARGS)
 	if(fcinfo->isnull)
 		PG_RETURN_NULL();
 
-	PG_RETURN_BOOL(ret > 0);
+	PG_RETURN_BOOL(ret >= 0);
 }
 PG_FUNCTION_INFO_V1(variant_gt);
 Datum
@@ -269,7 +269,7 @@ variant_gt(PG_FUNCTION_ARGS)
 	if(fcinfo->isnull)
 		PG_RETURN_NULL();
 
-	PG_RETURN_BOOL(ret == 1);
+	PG_RETURN_BOOL(ret > 0);
 }
 
 /*

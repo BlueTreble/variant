@@ -80,7 +80,7 @@ CREATE OPERATOR = (
   , NEGATOR = !=
 );
 CREATE OPERATOR != (
-  PROCEDURE = _variant.variant_eq
+  PROCEDURE = _variant.variant_ne
   , LEFTARG = variant.variant
   , RIGHTARG = variant.variant
   , COMMUTATOR = !=

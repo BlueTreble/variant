@@ -1,14 +1,47 @@
 \set ECHO 0
+ exec 
+------
+ 
+ 
+ 
+ 
+ 
+ 
+(6 rows)
+
  create_casts 
 --------------
  
 (1 row)
 
-(text,test)
-test
-1..5
+1..30
 ok 1 - cast to text
 ok 2 - Check equality
-ok 3 - valid variant(DEFAULT)
-ok 4 - Register variant
-ok 5 - test variant correctly added
+ok 3 -  '( smallint , -1 )'::variant.variant::smallint  = -1::smallint
+ok 4 -  '( integer , -1 )'::variant.variant::integer  = -1::integer
+ok 5 -  '( bigint , -1 )'::variant.variant::bigint  = -1::bigint
+ok 6 -  '( double precision , -1.1 )'::variant.variant::double precision  = -1.1::double precision
+ok 7 -  '( real , -1.1 )'::variant.variant::real  = -1.1::real
+ok 8 -  '( numeric , -1.1 )'::variant.variant::numeric  = -1.1::numeric
+ok 9 -  '( smallint , 0 )'::variant.variant::smallint  = 0::smallint
+ok 10 -  '( integer , 0 )'::variant.variant::integer  = 0::integer
+ok 11 -  '( bigint , 0 )'::variant.variant::bigint  = 0::bigint
+ok 12 -  '( double precision , 0.0 )'::variant.variant::double precision  = 0.0::double precision
+ok 13 -  '( real , 0.0 )'::variant.variant::real  = 0.0::real
+ok 14 -  '( numeric , 0.0 )'::variant.variant::numeric  = 0.0::numeric
+ok 15 -  '( smallint , 1 )'::variant.variant::smallint  = 1::smallint
+ok 16 -  '( integer , 1 )'::variant.variant::integer  = 1::integer
+ok 17 -  '( bigint , 1 )'::variant.variant::bigint  = 1::bigint
+ok 18 -  '( double precision , 1.1 )'::variant.variant::double precision  = 1.1::double precision
+ok 19 -  '( real , 1.1 )'::variant.variant::real  = 1.1::real
+ok 20 -  '( numeric , 1.1 )'::variant.variant::numeric  = 1.1::numeric
+ok 21 - variant.text_in()
+ok 22 - variant.text_out()
+ok 23 - valid variant(DEFAULT)
+ok 24 - Register variant
+ok 25 - test variant correctly added
+ok 26 - (int,)::int = NULL
+ok 27 - (int,1)::int != NULL
+ok 28 - (int,)::int = NULL is NULL
+ok 29 - (int,1)::int != NULL is NULL
+ok 30 - Check <, <=, =, >=, >, !=

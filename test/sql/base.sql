@@ -10,45 +10,25 @@ BEGIN;
 \set ON_ERROR_ROLLBACK 1
 \set ON_ERROR_STOP true
 
-/*
-CREATE TEMP TABLE num(
-	numtype	regtype
-	, v		variant.variant
-	, n		numeric
-);
-
-INSERT INTO num VALUES
-	  ( 'smallint'	, '(smallint, -1)'	, -1	)
-	, ( 'smallint'	, '(smallint, -1)'	, -1	)
-	, ( 'smallint'	, '(smallint,  0)'	, 0		)
-	, ( 'smallint'	, '(smallint,  1)'	, 1		)
-
-	, ( 'int'		, '(int, -1)'		, -1	)
-	, ( 'int'		, '(int,  0)'		, 0		)
-	, ( 'int'		, '(int,  1)'		, 1		)
-
-	, ( 'bigint'	, '(bigint, -1)'	, -1	)
-	, ( 'bigint'	, '(bigint,  0)'	, 0		)
-	, ( 'bigint'	, '(bigint,  1)'	, 1		)
-
-	, ( 'smallint'	, '(smallint, -1)'	, -1	)
-	, ( 'smallint'	, '(smallint,  0)'	, 0		)
-	, ( 'smallint'	, '(smallint,  1)'	, 1		)
-
-	, ( 'float'		, '(float, -1)'		, -1	)
-	, ( 'float'		, '(float,  0)'		, 0		)
-	, ( 'float'		, '(float,  1)'		, 1		)
-
-	, ( 'double'	, '(double, -1)'	, -1	)
-	, ( 'double'	, '(double,  0)'	, 0		)
-	, ( 'double'	, '(double,  1)'	, 1		)
-
-	, ( 'numeric'	, '(numeric, -1)'	, -1	)
-	, ( 'numeric'	, '(numeric,  0)'	, 0		)
-	, ( 'numeric'	, '(numeric,  1)'	, 1		)
-
-;
-*/
+CREATE OR REPLACE FUNCTION pg_temp.exec_text(
+	sql text
+	, VARIADIC v anyarray
+) RETURNS SETOF text LANGUAGE plpgsql AS $f$
+DECLARE
+	v_sql text := format(sql, VARIADIC v);
+	t text;
+BEGIN
+	RAISE DEBUG 'Executing % into text', v_sql;
+	FOR t IN EXECUTE v_sql LOOP
+		RETURN NEXT t;
+	END LOOP;
+	RETURN;
+END
+$f$;
+CREATE OR REPLACE FUNCTION pg_temp.exec_text(text)
+RETURNS SETOF text LANGUAGE sql AS $$
+	SELECT * FROM pg_temp.exec_text($1, NULL::text)
+$$;
 
 CREATE TEMP TABLE num(
 	numtype	regtype
@@ -74,35 +54,29 @@ CREATE TEMP TABLE cmp(
 	l		variant.variant
 	, r		variant.variant
 	, lt	boolean
-	, ltr	boolean
 	, le	boolean
-	, ler	boolean
 	, eq	boolean
-	, eqr	boolean
 	, ge	boolean
-	, ger	boolean
 	, gt	boolean
-	, gtr	boolean
 	, ne	boolean
-	, ner	boolean
 );
 
-INSERT INTO cmp VALUES
---											lt		ltr		le		ler		eq		eqr		ge		ger		gt		gtr		ne		ner
-	  ( '(smallint,-1)', '(bigint,0)'	, true	, false	, true	, false	, false	, false	, false	, true	, false	, true	, true	, true	)
-	, ( '(smallint,0)', '(int,0)'		, false	, false	, true	, true	, true	, true	, true	, true	, false	, false	, false	, false	)
-	, ( '(bigint,1)', '(int,0)'			, false	, true	, false	, true	, false	, false	, true	, false	, true	, false	, true	, true	)
+INSERT INTO cmp(	l,		r			, lt	,	le	,	eq	,	ge	,	gt	,	ne	)
+VALUES
+	  ( '(smallint,-1)', '(bigint,0)'	, true	, true	, false	, false	, false	, true	)
+	, ( '(smallint,0)', '(int,0)'		, false	, true	, true	, true	, false	, false	)
+	, ( '(bigint,1)', '(int,0)'			, false	, false	, false	, true	, true	, true	)
 ;
 
 \set ON_ERROR_STOP false
 
 SELECT plan( (
-	2
+	2 -- cast, equality
 	+ (SELECT count(*) FROM numtest)
-	+2
-	+3
-	+4
-	+4
+	+2 -- text in/out
+	+3 -- register
+	+4 -- NULL
+	+1 -- cmp
 )::int );
 
 SELECT is(
@@ -117,8 +91,8 @@ SELECT is(
 	, 'Check equality'
 );
 
-SELECT _variant.exec(
-	format( $$SELECT cmp_ok( %s, '=', %s::%s )$$, var, n, numtype )
+SELECT pg_temp.exec_text(
+	format( $$SELECT cmp_ok( %s, '=', %s::%s, %1$L || ' = %2$s::%3$s' )$$, var, n, numtype )
 ) FROM numtest;
 
 SELECT is(
@@ -157,26 +131,10 @@ SELECT is( '(int,)'::variant.variant::int = NULL, NULL, '(int,)::int = NULL is N
 SELECT is( '(int,1)'::variant.variant::int = NULL, NULL, '(int,1)::int != NULL is NULL' );
 
 SELECT bag_eq(
-	$$SELECT variant.text_out(l) AS l, variant.text_out(r) AS r, lt AS lt, le AS le, eq AS eq, ge AS ge, gt AS gt, ne AS ne FROM cmp$$
+	  $$SELECT variant.text_out(l) AS l, variant.text_out(r) AS r,        lt,         le,        eq,         ge,        gt,         ne FROM cmp$$
 	, $$SELECT variant.text_out(l) AS l, variant.text_out(r) AS r, l<r AS lt, l<=r AS le, l=r AS eq, l>=r AS ge, l>r AS gt, l!=r AS ne FROM cmp$$
 	, 'Check <, <=, =, >=, >, !='
 );
-SELECT bag_eq(
-	$$SELECT variant.text_out(l) AS l, variant.text_out(r) AS r, lt AS ltr, le AS ler, eq AS eqr, ge AS ger, gt AS gtr, ne AS ner FROM cmp$$
-	, $$SELECT variant.text_out(l) AS l, variant.text_out(r) AS r, r<l AS ltr, r<=l AS ler, r=l AS eqr, r>=l AS ger, r>l AS gtr, r!=l AS ner FROM cmp$$
-	, 'Check reversed <, <=, =, >=, >, !='
-);
-SELECT bag_eq(
-	$$SELECT variant.text_out(l) AS l, variant.text_out(r) AS r, lt AS lt, NOT le AS le, NOT eq AS eq, NOT ge AS ge, NOT gt AS gt, NOT ne AS ne FROM cmp$$
-	, $$SELECT variant.text_out(l) AS l, variant.text_out(r) AS r, l<r AS lt, NOT l<=r AS le, NOT l=r AS eq, NOT l>=r AS ge, NOT l>r AS gt, NOT l!=r AS ne FROM cmp$$
-	, 'Check <, <=, =, >=, >, !='
-);
-SELECT bag_eq(
-	$$SELECT variant.text_out(l) AS l, variant.text_out(r) AS r, lt AS ltr, NOT le AS ler, NOT eq AS eqr, NOT ge AS ger, NOT gt AS gtr, NOT ne AS ner FROM cmp$$
-	, $$SELECT variant.text_out(l) AS l, variant.text_out(r) AS r, r<l AS ltr, NOT r<=l AS ler, NOT r=l AS eqr, NOT r>=l AS ger, NOT r>l AS gtr, NOT r!=l AS ner FROM cmp$$
-	, 'Check reversed <, <=, =, >=, >, !='
-);
-
 
 SELECT finish();
 ROLLBACK;
