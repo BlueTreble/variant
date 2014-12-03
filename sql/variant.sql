@@ -14,6 +14,15 @@ CREATE SCHEMA _variant;
 CREATE SCHEMA variant;
 GRANT USAGE ON SCHEMA variant TO public;
 
+CREATE OR REPLACE FUNCTION _variant.exec(
+  sql text
+) RETURNS void LANGUAGE plpgsql AS $f$
+BEGIN
+  RAISE DEBUG 'Executing SQL %s', sql;
+  EXECUTE sql;
+END
+$f$;
+
 CREATE TYPE _variant._variant AS ( original_type text, data text );
 
 CREATE TYPE variant.variant;
@@ -21,11 +30,19 @@ CREATE OR REPLACE FUNCTION _variant._variant_in(cstring)
 RETURNS variant.variant
 LANGUAGE c IMMUTABLE STRICT
 AS '$libdir/variant', 'variant_in';
+CREATE OR REPLACE FUNCTION variant.text_in(text)
+RETURNS variant.variant
+LANGUAGE c IMMUTABLE STRICT
+AS '$libdir/variant', 'variant_text_in';
 
 CREATE OR REPLACE FUNCTION _variant._variant_out(variant.variant)
 RETURNS cstring
 LANGUAGE c IMMUTABLE STRICT
 AS '$libdir/variant', 'variant_out';
+CREATE OR REPLACE FUNCTION variant.text_out(variant.variant)
+RETURNS text
+LANGUAGE c IMMUTABLE STRICT
+AS '$libdir/variant', 'variant_text_out';
 
 CREATE TYPE variant.variant(
   INPUT = _variant._variant_in
@@ -33,14 +50,55 @@ CREATE TYPE variant.variant(
   , STORAGE = extended
 );
 
-CREATE OR REPLACE FUNCTION _variant.variant_eq(variant.variant, variant.variant)
-  RETURNS boolean LANGUAGE c IMMUTABLE AS '$libdir/variant', 'variant_eq';
+SELECT _variant.exec( format($$
+CREATE OR REPLACE FUNCTION _variant.variant_%1$s(variant.variant, variant.variant)
+  RETURNS boolean LANGUAGE c IMMUTABLE AS '$libdir/variant', 'variant_%1$s';
+  $$
+  , op
+) )
+FROM unnest(string_to_array('lt le eq ne ge gt', ' ')) AS op;
 
+CREATE OPERATOR < (
+  PROCEDURE = _variant.variant_lt
+  , LEFTARG = variant.variant
+  , RIGHTARG = variant.variant
+  , COMMUTATOR = >
+  , NEGATOR = >=
+);
+CREATE OPERATOR <= (
+  PROCEDURE = _variant.variant_le
+  , LEFTARG = variant.variant
+  , RIGHTARG = variant.variant
+  , COMMUTATOR = >=
+  , NEGATOR = >
+);
 CREATE OPERATOR = (
   PROCEDURE = _variant.variant_eq
   , LEFTARG = variant.variant
   , RIGHTARG = variant.variant
   , COMMUTATOR = =
+  , NEGATOR = !=
+);
+CREATE OPERATOR != (
+  PROCEDURE = _variant.variant_eq
+  , LEFTARG = variant.variant
+  , RIGHTARG = variant.variant
+  , COMMUTATOR = !=
+  , NEGATOR = =
+);
+CREATE OPERATOR >= (
+  PROCEDURE = _variant.variant_ge
+  , LEFTARG = variant.variant
+  , RIGHTARG = variant.variant
+  , COMMUTATOR = <=
+  , NEGATOR = <
+);
+CREATE OPERATOR > (
+  PROCEDURE = _variant.variant_gt
+  , LEFTARG = variant.variant
+  , RIGHTARG = variant.variant
+  , COMMUTATOR = <
+  , NEGATOR = <=
 );
 
 CREATE OR REPLACE VIEW _variant.allowed_types AS

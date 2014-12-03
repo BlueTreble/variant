@@ -42,6 +42,8 @@ typedef struct VariantCache
 
 #define GetCache(fcinfo) ((VariantCache *) fcinfo->flinfo->fn_extra)
 
+static Variant variant_in_int(FunctionCallInfo fcinfo, char *input);
+static char * variant_out_int(FunctionCallInfo fcinfo, Variant input);
 static int variant_cmp_int(FunctionCallInfo fcinfo);
 static VariantInt make_variant_int(Variant v, FunctionCallInfo fcinfo, IOFuncSelector func);
 static Variant make_variant(VariantInt vi, FunctionCallInfo fcinfo, IOFuncSelector func);
@@ -73,48 +75,7 @@ PG_FUNCTION_INFO_V1(variant_in);
 Datum
 variant_in(PG_FUNCTION_ARGS)
 {
-	VariantCache	*cache;
-	char					*input = PG_GETARG_CSTRING(0);
-	bool					isnull;
-	Oid						intTypeOid = InvalidOid;
-	int32					typmod = 0;
-	text					*orgType;
-	text					*orgData;
-	VariantInt		vi = palloc0(sizeof(*vi));
-
-	Assert(fcinfo->flinfo->fn_strict); /* Must be strict */
-
-	/* Eventually getting rid of this crap, so segregate it */
-		intTypeOid = getIntOid();
-
-		FmgrInfo	 		proc;
-		Datum						composite;
-		HeapTupleHeader	composite_tuple;
-		Oid							typioparam;
-		Oid							typIoFunc;
-
-		/* Cast input data to our internal composite type */
-		getTypeInputInfo(intTypeOid, &typIoFunc, &typioparam);
-		fmgr_info_cxt(typIoFunc, &proc, fcinfo->flinfo->fn_mcxt);
-		composite=InputFunctionCall(&proc, input, typioparam, typmod);
-
-		/* Extract data from internal composite type */
-		composite_tuple=DatumGetHeapTupleHeader(composite);
-		orgType = (text *) GetAttributeByNum( composite_tuple, 1, &isnull );
-		if (isnull)
-			elog(ERROR, "original_type of variant must not be NULL");
-		orgData = (text *) GetAttributeByNum( composite_tuple, 2, &vi->isnull );
-	/* End crap */
-
-	parseTypeString(text_to_cstring(orgType), &vi->typid, &vi->typmod, false);
-
-	cache = get_cache(fcinfo, vi, IOFunc_input);
-
-	if (!vi->isnull)
-		/* Actually need to be using stringTypeDatum(Type tp, char *string, int32 atttypmod) */
-		vi->data = InputFunctionCall(&cache->proc, text_to_cstring(orgData), cache->typioparam, vi->typmod);
-
-	PG_RETURN_VARIANT( make_variant(vi, fcinfo, IOFunc_input) );
+	PG_RETURN_VARIANT( variant_in_int(fcinfo, PG_GETARG_CSTRING(0)) );
 }
 
 /*
@@ -155,69 +116,7 @@ PG_FUNCTION_INFO_V1(variant_out);
 Datum
 variant_out(PG_FUNCTION_ARGS)
 {
-	Variant				input = PG_GETARG_VARIANT(0);
-	VariantCache	*cache;
-	bool					need_quote;
-	char					*tmp;
-	char					*org_cstring;
-	StringInfoData	out;
-	VariantInt		vi;
-
-	Assert(fcinfo->flinfo->fn_strict); /* Must be strict */
-
-	vi = make_variant_int(input, fcinfo, IOFunc_output);
-	cache = GetCache(fcinfo);
-
-	/* Start building string */
-	initStringInfo(&out);
-	appendStringInfoString(&out, cache->outString);
-
-	if(!vi->isnull)
-	{
-		org_cstring = OutputFunctionCall(&cache->proc, vi->data);
-
-		/*
-		 * Detect whether we need double quotes for this value
-		 *
-		 * Stolen then modified from record_out.
-		 */
-		need_quote = (org_cstring[0] == '\0' ); /* force quotes for empty string */
-		if( !need_quote )
-		{
-			for (tmp = org_cstring; *tmp; tmp++)
-			{
-				char		ch = *tmp;
-
-				if (ch == '"' || ch == '\\' ||
-					ch == '(' || ch == ')' || ch == ',' ||
-					isspace((unsigned char) ch))
-				{
-					need_quote = true;
-					break;
-				}
-			}
-		}
-
-		if (!need_quote)
-			appendStringInfoString(&out, org_cstring);
-		else
-		{
-			appendStringInfoChar(&out, '"');
-			for (tmp = org_cstring; *tmp; tmp++)
-			{
-				char		ch = *tmp;
-
-				if (ch == '"' || ch == '\\')
-					appendStringInfoCharMacro(&out, ch);
-				appendStringInfoCharMacro(&out, ch);
-			}
-			appendStringInfoChar(&out, '"');
-		}
-	}
-
-	appendStringInfoChar(&out, ')');
-
-	PG_RETURN_CSTRING(out.data);
+	PG_RETURN_CSTRING( variant_out_int(fcinfo, PG_GETARG_VARIANT(0)) );
 }
 
 /*
@@ -281,11 +180,50 @@ variant_cast_out(PG_FUNCTION_ARGS)
 	PG_RETURN_DATUM(out);
 }
 
+/*
+ * text_(in|out): Same as variant_(in|out) except text instead of cstring
+ */
+PG_FUNCTION_INFO_V1(variant_text_in);
+Datum
+variant_text_in(PG_FUNCTION_ARGS)
+{
+	PG_RETURN_VARIANT( variant_in_int(fcinfo, TextDatumGetCString(PG_GETARG_DATUM(0)) ) );
+}
+PG_FUNCTION_INFO_V1(variant_text_out);
+Datum
+variant_text_out(PG_FUNCTION_ARGS)
+{
+	PG_RETURN_DATUM( CStringGetTextDatum( variant_out_int(fcinfo, PG_GETARG_VARIANT(0)) ) );
+}
+
 PG_FUNCTION_INFO_V1(variant_cmp);
 Datum
 variant_cmp(PG_FUNCTION_ARGS)
 {
 	PG_RETURN_INT32(variant_cmp_int(fcinfo));
+}
+
+PG_FUNCTION_INFO_V1(variant_lt);
+Datum
+variant_lt(PG_FUNCTION_ARGS)
+{
+	int ret = variant_cmp_int(fcinfo);
+
+	if(fcinfo->isnull)
+		PG_RETURN_NULL();
+
+	PG_RETURN_BOOL(ret == -1);
+}
+PG_FUNCTION_INFO_V1(variant_le);
+Datum
+variant_le(PG_FUNCTION_ARGS)
+{
+	int ret = variant_cmp_int(fcinfo);
+
+	if(fcinfo->isnull)
+		PG_RETURN_NULL();
+
+	PG_RETURN_BOOL(ret < 1);
 }
 
 PG_FUNCTION_INFO_V1(variant_eq);
@@ -298,6 +236,40 @@ variant_eq(PG_FUNCTION_ARGS)
 		PG_RETURN_NULL();
 
 	PG_RETURN_BOOL(ret == 0);
+}
+PG_FUNCTION_INFO_V1(variant_ne);
+Datum
+variant_ne(PG_FUNCTION_ARGS)
+{
+	int ret = variant_cmp_int(fcinfo);
+
+	if(fcinfo->isnull)
+		PG_RETURN_NULL();
+
+	PG_RETURN_BOOL(ret != 0);
+}
+
+PG_FUNCTION_INFO_V1(variant_ge);
+Datum
+variant_ge(PG_FUNCTION_ARGS)
+{
+	int ret = variant_cmp_int(fcinfo);
+
+	if(fcinfo->isnull)
+		PG_RETURN_NULL();
+
+	PG_RETURN_BOOL(ret > 0);
+}
+PG_FUNCTION_INFO_V1(variant_gt);
+Datum
+variant_gt(PG_FUNCTION_ARGS)
+{
+	int ret = variant_cmp_int(fcinfo);
+
+	if(fcinfo->isnull)
+		PG_RETURN_NULL();
+
+	PG_RETURN_BOOL(ret == 1);
 }
 
 /*
@@ -340,6 +312,119 @@ variant_image_eq(PG_FUNCTION_ARGS)
  * SUPPORT FUNCTIONS
  ********************
  */
+
+static Variant
+variant_in_int(FunctionCallInfo fcinfo, char *input)
+{
+	VariantCache	*cache;
+	bool					isnull;
+	Oid						intTypeOid = InvalidOid;
+	int32					typmod = 0;
+	text					*orgType;
+	text					*orgData;
+	VariantInt		vi = palloc0(sizeof(*vi));
+
+	Assert(fcinfo->flinfo->fn_strict); /* Must be strict */
+
+	/* Eventually getting rid of this crap, so segregate it */
+		intTypeOid = getIntOid();
+
+		FmgrInfo	 		proc;
+		Datum						composite;
+		HeapTupleHeader	composite_tuple;
+		Oid							typioparam;
+		Oid							typIoFunc;
+
+		/* Cast input data to our internal composite type */
+		getTypeInputInfo(intTypeOid, &typIoFunc, &typioparam);
+		fmgr_info_cxt(typIoFunc, &proc, fcinfo->flinfo->fn_mcxt);
+		composite=InputFunctionCall(&proc, input, typioparam, typmod);
+
+		/* Extract data from internal composite type */
+		composite_tuple=DatumGetHeapTupleHeader(composite);
+		orgType = (text *) GetAttributeByNum( composite_tuple, 1, &isnull );
+		if (isnull)
+			elog(ERROR, "original_type of variant must not be NULL");
+		orgData = (text *) GetAttributeByNum( composite_tuple, 2, &vi->isnull );
+	/* End crap */
+
+	parseTypeString(text_to_cstring(orgType), &vi->typid, &vi->typmod, false);
+
+	cache = get_cache(fcinfo, vi, IOFunc_input);
+
+	if (!vi->isnull)
+		/* Actually need to be using stringTypeDatum(Type tp, char *string, int32 atttypmod) */
+		vi->data = InputFunctionCall(&cache->proc, text_to_cstring(orgData), cache->typioparam, vi->typmod);
+
+	return make_variant(vi, fcinfo, IOFunc_input);
+}
+
+static char *
+variant_out_int(FunctionCallInfo fcinfo, Variant input)
+{
+	VariantCache	*cache;
+	bool					need_quote;
+	char					*tmp;
+	char					*org_cstring;
+	StringInfoData	out;
+	VariantInt		vi;
+
+	Assert(fcinfo->flinfo->fn_strict); /* Must be strict */
+
+	vi = make_variant_int(input, fcinfo, IOFunc_output);
+	cache = GetCache(fcinfo);
+
+	/* Start building string */
+	initStringInfo(&out);
+	appendStringInfoString(&out, cache->outString);
+
+	if(!vi->isnull)
+	{
+		org_cstring = OutputFunctionCall(&cache->proc, vi->data);
+
+		/*
+		 * Detect whether we need double quotes for this value
+		 *
+		 * Stolen then modified from record_out.
+		 */
+		need_quote = (org_cstring[0] == '\0' ); /* force quotes for empty string */
+		if( !need_quote )
+		{
+			for (tmp = org_cstring; *tmp; tmp++)
+			{
+				char		ch = *tmp;
+
+				if (ch == '"' || ch == '\\' ||
+					ch == '(' || ch == ')' || ch == ',' ||
+					isspace((unsigned char) ch))
+				{
+					need_quote = true;
+					break;
+				}
+			}
+		}
+
+		if (!need_quote)
+			appendStringInfoString(&out, org_cstring);
+		else
+		{
+			appendStringInfoChar(&out, '"');
+			for (tmp = org_cstring; *tmp; tmp++)
+			{
+				char		ch = *tmp;
+
+				if (ch == '"' || ch == '\\')
+					appendStringInfoCharMacro(&out, ch);
+				appendStringInfoCharMacro(&out, ch);
+			}
+			appendStringInfoChar(&out, '"');
+		}
+	}
+
+	appendStringInfoChar(&out, ')');
+
+	return out.data;
+}
 
 /*
  * variant_cmp_int: Are two variants identical on a binary level?
@@ -388,7 +473,7 @@ variant_cmp_int(FunctionCallInfo fcinfo)
 
 		do_pop = _SPI_conn();
 
-		cmd = "SELECT CASE WHEN $1 = $2 THEN 0 ELSE WHEN $1 < $2 THEN -1 ELSE 0 END::int";
+		cmd = "SELECT CASE WHEN $1 = $2 THEN 0 WHEN $1 < $2 THEN -1 ELSE 1 END::int";
 		types[0] = li->typid;
 		values[0] = li->data;
 		nulls[0] = li->isnull;
