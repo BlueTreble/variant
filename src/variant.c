@@ -505,7 +505,7 @@ make_variant_int(Variant v, FunctionCallInfo fcinfo, IOFuncSelector func)
 {
 	VariantCache	*cache;
 	VariantInt		vi;
-	long 					len; /* long instead of size_t because we're subtracting */
+	long 					data_length; /* long instead of size_t because we're subtracting */
 	Pointer 			ptr;
 	uint					flags;
 
@@ -546,28 +546,28 @@ make_variant_int(Variant v, FunctionCallInfo fcinfo, IOFuncSelector func)
 	 *
 	 * For cstring, we don't store the trailing NUL
 	 */
-	len = VARSIZE(v) - VHDRSZ - (flags & VAR_OVERFLOW ? 1 : 0);
-	if( len < 0 )
-		elog(ERROR, "Negative len %li", len);
+	data_length = VARSIZE(v) - VHDRSZ - (flags & VAR_OVERFLOW ? 1 : 0);
+	if( data_length < 0 )
+		elog(ERROR, "Negative data_length %li", data_length);
 
 	if (cache->typlen == -1) /* varlena */
 	{
-		ptr = palloc0(len + VARHDRSZ);
-		SET_VARSIZE(ptr, len + VARHDRSZ);
-		memcpy(VARDATA(ptr), VDATAPTR(v), len);
+		ptr = palloc0(data_length + VARHDRSZ);
+		SET_VARSIZE(ptr, data_length + VARHDRSZ);
+		memcpy(VARDATA(ptr), VDATAPTR(v), data_length);
 	}
 	else if(cache->typlen == -2) /* cstring */
 	{
-		ptr = palloc(len + 1); /* Need space for NUL terminator */
-		memcpy(ptr, VDATAPTR(v), len);
-		*(ptr + len + 1) = '\0';
+		ptr = palloc(data_length + 1); /* Need space for NUL terminator */
+		memcpy(ptr, VDATAPTR(v), data_length);
+		*(ptr + data_length + 1) = '\0';
 	}
 	else /* Fixed size, pass by reference */
 	{
-		Assert(len == cache->typlen);
-		ptr = palloc0(len);
+		Assert(data_length == cache->typlen);
+		ptr = palloc0(data_length);
 		Assert(ptr == (char *) att_align_nominal(ptr, cache->typalign));
-		memcpy(ptr, VDATAPTR(v), len);
+		memcpy(ptr, VDATAPTR(v), data_length);
 	}
 	vi->data = PointerGetDatum(ptr);
 
@@ -583,7 +583,7 @@ make_variant(VariantInt vi, FunctionCallInfo fcinfo, IOFuncSelector func)
 	VariantCache	*cache;
 	Variant				v;
 	bool					oid_overflow=OID_TOO_LARGE(vi->typid);
-	long					len, data_length; /* long because we subtract */
+	long					variant_length, data_length; /* long because we subtract */
 	Pointer				data_ptr = 0;
 	uint					flags = 0;
 
@@ -629,12 +629,12 @@ make_variant(VariantInt vi, FunctionCallInfo fcinfo, IOFuncSelector func)
 	}
 
 	/* If typid is too large then we need an extra byte */
-	len = VHDRSZ + data_length + (oid_overflow ? sizeof(char) : 0);
-	if( len < 0 )
-		elog(ERROR, "Negative len %li", len);
+	variant_length = VHDRSZ + data_length + (oid_overflow ? sizeof(char) : 0);
+	if( variant_length < 0 )
+		elog(ERROR, "Negative variant_length %li", variant_length);
 
-	v = palloc0(len);
-	SET_VARSIZE(v, len);
+	v = palloc0(variant_length);
+	SET_VARSIZE(v, variant_length);
 	v->pOid = vi->typid;
 	v->typmod = vi->typmod;
 
@@ -646,7 +646,7 @@ make_variant(VariantInt vi, FunctionCallInfo fcinfo, IOFuncSelector func)
 		v->pOid &= 0x00FFFFFF;
 
 		/* Store high byte of OID at the end of our structure */
-		*((char *) v + len - sizeof(char)) = vi->typid >> 24;
+		*((char *) v + variant_length - sizeof(char)) = vi->typid >> 24;
 	}
 
 	/*
