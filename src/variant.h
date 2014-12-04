@@ -43,7 +43,8 @@ typedef VariantData *Variant;
 
 
 #define VHDRSZ				(sizeof(VariantData))
-#define VDATAPTR(x)		( (Pointer) ( (x) + 1 ) )
+#define VDATAPTR(x)		    ( (Pointer) ( (x) + 1 ) )
+#define VDATAPTR_ALIGN(x, typalign)   ( (Pointer) att_align_nominal(VDATAPTR(x), typalign) )
 
 /*
  * Easier to use internal representation. All the fields represent the state of

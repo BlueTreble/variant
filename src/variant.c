@@ -522,17 +522,22 @@ make_variant_int(Variant v, FunctionCallInfo fcinfo, IOFuncSelector func)
 
 	cache = get_cache(fcinfo, vi, func);
 
-	/* by-value type, or fixed-length pass-by-reference */
-	if( cache->typbyval || cache->typlen >= 1)
+	/*
+	 * by-value type. We do special things with all pass-by-reference when we
+	 * store, so we only use this for typbyval even though fetch_att supports
+	 * pass-by-reference.
+	 *
+	 * Note that fetch_att sanity-checks typlen for us (because we're only passing typbyval).
+	 */
+	if(cache->typbyval)
 	{
 		if(!vi->isnull)
-			vi->data = fetch_att(VDATAPTR(v), cache->typbyval, cache->typlen);
+		{
+			Pointer p = VDATAPTR_ALIGN(v, cache->typalign);
+			vi->data = fetch_att(p, cache->typbyval, cache->typlen);
+		}
 		return vi;
 	}
-
-	/* Make sure we know we're dealing with either varlena or cstring */
-	if (cache->typlen > -1 || cache->typlen < -2)
-		elog(ERROR, "unknown typlen %i for typid %u", cache->typlen, cache->typid);
 
 	/* we don't store a varlena header for varlena data; instead we compute
 	 * it's size based on ours:
@@ -551,9 +556,17 @@ make_variant_int(Variant v, FunctionCallInfo fcinfo, IOFuncSelector func)
 		SET_VARSIZE(ptr, len + VARHDRSZ);
 		memcpy(VARDATA(ptr), VDATAPTR(v), len);
 	}
-	else /* cstring */
+	else if(cache->typlen == -2) /* cstring */
 	{
-		ptr = palloc0(len + 1); /* Need space for NUL terminator */
+		ptr = palloc(len + 1); /* Need space for NUL terminator */
+		memcpy(ptr, VDATAPTR(v), len);
+		*(ptr + len + 1) = '\0';
+	}
+	else /* Fixed size, pass by reference */
+	{
+		Assert(len == cache->typlen);
+		ptr = palloc0(len);
+		Assert(ptr == (char *) att_align_nominal(ptr, cache->typalign));
 		memcpy(ptr, VDATAPTR(v), len);
 	}
 	vi->data = PointerGetDatum(ptr);
@@ -604,18 +617,16 @@ make_variant(VariantInt vi, FunctionCallInfo fcinfo, IOFuncSelector func)
 		data_length = strlen(DatumGetCString(vi->data)); /* We don't store NUL terminator */
 		data_ptr = DatumGetPointer(vi->data);
 	}
-	else /* att_addlength_datum() sanity-checks for us */
+	else /* att_addlength_datum() sanity-checks typlen for us */
 	{
 		data_length = VHDRSZ; /* Start with header size to make sure alignment is correct */
-		data_length = att_align_datum(data_length, cache->typalign, cache->typlen, vi->data);
+		data_length = (long) VDATAPTR_ALIGN(data_length, cache->typalign);
 		data_length = att_addlength_datum(data_length, cache->typlen, vi->data);
 		data_length -= VHDRSZ;
 
 		if(!cache->typbyval) /* fixed length, pass by reference */
 			data_ptr = DatumGetPointer(vi->data);
 	}
-	if( data_length < 0 )
-		elog(ERROR, "Negative data_length %li", data_length);
 
 	/* If typid is too large then we need an extra byte */
 	len = VHDRSZ + data_length + (oid_overflow ? sizeof(char) : 0);
@@ -648,7 +659,7 @@ make_variant(VariantInt vi, FunctionCallInfo fcinfo, IOFuncSelector func)
 	{
 		if(cache->typbyval)
 		{
-			Pointer p = (char *) att_align_nominal(VDATAPTR(v), cache->typalign);
+			Pointer p = VDATAPTR_ALIGN(v, cache->typalign);
 			store_att_byval(p, vi->data, cache->typlen);
 		}
 		else
