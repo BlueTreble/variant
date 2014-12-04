@@ -14,7 +14,7 @@
  
 (1 row)
 
-1..30
+1..47
 ok 1 - cast to text
 ok 2 - Check equality
 ok 3 -  '( smallint , -1 )'::variant.variant::smallint  = -1::smallint
@@ -44,4 +44,21 @@ ok 26 - (int,)::int = NULL
 ok 27 - (int,1)::int != NULL
 ok 28 - (int,)::int = NULL is NULL
 ok 29 - (int,1)::int != NULL is NULL
-ok 30 - Check <, <=, =, >=, >, !=
+ok 30 - (smallint,-1) <   (bigint,0) 
+ok 31 - (smallint,-1) <=  (bigint,0) 
+ok 32 - (smallint,-1)  =  (bigint,0) 
+ok 33 - (smallint,-1)  >= (bigint,0) 
+ok 34 - (smallint,-1)   > (bigint,0) 
+ok 35 - (smallint,-1) !=  (bigint,0) 
+ok 36 - (smallint,0)  <   (integer,0)
+ok 37 - (smallint,0)  <=  (integer,0)
+ok 38 - (smallint,0)   =  (integer,0)
+ok 39 - (smallint,0)   >= (integer,0)
+ok 40 - (smallint,0)    > (integer,0)
+ok 41 - (smallint,0)  !=  (integer,0)
+ok 42 - (bigint,1)    <   (integer,0)
+ok 43 - (bigint,1)    <=  (integer,0)
+ok 44 - (bigint,1)     =  (integer,0)
+ok 45 - (bigint,1)     >= (integer,0)
+ok 46 - (bigint,1)      > (integer,0)
+ok 47 - (bigint,1)    !=  (integer,0)

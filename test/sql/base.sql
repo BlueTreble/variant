@@ -50,23 +50,21 @@ CREATE OR REPLACE TEMP VIEW numtest AS
 ;
 
 -- Trailing 'r' means reverse the operands
-CREATE TEMP TABLE cmp(
+CREATE TEMP TABLE cmp_raw(
 	l		variant.variant
 	, r		variant.variant
-	, lt	boolean
-	, le	boolean
-	, eq	boolean
-	, ge	boolean
-	, gt	boolean
-	, ne	boolean
+	, li	int
+	, ri	int
 );
-
-INSERT INTO cmp(	l,		r			, lt	,	le	,	eq	,	ge	,	gt	,	ne	)
+INSERT INTO cmp_raw(	l,		r		, li	, ri	)
 VALUES
-	  ( '(smallint,-1)', '(bigint,0)'	, true	, true	, false	, false	, false	, true	)
-	, ( '(smallint,0)', '(int,0)'		, false	, true	, true	, true	, false	, false	)
-	, ( '(bigint,1)', '(int,0)'			, false	, false	, false	, true	, true	, true	)
+	  ( '(smallint,-1)', '(bigint,0)'	, -1	, 0	)
+	, ( '(smallint,0)', '(int,0)'		, 0		, 0	)
+	, ( '(bigint,1)', '(int,0)'			, 1		, 0	)
 ;
+CREATE OR REPLACE TEMP VIEW cmp AS SELECT *, variant.text_out(l) AS l_text, variant.text_out(r) AS r_text FROM cmp_raw;
+
+CREATE TEMP VIEW ops AS SELECT * FROM unnest( string_to_array( '<  ,<= , = , >=,  >,!= ', ',' ) ) AS op;
 
 \set ON_ERROR_STOP false
 
@@ -76,7 +74,8 @@ SELECT plan( (
 	+2 -- text in/out
 	+3 -- register
 	+4 -- NULL
-	+1 -- cmp
+--	+1 -- cmp
+	+ (SELECT count(*) FROM cmp, ops)
 )::int );
 
 SELECT is(
@@ -130,11 +129,20 @@ SET transform_null_equals = off;
 SELECT is( '(int,)'::variant.variant::int = NULL, NULL, '(int,)::int = NULL is NULL' );
 SELECT is( '(int,1)'::variant.variant::int = NULL, NULL, '(int,1)::int != NULL is NULL' );
 
-SELECT bag_eq(
-	  $$SELECT variant.text_out(l) AS l, variant.text_out(r) AS r,        lt,         le,        eq,         ge,        gt,         ne FROM cmp$$
-	, $$SELECT variant.text_out(l) AS l, variant.text_out(r) AS r, l<r AS lt, l<=r AS le, l=r AS eq, l>=r AS ge, l>r AS gt, l!=r AS ne FROM cmp$$
-	, 'Check <, <=, =, >=, >, !='
-);
+-- TODO: integrate this with numtest; it's quite similar
+SELECT pg_temp.exec_text(
+			$$SELECT is( %s )$$
+			, format( $fmt$%L::variant.variant %s %L::variant.variant
+					, %s %s %s
+					, '%s %s %s'$fmt$
+				, l, op, r
+				, li, op, ri
+				, rpad(l_text, len_l), op, rpad(r_text, len_r)
+			)
+		)
+	FROM cmp, ops
+		, (SELECT max(length(l_text)) AS len_l, max(length(r_text)) AS len_r FROM cmp) l
+;
 
 SELECT finish();
 ROLLBACK;
