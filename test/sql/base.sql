@@ -57,6 +57,7 @@ CREATE TEMP TABLE ncmp_raw(
 	, lr	int
 	, rr	int
 );
+-- DO NOT TOUCH! Change to the pattern we're using for _ncmp_raw's insert instead!
 INSERT INTO ncmp_raw(	l,		r		, lr	, rr	)
 VALUES
 	  ( NULL, NULL						, NULL	, NULL	)
@@ -105,25 +106,6 @@ FROM (
 			) a
 	) a
 ;
-/*
-INSERT INTO _ncmp_raw(	l,		r									, lr			, rr	)
-VALUES
-	  ( NULL, NULL													, NULL			, NULL	)
-	, ( '(smallint[],"{0,0,1}")'		, '(bigint[],"{0,1,1}")'	, '{0,0,1}'		, '{0,1,1}'	)
-	, ( '(     int[],"{0,1,1}")'		, '(int2[],"{0,1,1}")'		, '{0,1,1}'		, '{0,1,1}'	)
-	, ( '(  bigint[],"{0,2,1}")'		, '(bigint[],"{0,1,1}")'	, '{0,2,1}'		, '{0,1,1}'	)
-	, ( '(smallint[],"{NULL,0,1}")'		, '(bigint[],"{0,1,1}")'	, '{NULL,0,1}'	, '{0,1,1}'	)
-	, ( '(     int[],"{NULL,1,1}")'		, '(int2[],"{0,1,1}")'		, '{NULL,1,1}'	, '{0,1,1}'	)
-	, ( '(  bigint[],"{NULL,2,1}")'		, '(bigint[],"{0,1,1}")'	, '{NULL,2,1}'	, '{0,1,1}'	)
-	, ( '(smallint[],"{0,0,NULL}")'		, '(bigint[],"{0,1,1}")'	, '{0,0,NULL}'	, '{0,1,1}'	)
-	, ( '(     int[],"{0,1,NULL}")'		, '(int2[],"{0,1,1}")'		, '{0,1,NULL}'	, '{0,1,1}'	)
-	, ( '(  bigint[],"{0,2,NULL}")'		, '(bigint[],"{0,1,1}")'	, '{0,2,NULL}'	, '{0,1,1}'	)
-	, ( '(  bigint[],)'					, '(bigint[],"{0,1,1}")'	, NULL			, '{0,1,1}'	)
-	, ( '(smallint[],"{0,0,1}")'		, '(bigint[],)'				, '{0,0,1}'		, NULL )
-	, ( '(     int[],"{0,1,1}")'		, '(int2[],)'				, '{0,1,1}'		, NULL )
-	, ( '(  bigint[],"{0,2,1}")'		, '(bigint[],)'				, '{0,2,1}'		, NULL )
-;
-*/
 CREATE OR REPLACE TEMP VIEW _ncmp AS
 	SELECT *
 			, variant.text_out(l) AS l_text
@@ -140,6 +122,7 @@ CREATE TEMP TABLE scmp_raw(
 	, lr	text
 	, rr	text
 );
+-- DO NOT TOUCH! Change to the pattern we're using for _ncmp_raw's insert instead!
 INSERT INTO scmp_raw(	l,		r		, lr	, rr	)
 VALUES
 	  ( NULL, NULL						, NULL	, NULL	)
@@ -169,6 +152,7 @@ CREATE TEMP TABLE box_cmp_raw(
 	, lr	box
 	, rr	box
 );
+-- DO NOT TOUCH! Change to the pattern we're using for _ncmp_raw's insert instead!
 INSERT INTO box_cmp_raw(	l,		r								, lr					, rr	)
 VALUES
 	  ( NULL, NULL													, NULL					, NULL	)
