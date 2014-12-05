@@ -49,14 +49,13 @@ CREATE OR REPLACE TEMP VIEW numtest AS
 		FROM ( SELECT numtype, n * multiplier AS n FROM num, generate_series(-1,1) AS multiplier ) a
 ;
 
--- Trailing 'r' means reverse the operands
-CREATE TEMP TABLE cmp_raw(
+CREATE TEMP TABLE ncmp_raw(
 	l		variant.variant
 	, r		variant.variant
-	, li	int
-	, ri	int
+	, lr	int
+	, rr	int
 );
-INSERT INTO cmp_raw(	l,		r		, li	, ri	)
+INSERT INTO ncmp_raw(	l,		r		, lr	, rr	)
 VALUES
 	  ( NULL, NULL						, NULL	, NULL	)
 	, ( '(smallint,-1)', '(bigint,0)'	, -1	, 0	)
@@ -72,15 +71,42 @@ VALUES
 	, ( '(smallint,)', '(int,)'			, NULL	, NULL	)
 	, ( '(bigint,)', '(int,)'			, NULL	, NULL	)
 ;
-CREATE OR REPLACE TEMP VIEW cmp AS
+CREATE OR REPLACE TEMP VIEW ncmp AS
 	SELECT *
 			, variant.text_out(l) AS l_text
 			, variant.text_out(r) AS r_text
-			, coalesce(li::text, 'NULL') AS li_text
-			, coalesce(ri::text, 'NULL') AS ri_text
-	FROM cmp_raw
+			, coalesce(lr::text, 'NULL') AS lr_text
+			, coalesce(rr::text, 'NULL') AS rr_text
+	FROM ncmp_raw
 ;
 
+CREATE TEMP TABLE scmp_raw(
+	l		variant.variant
+	, r		variant.variant
+	, lr	text
+	, rr	text
+);
+INSERT INTO scmp_raw(	l,		r		, lr	, rr	)
+VALUES
+	  ( NULL, NULL						, NULL	, NULL	)
+	, ( '(text,A)','(text,x)'			, 'A'	, 'x'	)
+	, ( '(text,x)','(text,x)'			, 'x'	, 'x'	)
+	, ( '(text,y)','(text,x)'			, 'y'	, 'x'	)
+	, ( '(text,)','(text,x)'			, NULL	, 'x'	)
+	, ( '(text,)','(text,x)'			, NULL	, 'x'	)
+	, ( '(text,)','(text,x)'			, NULL	, 'x'	)
+	, ( '(text,A)','(text,)'			, 'A'	, NULL	)
+	, ( '(text,x)','(text,)'			, 'x'	, NULL	)
+	, ( '(text,y)','(text,)'			, 'y'	, NULL	)
+;
+CREATE OR REPLACE TEMP VIEW scmp AS
+	SELECT *
+			, variant.text_out(l) AS l_text
+			, variant.text_out(r) AS r_text
+			, coalesce(lr::text, 'NULL') AS lr_text
+			, coalesce(rr::text, 'NULL') AS rr_text
+	FROM scmp_raw
+;
 CREATE TEMP VIEW ops AS SELECT * FROM unnest( string_to_array( '<  ,<= , = , >=,  >,!= ', ',' ) ) AS op;
 
 \set ON_ERROR_STOP false
@@ -91,8 +117,8 @@ SELECT plan( (
 	+2 -- text in/out
 	+3 -- register
 	+4 -- NULL
---	+1 -- cmp
-	+ (SELECT count(*) FROM cmp, ops)
+	+ (SELECT count(*) FROM ncmp, ops)
+	+ (SELECT count(*) FROM scmp, ops)
 )::int );
 
 SELECT is(
@@ -157,12 +183,27 @@ SELECT pg_temp.exec_text(
 					, %s %s %s
 					, '%s %s %s'$fmt$
 				, l, op, r
-				, li_text, op, ri_text
+				, lr_text, op, rr_text
 				, rpad(l_text, len_l), op, rpad(r_text, len_r)
 			)
 		)
-	FROM cmp, ops
-		, (SELECT max(length(l_text)) AS len_l, max(length(r_text)) AS len_r FROM cmp) l
+	FROM ncmp, ops
+		, (SELECT max(length(l_text)) AS len_l, max(length(r_text)) AS len_r FROM ncmp) l
+;
+
+--SET client_min_messages = debug;
+SELECT pg_temp.exec_text(
+			$$SELECT is( %s )$$
+			, format( $fmt$%L::variant.variant %s %L::variant.variant
+					, %L %s %L
+					, '%s %s %s'$fmt$
+				, l, op, r
+				, lr, op, rr
+				, rpad(l_text, len_l), op, rpad(r_text, len_r)
+			)
+		)
+	FROM scmp, ops
+		, (SELECT max(length(l_text)) AS len_l, max(length(r_text)) AS len_r FROM ncmp) l
 ;
 
 SELECT finish();

@@ -14,7 +14,7 @@
  
 (1 row)
 
-1..108
+1..168
 ok 1 - cast to text
 ok 2 - Check equality
 ok 3 - Check NULL
@@ -123,3 +123,63 @@ ok 105 - (bigint,)      =  (integer,)
 ok 106 - (bigint,)      >= (integer,) 
 ok 107 - (bigint,)       > (integer,) 
 ok 108 - (bigint,)     !=  (integer,) 
+ok 109 -  <   
+ok 110 -  <=  
+ok 111 -   =  
+ok 112 -   >= 
+ok 113 -    > 
+ok 114 -  !=  
+ok 115 - (text,A)      <   (text,x)   
+ok 116 - (text,A)      <=  (text,x)   
+ok 117 - (text,A)       =  (text,x)   
+ok 118 - (text,A)       >= (text,x)   
+ok 119 - (text,A)        > (text,x)   
+ok 120 - (text,A)      !=  (text,x)   
+ok 121 - (text,x)      <   (text,x)   
+ok 122 - (text,x)      <=  (text,x)   
+ok 123 - (text,x)       =  (text,x)   
+ok 124 - (text,x)       >= (text,x)   
+ok 125 - (text,x)        > (text,x)   
+ok 126 - (text,x)      !=  (text,x)   
+ok 127 - (text,y)      <   (text,x)   
+ok 128 - (text,y)      <=  (text,x)   
+ok 129 - (text,y)       =  (text,x)   
+ok 130 - (text,y)       >= (text,x)   
+ok 131 - (text,y)        > (text,x)   
+ok 132 - (text,y)      !=  (text,x)   
+ok 133 - (text,)       <   (text,x)   
+ok 134 - (text,)       <=  (text,x)   
+ok 135 - (text,)        =  (text,x)   
+ok 136 - (text,)        >= (text,x)   
+ok 137 - (text,)         > (text,x)   
+ok 138 - (text,)       !=  (text,x)   
+ok 139 - (text,)       <   (text,x)   
+ok 140 - (text,)       <=  (text,x)   
+ok 141 - (text,)        =  (text,x)   
+ok 142 - (text,)        >= (text,x)   
+ok 143 - (text,)         > (text,x)   
+ok 144 - (text,)       !=  (text,x)   
+ok 145 - (text,)       <   (text,x)   
+ok 146 - (text,)       <=  (text,x)   
+ok 147 - (text,)        =  (text,x)   
+ok 148 - (text,)        >= (text,x)   
+ok 149 - (text,)         > (text,x)   
+ok 150 - (text,)       !=  (text,x)   
+ok 151 - (text,A)      <   (text,)    
+ok 152 - (text,A)      <=  (text,)    
+ok 153 - (text,A)       =  (text,)    
+ok 154 - (text,A)       >= (text,)    
+ok 155 - (text,A)        > (text,)    
+ok 156 - (text,A)      !=  (text,)    
+ok 157 - (text,x)      <   (text,)    
+ok 158 - (text,x)      <=  (text,)    
+ok 159 - (text,x)       =  (text,)    
+ok 160 - (text,x)       >= (text,)    
+ok 161 - (text,x)        > (text,)    
+ok 162 - (text,x)      !=  (text,)    
+ok 163 - (text,y)      <   (text,)    
+ok 164 - (text,y)      <=  (text,)    
+ok 165 - (text,y)       =  (text,)    
+ok 166 - (text,y)       >= (text,)    
+ok 167 - (text,y)        > (text,)    
+ok 168 - (text,y)      !=  (text,)    
