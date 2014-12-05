@@ -30,6 +30,8 @@ RETURNS SETOF text LANGUAGE sql AS $$
 	SELECT * FROM pg_temp.exec_text($1, NULL::text)
 $$;
 
+CREATE TEMP VIEW ops AS SELECT * FROM unnest( string_to_array( '<  ,<= , = , >=,  >,!= ', ',' ) ) AS op;
+
 CREATE TEMP TABLE num(
 	numtype	regtype
 	, n		numeric
@@ -79,6 +81,58 @@ CREATE OR REPLACE TEMP VIEW ncmp AS
 			, coalesce(rr::text, 'NULL') AS rr_text
 	FROM ncmp_raw
 ;
+CREATE OR REPLACE TEMP VIEW ncmp_ops AS SELECT * FROM ncmp, ops;
+
+CREATE TEMP TABLE _ncmp_raw(
+	l		variant.variant
+	, r		variant.variant
+	, lr	numeric[]
+	, rr	numeric[]
+);
+INSERT INTO _ncmp_raw
+SELECT l, r, lr, rr
+FROM (
+	SELECT *
+			/*
+			 * Need to cast lr/rr to text because "blah" isn't actually a valid array and format() gets mad.
+			 */
+			, variant.text_in(format( $$(%s[],%s)$$, t, '"' || lr::text || '"' )) AS l
+			, variant.text_in(format( $$(%s[],%s)$$, t, '"' || rr::text || '"' )) AS r
+		FROM (
+				SELECT *, '{0,1,1}'::numeric[] AS lr, v::numeric[] AS rr
+					FROM unnest(array[ '{0,0,1}', '{0,1,1}', '{0,2,1}', '{NULL,1,1}', '{0,NULL,1}', '{0,1,NULL}', NULL ]) AS vals(v)
+						, unnest( string_to_array( 'int2 int4 int8 float real numeric', ' ' ) ) AS types(t)
+			) a
+	) a
+;
+/*
+INSERT INTO _ncmp_raw(	l,		r									, lr			, rr	)
+VALUES
+	  ( NULL, NULL													, NULL			, NULL	)
+	, ( '(smallint[],"{0,0,1}")'		, '(bigint[],"{0,1,1}")'	, '{0,0,1}'		, '{0,1,1}'	)
+	, ( '(     int[],"{0,1,1}")'		, '(int2[],"{0,1,1}")'		, '{0,1,1}'		, '{0,1,1}'	)
+	, ( '(  bigint[],"{0,2,1}")'		, '(bigint[],"{0,1,1}")'	, '{0,2,1}'		, '{0,1,1}'	)
+	, ( '(smallint[],"{NULL,0,1}")'		, '(bigint[],"{0,1,1}")'	, '{NULL,0,1}'	, '{0,1,1}'	)
+	, ( '(     int[],"{NULL,1,1}")'		, '(int2[],"{0,1,1}")'		, '{NULL,1,1}'	, '{0,1,1}'	)
+	, ( '(  bigint[],"{NULL,2,1}")'		, '(bigint[],"{0,1,1}")'	, '{NULL,2,1}'	, '{0,1,1}'	)
+	, ( '(smallint[],"{0,0,NULL}")'		, '(bigint[],"{0,1,1}")'	, '{0,0,NULL}'	, '{0,1,1}'	)
+	, ( '(     int[],"{0,1,NULL}")'		, '(int2[],"{0,1,1}")'		, '{0,1,NULL}'	, '{0,1,1}'	)
+	, ( '(  bigint[],"{0,2,NULL}")'		, '(bigint[],"{0,1,1}")'	, '{0,2,NULL}'	, '{0,1,1}'	)
+	, ( '(  bigint[],)'					, '(bigint[],"{0,1,1}")'	, NULL			, '{0,1,1}'	)
+	, ( '(smallint[],"{0,0,1}")'		, '(bigint[],)'				, '{0,0,1}'		, NULL )
+	, ( '(     int[],"{0,1,1}")'		, '(int2[],)'				, '{0,1,1}'		, NULL )
+	, ( '(  bigint[],"{0,2,1}")'		, '(bigint[],)'				, '{0,2,1}'		, NULL )
+;
+*/
+CREATE OR REPLACE TEMP VIEW _ncmp AS
+	SELECT *
+			, variant.text_out(l) AS l_text
+			, variant.text_out(r) AS r_text
+			, coalesce(lr::text, 'NULL') AS lr_text
+			, coalesce(rr::text, 'NULL') AS rr_text
+	FROM _ncmp_raw
+;
+CREATE OR REPLACE TEMP VIEW _ncmp_ops AS SELECT * FROM _ncmp, ops;
 
 CREATE TEMP TABLE scmp_raw(
 	l		variant.variant
@@ -107,7 +161,30 @@ CREATE OR REPLACE TEMP VIEW scmp AS
 			, coalesce(rr::text, 'NULL') AS rr_text
 	FROM scmp_raw
 ;
-CREATE TEMP VIEW ops AS SELECT * FROM unnest( string_to_array( '<  ,<= , = , >=,  >,!= ', ',' ) ) AS op;
+CREATE OR REPLACE TEMP VIEW scmp_ops AS SELECT * FROM scmp, ops;
+
+CREATE TEMP TABLE box_cmp_raw(
+	l		variant.variant
+	, r		variant.variant
+	, lr	box
+	, rr	box
+);
+INSERT INTO box_cmp_raw(	l,		r								, lr					, rr	)
+VALUES
+	  ( NULL, NULL													, NULL					, NULL	)
+	, ( '(box,"((0,0),(0.5,0.5))")'	,'(box,"((0,0),(1,1))")'		, '((0,0),(0.5,0.5))'	, '((0,0),(1,1))'	)
+	, ( '(box,"((0,0),(1,1))")'		,'(box,"((0,0),(1,1))")'		, '((0,0),(1,1))'		, '((0,0),(1,1))'	)
+	, ( '(box,"((-1,-1),(1,1))")'	,'(box,"((0,0),(1,1))")'		, '((-1,-1),(1,1))'		, '((0,0),(1,1))'	)
+;
+CREATE OR REPLACE TEMP VIEW box_cmp AS
+	SELECT *
+			, variant.text_out(l) AS l_text
+			, variant.text_out(r) AS r_text
+			, coalesce(lr::text, 'NULL') AS lr_text
+			, coalesce(rr::text, 'NULL') AS rr_text
+	FROM box_cmp_raw
+;
+CREATE OR REPLACE TEMP VIEW box_cmp_ops AS SELECT * FROM box_cmp, ops WHERE btrim(op) NOT IN ( '!=', '<>' );
 
 \set ON_ERROR_STOP false
 
@@ -117,8 +194,10 @@ SELECT plan( (
 	+2 -- text in/out
 	+3 -- register
 	+4 -- NULL
-	+ (SELECT count(*) FROM ncmp, ops)
-	+ (SELECT count(*) FROM scmp, ops)
+	+ (SELECT count(*) FROM ncmp_ops)
+	+ (SELECT count(*) FROM _ncmp_ops)
+	+ (SELECT count(*) FROM scmp_ops)
+	+ (SELECT count(*) FROM box_cmp_ops)
 )::int );
 
 SELECT is(
@@ -181,29 +260,56 @@ SELECT pg_temp.exec_text(
 			$$SELECT is( %s )$$
 			, format( $fmt$%L::variant.variant %s %L::variant.variant
 					, %s %s %s
-					, '%s %s %s'$fmt$
+					, $$%L %s %L$$$fmt$
 				, l, op, r
 				, lr_text, op, rr_text
 				, rpad(l_text, len_l), op, rpad(r_text, len_r)
 			)
 		)
-	FROM ncmp, ops
+	FROM ncmp_ops
 		, (SELECT max(length(l_text)) AS len_l, max(length(r_text)) AS len_r FROM ncmp) l
+;
+SELECT pg_temp.exec_text(
+			$$SELECT is( %s )$$
+			, format( $fmt$%L::variant.variant %s %L::variant.variant
+					, %L::numeric[] %s %L::numeric[]
+					, $$%L::numeric[] %s %L::numeric[]$$$fmt$
+				, l, op, r
+				, lr, op, rr
+				, rpad(l_text, len_l), op, rpad(r_text, len_r)
+			)
+		)
+	FROM _ncmp_ops
+		, (SELECT max(length(l_text)) AS len_l, max(length(r_text)) AS len_r FROM _ncmp) l
+;
+
+SELECT pg_temp.exec_text(
+			$$SELECT is( %s )$$
+			, format( $fmt$%L::variant.variant %s %L::variant.variant
+					, %L::text %s %L::text
+					, $$%L::text %s %L::text$$$fmt$
+				, l, op, r
+				, lr, op, rr
+				, rpad(l_text, len_l), op, rpad(r_text, len_r)
+			)
+		)
+	FROM scmp_ops
+		, (SELECT max(length(l_text)) AS len_l, max(length(r_text)) AS len_r FROM scmp) l
 ;
 
 --SET client_min_messages = debug;
 SELECT pg_temp.exec_text(
 			$$SELECT is( %s )$$
 			, format( $fmt$%L::variant.variant %s %L::variant.variant
-					, %L %s %L
-					, '%s %s %s'$fmt$
+					, %L::box %s %L::box
+					, $$%L::box %s %L::box$$$fmt$
 				, l, op, r
 				, lr, op, rr
 				, rpad(l_text, len_l), op, rpad(r_text, len_r)
 			)
 		)
-	FROM scmp, ops
-		, (SELECT max(length(l_text)) AS len_l, max(length(r_text)) AS len_r FROM ncmp) l
+	FROM box_cmp_ops
+		, (SELECT max(length(l_text)) AS len_l, max(length(r_text)) AS len_r FROM box_cmp) l
 ;
 
 SELECT finish();
