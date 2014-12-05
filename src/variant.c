@@ -435,20 +435,29 @@ variant_out_int(FunctionCallInfo fcinfo, Variant input)
 static int
 variant_cmp_int(FunctionCallInfo fcinfo)
 {
-	Variant			l = PG_GETARG_VARIANT(0);
-	Variant			r = PG_GETARG_VARIANT(1);
+	Variant			l, r;
 	VariantInt	li;
 	VariantInt	ri;
 	int					result;
+	
+	Assert(fcinfo->flinfo->fn_strict); /* Must not be callable on NULL input */
+	l = PG_GETARG_VARIANT(0);
+	r = PG_GETARG_VARIANT(1);
 
 	/*
 	 * Presumably if both inputs are binary equal then they are in fact equal.
+	 * The only problem is two variants storing NULL would be binary equal but
+	 * can't be treated as-such. Given that issue, it doesn't seem worth trying
+	 * to optimize this.
+	 *
 	 * Note that we're not trying to play tricks with not detoasting or
 	 * un-packing, unlike variant_image_eq().
 	 */
+#ifdef NOT_USED
 	if(VARSIZE(l) == VARSIZE(r)
 			&& memcmp(l, r, VARSIZE(l)) == 0)
 		return 0;
+#endif
 
 	/*
 	 * We don't care about IO function but must specify something
@@ -456,7 +465,11 @@ variant_cmp_int(FunctionCallInfo fcinfo)
 	 * TODO: Improve caching so it will handle more than just one type :(
 	 */
 	li = make_variant_int(l, fcinfo, IOFunc_input);
+	if(li->isnull)
+		PG_RETURN_NULL();
 	ri = make_variant_int(r, fcinfo, IOFunc_input);
+	if(ri->isnull)
+		PG_RETURN_NULL();
 
 	/* TODO: If both variants are of the same type try comparing directly */
 		/* TODO: Support Transform_null_equals */
@@ -496,7 +509,6 @@ variant_cmp_int(FunctionCallInfo fcinfo)
 	return result;
 }
 
-
 /*
  * make_variant_int: Converts our external (Variant) representation to a VariantInt.
  */
@@ -517,6 +529,11 @@ make_variant_int(Variant v, FunctionCallInfo fcinfo, IOFuncSelector func)
 	vi = palloc0(sizeof(VariantDataInt));
 
 	vi->typid = get_oid(v, &flags);
+
+#ifdef VARIANT_TEST_OID
+	vi->typid -= OID_MASK;
+#endif
+
 	vi->typmod = v->typmod;
 	vi->isnull = (flags & VAR_ISNULL ? true : false);
 
@@ -590,6 +607,11 @@ make_variant(VariantInt vi, FunctionCallInfo fcinfo, IOFuncSelector func)
 	cache = get_cache(fcinfo, vi, func);
 	Assert(cache->typid = vi->typid);
 
+#ifdef VARIANT_TEST_OID
+	vi->typid += OID_MASK;
+	oid_overflow=OID_TOO_LARGE(vi->typid);
+#endif
+
 	if(vi->isnull)
 	{
 		flags |= VAR_ISNULL;
@@ -646,7 +668,7 @@ make_variant(VariantInt vi, FunctionCallInfo fcinfo, IOFuncSelector func)
 		v->pOid &= 0x00FFFFFF;
 
 		/* Store high byte of OID at the end of our structure */
-		*((char *) v + variant_length - sizeof(char)) = vi->typid >> 24;
+		*((char *) v + VARSIZE(v) - 1) = vi->typid >> 24;
 	}
 
 	/*
@@ -686,7 +708,7 @@ get_oid(Variant v, uint *flags)
 		e = *((char *) v + VARSIZE(v) - 1);
 
 		o = ((uint) e) << 24;
-		o = v->pOid & 0x00FFFFFF;
+		o |= v->pOid & 0x00FFFFFF;
 		return o;
 	}
 	else

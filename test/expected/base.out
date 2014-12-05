@@ -14,51 +14,112 @@
  
 (1 row)
 
-1..47
+1..108
 ok 1 - cast to text
 ok 2 - Check equality
-ok 3 -  '( smallint , -1 )'::variant.variant::smallint  = -1::smallint
-ok 4 -  '( integer , -1 )'::variant.variant::integer  = -1::integer
-ok 5 -  '( bigint , -1 )'::variant.variant::bigint  = -1::bigint
-ok 6 -  '( double precision , -1.1 )'::variant.variant::double precision  = -1.1::double precision
-ok 7 -  '( real , -1.1 )'::variant.variant::real  = -1.1::real
-ok 8 -  '( numeric , -1.1 )'::variant.variant::numeric  = -1.1::numeric
-ok 9 -  '( smallint , 0 )'::variant.variant::smallint  = 0::smallint
-ok 10 -  '( integer , 0 )'::variant.variant::integer  = 0::integer
-ok 11 -  '( bigint , 0 )'::variant.variant::bigint  = 0::bigint
-ok 12 -  '( double precision , 0.0 )'::variant.variant::double precision  = 0.0::double precision
-ok 13 -  '( real , 0.0 )'::variant.variant::real  = 0.0::real
-ok 14 -  '( numeric , 0.0 )'::variant.variant::numeric  = 0.0::numeric
-ok 15 -  '( smallint , 1 )'::variant.variant::smallint  = 1::smallint
-ok 16 -  '( integer , 1 )'::variant.variant::integer  = 1::integer
-ok 17 -  '( bigint , 1 )'::variant.variant::bigint  = 1::bigint
-ok 18 -  '( double precision , 1.1 )'::variant.variant::double precision  = 1.1::double precision
-ok 19 -  '( real , 1.1 )'::variant.variant::real  = 1.1::real
-ok 20 -  '( numeric , 1.1 )'::variant.variant::numeric  = 1.1::numeric
-ok 21 - variant.text_in()
-ok 22 - variant.text_out()
-ok 23 - valid variant(DEFAULT)
-ok 24 - Register variant
-ok 25 - test variant correctly added
-ok 26 - (int,)::int = NULL
-ok 27 - (int,1)::int != NULL
-ok 28 - (int,)::int = NULL is NULL
-ok 29 - (int,1)::int != NULL is NULL
-ok 30 - (smallint,-1) <   (bigint,0) 
-ok 31 - (smallint,-1) <=  (bigint,0) 
-ok 32 - (smallint,-1)  =  (bigint,0) 
-ok 33 - (smallint,-1)  >= (bigint,0) 
-ok 34 - (smallint,-1)   > (bigint,0) 
-ok 35 - (smallint,-1) !=  (bigint,0) 
-ok 36 - (smallint,0)  <   (integer,0)
-ok 37 - (smallint,0)  <=  (integer,0)
-ok 38 - (smallint,0)   =  (integer,0)
-ok 39 - (smallint,0)   >= (integer,0)
-ok 40 - (smallint,0)    > (integer,0)
-ok 41 - (smallint,0)  !=  (integer,0)
-ok 42 - (bigint,1)    <   (integer,0)
-ok 43 - (bigint,1)    <=  (integer,0)
-ok 44 - (bigint,1)     =  (integer,0)
-ok 45 - (bigint,1)     >= (integer,0)
-ok 46 - (bigint,1)      > (integer,0)
-ok 47 - (bigint,1)    !=  (integer,0)
+ok 3 - Check NULL
+ok 4 -  '( smallint , -1 )'::variant.variant::smallint  = -1::smallint
+ok 5 -  '( integer , -1 )'::variant.variant::integer  = -1::integer
+ok 6 -  '( bigint , -1 )'::variant.variant::bigint  = -1::bigint
+ok 7 -  '( double precision , -1.1 )'::variant.variant::double precision  = -1.1::double precision
+ok 8 -  '( real , -1.1 )'::variant.variant::real  = -1.1::real
+ok 9 -  '( numeric , -1.1 )'::variant.variant::numeric  = -1.1::numeric
+ok 10 -  '( smallint , 0 )'::variant.variant::smallint  = 0::smallint
+ok 11 -  '( integer , 0 )'::variant.variant::integer  = 0::integer
+ok 12 -  '( bigint , 0 )'::variant.variant::bigint  = 0::bigint
+ok 13 -  '( double precision , 0.0 )'::variant.variant::double precision  = 0.0::double precision
+ok 14 -  '( real , 0.0 )'::variant.variant::real  = 0.0::real
+ok 15 -  '( numeric , 0.0 )'::variant.variant::numeric  = 0.0::numeric
+ok 16 -  '( smallint , 1 )'::variant.variant::smallint  = 1::smallint
+ok 17 -  '( integer , 1 )'::variant.variant::integer  = 1::integer
+ok 18 -  '( bigint , 1 )'::variant.variant::bigint  = 1::bigint
+ok 19 -  '( double precision , 1.1 )'::variant.variant::double precision  = 1.1::double precision
+ok 20 -  '( real , 1.1 )'::variant.variant::real  = 1.1::real
+ok 21 -  '( numeric , 1.1 )'::variant.variant::numeric  = 1.1::numeric
+ok 22 - variant.text_in()
+ok 23 - variant.text_out()
+ok 24 - valid variant(DEFAULT)
+ok 25 - Register variant
+ok 26 - test variant correctly added
+ok 27 - (int,)::int = NULL
+ok 28 - (int,1)::int != NULL
+ok 29 - (int,)::int = NULL is NULL
+ok 30 - (int,1)::int != NULL is NULL
+ok 31 -  <   
+ok 32 -  <=  
+ok 33 -   =  
+ok 34 -   >= 
+ok 35 -    > 
+ok 36 -  !=  
+ok 37 - (smallint,-1) <   (bigint,0) 
+ok 38 - (smallint,-1) <=  (bigint,0) 
+ok 39 - (smallint,-1)  =  (bigint,0) 
+ok 40 - (smallint,-1)  >= (bigint,0) 
+ok 41 - (smallint,-1)   > (bigint,0) 
+ok 42 - (smallint,-1) !=  (bigint,0) 
+ok 43 - (smallint,0)  <   (integer,0)
+ok 44 - (smallint,0)  <=  (integer,0)
+ok 45 - (smallint,0)   =  (integer,0)
+ok 46 - (smallint,0)   >= (integer,0)
+ok 47 - (smallint,0)    > (integer,0)
+ok 48 - (smallint,0)  !=  (integer,0)
+ok 49 - (bigint,1)    <   (integer,0)
+ok 50 - (bigint,1)    <=  (integer,0)
+ok 51 - (bigint,1)     =  (integer,0)
+ok 52 - (bigint,1)     >= (integer,0)
+ok 53 - (bigint,1)      > (integer,0)
+ok 54 - (bigint,1)    !=  (integer,0)
+ok 55 - (smallint,)   <   (bigint,0) 
+ok 56 - (smallint,)   <=  (bigint,0) 
+ok 57 - (smallint,)    =  (bigint,0) 
+ok 58 - (smallint,)    >= (bigint,0) 
+ok 59 - (smallint,)     > (bigint,0) 
+ok 60 - (smallint,)   !=  (bigint,0) 
+ok 61 - (smallint,)   <   (integer,0)
+ok 62 - (smallint,)   <=  (integer,0)
+ok 63 - (smallint,)    =  (integer,0)
+ok 64 - (smallint,)    >= (integer,0)
+ok 65 - (smallint,)     > (integer,0)
+ok 66 - (smallint,)   !=  (integer,0)
+ok 67 - (bigint,)     <   (integer,0)
+ok 68 - (bigint,)     <=  (integer,0)
+ok 69 - (bigint,)      =  (integer,0)
+ok 70 - (bigint,)      >= (integer,0)
+ok 71 - (bigint,)       > (integer,0)
+ok 72 - (bigint,)     !=  (integer,0)
+ok 73 - (smallint,-1) <   (bigint,)  
+ok 74 - (smallint,-1) <=  (bigint,)  
+ok 75 - (smallint,-1)  =  (bigint,)  
+ok 76 - (smallint,-1)  >= (bigint,)  
+ok 77 - (smallint,-1)   > (bigint,)  
+ok 78 - (smallint,-1) !=  (bigint,)  
+ok 79 - (smallint,0)  <   (integer,) 
+ok 80 - (smallint,0)  <=  (integer,) 
+ok 81 - (smallint,0)   =  (integer,) 
+ok 82 - (smallint,0)   >= (integer,) 
+ok 83 - (smallint,0)    > (integer,) 
+ok 84 - (smallint,0)  !=  (integer,) 
+ok 85 - (bigint,1)    <   (integer,) 
+ok 86 - (bigint,1)    <=  (integer,) 
+ok 87 - (bigint,1)     =  (integer,) 
+ok 88 - (bigint,1)     >= (integer,) 
+ok 89 - (bigint,1)      > (integer,) 
+ok 90 - (bigint,1)    !=  (integer,) 
+ok 91 - (smallint,)   <   (bigint,)  
+ok 92 - (smallint,)   <=  (bigint,)  
+ok 93 - (smallint,)    =  (bigint,)  
+ok 94 - (smallint,)    >= (bigint,)  
+ok 95 - (smallint,)     > (bigint,)  
+ok 96 - (smallint,)   !=  (bigint,)  
+ok 97 - (smallint,)   <   (integer,) 
+ok 98 - (smallint,)   <=  (integer,) 
+ok 99 - (smallint,)    =  (integer,) 
+ok 100 - (smallint,)    >= (integer,) 
+ok 101 - (smallint,)     > (integer,) 
+ok 102 - (smallint,)   !=  (integer,) 
+ok 103 - (bigint,)     <   (integer,) 
+ok 104 - (bigint,)     <=  (integer,) 
+ok 105 - (bigint,)      =  (integer,) 
+ok 106 - (bigint,)      >= (integer,) 
+ok 107 - (bigint,)       > (integer,) 
+ok 108 - (bigint,)     !=  (integer,) 

@@ -52,7 +52,7 @@ CREATE TYPE variant.variant(
 
 SELECT _variant.exec( format($$
 CREATE OR REPLACE FUNCTION _variant.variant_%1$s(variant.variant, variant.variant)
-  RETURNS boolean LANGUAGE c IMMUTABLE AS '$libdir/variant', 'variant_%1$s';
+  RETURNS boolean LANGUAGE c IMMUTABLE STRICT AS '$libdir/variant', 'variant_%1$s';
   $$
   , op
 ) )

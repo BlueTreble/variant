@@ -34,9 +34,9 @@ typedef VariantData *Variant;
  * typid is a varlena.
  */
 
-#define VAR_OVERFLOW				0x80000000
+#define VAR_OVERFLOW				0x20000000
 #define VAR_ISNULL					0x40000000
-#define	VAR_VERSION					0x20000000
+#define	VAR_VERSION					0x80000000
 #define VAR_FLAGMASK				0xE0000000
 #define OID_MASK						0x1FFFFFFF
 #define OID_TOO_LARGE(Oid) (Oid > OID_MASK)
