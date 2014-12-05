@@ -639,15 +639,21 @@ make_variant(VariantInt vi, FunctionCallInfo fcinfo, IOFuncSelector func)
 		data_length = strlen(DatumGetCString(vi->data)); /* We don't store NUL terminator */
 		data_ptr = DatumGetPointer(vi->data);
 	}
-	else /* att_addlength_datum() sanity-checks typlen for us */
+	else
 	{
-		data_length = VHDRSZ; /* Start with header size to make sure alignment is correct */
-		data_length = (long) VDATAPTR_ALIGN(data_length, cache->typalign);
-		data_length = att_addlength_datum(data_length, cache->typlen, vi->data);
-		data_length -= VHDRSZ;
-
-		if(!cache->typbyval) /* fixed length, pass by reference */
+		Assert(cache->typlen >= 0);
+		if(cache->typbyval)
+		{
+			data_length = VHDRSZ; /* Start with header size to make sure alignment is correct */
+			data_length = (long) VDATAPTR_ALIGN(data_length, cache->typalign);
+			data_length += cache->typlen;
+			data_length -= VHDRSZ;
+		}
+		else /* fixed length, pass by reference */
+		{
+			data_length = cache->typlen;
 			data_ptr = DatumGetPointer(vi->data);
+		}
 	}
 
 	/* If typid is too large then we need an extra byte */
