@@ -19,10 +19,12 @@
 #include "parser/parse_type.h"
 #include "utils/builtins.h"
 #include "utils/datum.h"
+#include "utils/array.h"
 #include "executor/executor.h"
 #include "executor/spi.h"
 #include "utils/typcache.h"
 #include "utils/lsyscache.h"
+#include "catalog/pg_type.h"
 #include "variant.h"
 
 /* fn_extra cache entry */
@@ -42,9 +44,10 @@ typedef struct VariantCache
 
 #define GetCache(fcinfo) ((VariantCache *) fcinfo->flinfo->fn_extra)
 
-static Variant variant_in_int(FunctionCallInfo fcinfo, char *input);
+static Variant variant_in_int(FunctionCallInfo fcinfo, char *input, int variant_typmod);
 static char * variant_out_int(FunctionCallInfo fcinfo, Variant input);
 static int variant_cmp_int(FunctionCallInfo fcinfo);
+static char * variant_get_variant_name(int typmod);
 static VariantInt make_variant_int(Variant v, FunctionCallInfo fcinfo, IOFuncSelector func);
 static Variant make_variant(VariantInt vi, FunctionCallInfo fcinfo, IOFuncSelector func);
 static VariantCache * get_cache(FunctionCallInfo fcinfo, VariantInt vi, IOFuncSelector func);
@@ -75,7 +78,7 @@ PG_FUNCTION_INFO_V1(variant_in);
 Datum
 variant_in(PG_FUNCTION_ARGS)
 {
-	PG_RETURN_VARIANT( variant_in_int(fcinfo, PG_GETARG_CSTRING(0)) );
+	PG_RETURN_VARIANT( variant_in_int(fcinfo, PG_GETARG_CSTRING(0), PG_GETARG_INT32(2)) );
 }
 
 /*
@@ -122,9 +125,9 @@ variant_out(PG_FUNCTION_ARGS)
 /*
  * variant_cast_out: Cast a variant to some other type
  *
- * This function is defined as accepting (variant, anyelement). The second
- * argument is used strictly to determine what type we need to cast to. An
- * alternative would be to accept an OID input, but this seems cleaner.
+ * The type to return is determined by the return type of the Postgres-defined
+ * function that is calling us. There is a separate database cast function
+ * defined for each type, but they all just call this C function.
  */
 PG_FUNCTION_INFO_V1(variant_cast_out);
 Datum
@@ -151,13 +154,12 @@ variant_cast_out(PG_FUNCTION_ARGS)
 		bool						do_pop;
 		int							ret;
 		bool						isnull;
-		MemoryContext		cctx;
+		MemoryContext		cctx = CurrentMemoryContext;
 		HeapTuple				tup;
 		StringInfoData	cmdd;
 		StringInfo			cmd = &cmdd;
 		char						*nulls = " ";
 
-		cctx = CurrentMemoryContext;
 		do_pop = _SPI_conn();
 
 		initStringInfo(cmd);
@@ -166,7 +168,11 @@ variant_cast_out(PG_FUNCTION_ARGS)
 		if( !(ret =SPI_execute_with_args( cmd->data, 1, &vi->typid, &vi->data, nulls, true, 0 )) )
 			elog( ERROR, "SPI_execute_with_args returned %s", SPI_result_code_string(ret));
 
-		/* Make a copy of result Datum in previous memory context */
+		/*
+		 * Make a copy of result tuple in previous memory context. Copying the
+		 * entire tuple is wasteful; it would be better to only copy the actual
+		 * attribute; but in this case the difference isn't very large.
+		 */
 		MemoryContextSwitchTo(cctx);
 		tup = heap_copytuple(SPI_tuptable->vals[0]);
 		
@@ -180,6 +186,59 @@ variant_cast_out(PG_FUNCTION_ARGS)
 	PG_RETURN_DATUM(out);
 }
 
+PG_FUNCTION_INFO_V1(variant_typmod_in);
+Datum
+variant_typmod_in(PG_FUNCTION_ARGS)
+{
+	ArrayType	*arr = PG_GETARG_ARRAYTYPE_P(0);
+	Datum	   	*elem_values;
+	int				arr_nelem;
+	Datum			out;
+
+	Assert(fcinfo->flinfo->fn_strict); /* Must be strict */
+
+	deconstruct_array(arr, CSTRINGOID,
+					  -2, false, 'c', /* elmlen, elmbyval, elmalign */
+					  &elem_values, NULL, &arr_nelem); /* elements, nulls, number_of_elements */
+	/* TODO: Sanity check array */
+
+	/* TODO: cache this stuff */
+	/* Keep cruft localized to just here */
+	{
+		bool						do_pop = _SPI_conn();
+		bool						isnull;
+		int							ret;
+		Oid							type = TEXTOID;
+		char						*cmd = "SELECT _variant.registered__get__typmod( $1 )";
+
+		/* command, nargs, Oid *argument_types, *values, *nulls, read_only, count */
+		if( !(ret =SPI_execute_with_args( cmd, 1, &type, elem_values, " ", true, 0 )) )
+			elog( ERROR, "SPI_execute_with_args(%s) returned %s", cmd, SPI_result_code_string(ret));
+
+		/* Note 0 vs 1 based numbering */
+		Assert(SPI_tuptable->tupdesc->attrs[0]->atttypid == INT4OID);
+		out = heap_getattr( SPI_tuptable->vals[0], 1, SPI_tuptable->tupdesc, &isnull );
+		if( isnull )
+			elog( ERROR, "Got null from %s", cmd );
+
+		_SPI_disc(do_pop);
+	}
+
+	PG_RETURN_INT32(out);
+}
+
+PG_FUNCTION_INFO_V1(variant_typmod_out);
+Datum
+variant_typmod_out(PG_FUNCTION_ARGS)
+{
+	Assert(fcinfo->flinfo->fn_strict); /* Must be strict */
+
+	/* TODO: cache this stuff */
+
+	PG_RETURN_CSTRING(variant_get_variant_name(PG_GETARG_INT32(0)));
+}
+
+
 /*
  * text_(in|out): Same as variant_(in|out) except text instead of cstring
  */
@@ -187,7 +246,8 @@ PG_FUNCTION_INFO_V1(variant_text_in);
 Datum
 variant_text_in(PG_FUNCTION_ARGS)
 {
-	PG_RETURN_VARIANT( variant_in_int(fcinfo, TextDatumGetCString(PG_GETARG_DATUM(0)) ) );
+	/* TODO: Support passing a typmod in */
+	PG_RETURN_VARIANT( variant_in_int(fcinfo, TextDatumGetCString(PG_GETARG_DATUM(0)), -1 ) );
 }
 PG_FUNCTION_INFO_V1(variant_text_out);
 Datum
@@ -314,7 +374,7 @@ variant_image_eq(PG_FUNCTION_ARGS)
  */
 
 static Variant
-variant_in_int(FunctionCallInfo fcinfo, char *input)
+variant_in_int(FunctionCallInfo fcinfo, char *input, int variant_typmod)
 {
 	VariantCache	*cache;
 	bool					isnull;
@@ -325,7 +385,7 @@ variant_in_int(FunctionCallInfo fcinfo, char *input)
 	VariantInt		vi = palloc0(sizeof(*vi));
 
 	Assert(fcinfo->flinfo->fn_strict); /* Must be strict */
-
+	
 	/* Eventually getting rid of this crap, so segregate it */
 		intTypeOid = getIntOid();
 
@@ -349,6 +409,13 @@ variant_in_int(FunctionCallInfo fcinfo, char *input)
 	/* End crap */
 
 	parseTypeString(text_to_cstring(orgType), &vi->typid, &vi->typmod, false);
+
+	/*
+	 * Verify we've been handed a valid typmod
+	 *
+	 * TODO: validate that vi->typid is allowed to be used with this type of variant
+	 */
+	variant_get_variant_name(variant_typmod);
 
 	cache = get_cache(fcinfo, vi, IOFunc_input);
 
@@ -427,10 +494,40 @@ variant_out_int(FunctionCallInfo fcinfo, Variant input)
 }
 
 /*
- * variant_cmp_int: Are two variants identical on a binary level?
- *
- * Returns true iff a variant completely identical to another; same type and
- * everything.
+ * variant_get_variant_name: Return the name of a named variant
+ */
+char *
+variant_get_variant_name(int typmod)
+{
+	Datum						typmod_datum = Int32GetDatum(typmod);
+	MemoryContext		cctx = CurrentMemoryContext;
+	bool						do_pop = _SPI_conn();
+	bool						isnull;
+	Oid							type = INT4OID;
+	char						*cmd = "SELECT _variant.registered__get__variant_name( $1 )";
+	int							ret;
+	Datum						result;
+	char						*out;
+
+	/* command, nargs, Oid *argument_types, *values, *nulls, read_only, count */
+	if( !(ret =SPI_execute_with_args( cmd, 1, &type, &typmod_datum, " ", true, 0 )) )
+		elog( ERROR, "SPI_execute_with_args(%s) returned %s", cmd, SPI_result_code_string(ret));
+
+	/* Note 0 vs 1 based numbering */
+	Assert(SPI_tuptable->tupdesc->attrs[0]->atttypid == VARCHAROID);
+	result = heap_getattr( SPI_tuptable->vals[0], 1, SPI_tuptable->tupdesc, &isnull );
+	if( isnull )
+		elog( ERROR, "Got null from %s", cmd );
+
+	MemoryContextSwitchTo(cctx);
+	out = text_to_cstring(DatumGetTextP(result));
+	_SPI_disc(do_pop); /* pfree's all SPI stuff */
+
+	return out;
+}
+
+/*
+ * variant_cmp_int: Compare two variants
  */
 static int
 variant_cmp_int(FunctionCallInfo fcinfo)
@@ -501,6 +598,8 @@ variant_cmp_int(FunctionCallInfo fcinfo)
 					)) )
 			elog( ERROR, "SPI_execute_with_args returned %s", SPI_result_code_string(ret));
 
+		/* Note 0 vs 1 based numbering */
+		Assert(SPI_tuptable->tupdesc->attrs[0]->atttypid == INT4OID);
 		result = DatumGetObjectId( heap_getattr(SPI_tuptable->vals[0], 1, SPI_tuptable->tupdesc, &fcinfo->isnull) );
 
 		_SPI_disc(do_pop);

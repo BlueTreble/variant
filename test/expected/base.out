@@ -14,7 +14,7 @@
  
 (1 row)
 
-1..440
+1..446
 ok 1 - cast to text
 ok 2 - Check equality
 ok 3 - Check NULL
@@ -41,370 +41,370 @@ ok 23 - variant.text_out()
 ok 24 - valid variant(DEFAULT)
 ok 25 - Register variant
 ok 26 - test variant correctly added
-ok 27 - (int,)::int = NULL
-ok 28 - (int,1)::int != NULL
-ok 29 - (int,)::int = NULL is NULL
-ok 30 - (int,1)::int != NULL is NULL
-ok 31 - NULL <   NULL
-ok 32 - NULL <=  NULL
-ok 33 - NULL  =  NULL
-ok 34 - NULL  >= NULL
-ok 35 - NULL   > NULL
-ok 36 - NULL !=  NULL
-ok 37 - '(smallint,-1)' <   '(bigint,0) '
-ok 38 - '(smallint,-1)' <=  '(bigint,0) '
-ok 39 - '(smallint,-1)'  =  '(bigint,0) '
-ok 40 - '(smallint,-1)'  >= '(bigint,0) '
-ok 41 - '(smallint,-1)'   > '(bigint,0) '
-ok 42 - '(smallint,-1)' !=  '(bigint,0) '
-ok 43 - '(smallint,0) ' <   '(integer,0)'
-ok 44 - '(smallint,0) ' <=  '(integer,0)'
-ok 45 - '(smallint,0) '  =  '(integer,0)'
-ok 46 - '(smallint,0) '  >= '(integer,0)'
-ok 47 - '(smallint,0) '   > '(integer,0)'
-ok 48 - '(smallint,0) ' !=  '(integer,0)'
-ok 49 - '(bigint,1)   ' <   '(integer,0)'
-ok 50 - '(bigint,1)   ' <=  '(integer,0)'
-ok 51 - '(bigint,1)   '  =  '(integer,0)'
-ok 52 - '(bigint,1)   '  >= '(integer,0)'
-ok 53 - '(bigint,1)   '   > '(integer,0)'
-ok 54 - '(bigint,1)   ' !=  '(integer,0)'
-ok 55 - '(smallint,)  ' <   '(bigint,0) '
-ok 56 - '(smallint,)  ' <=  '(bigint,0) '
-ok 57 - '(smallint,)  '  =  '(bigint,0) '
-ok 58 - '(smallint,)  '  >= '(bigint,0) '
-ok 59 - '(smallint,)  '   > '(bigint,0) '
-ok 60 - '(smallint,)  ' !=  '(bigint,0) '
-ok 61 - '(smallint,)  ' <   '(integer,0)'
-ok 62 - '(smallint,)  ' <=  '(integer,0)'
-ok 63 - '(smallint,)  '  =  '(integer,0)'
-ok 64 - '(smallint,)  '  >= '(integer,0)'
-ok 65 - '(smallint,)  '   > '(integer,0)'
-ok 66 - '(smallint,)  ' !=  '(integer,0)'
-ok 67 - '(bigint,)    ' <   '(integer,0)'
-ok 68 - '(bigint,)    ' <=  '(integer,0)'
-ok 69 - '(bigint,)    '  =  '(integer,0)'
-ok 70 - '(bigint,)    '  >= '(integer,0)'
-ok 71 - '(bigint,)    '   > '(integer,0)'
-ok 72 - '(bigint,)    ' !=  '(integer,0)'
-ok 73 - '(smallint,-1)' <   '(bigint,)  '
-ok 74 - '(smallint,-1)' <=  '(bigint,)  '
-ok 75 - '(smallint,-1)'  =  '(bigint,)  '
-ok 76 - '(smallint,-1)'  >= '(bigint,)  '
-ok 77 - '(smallint,-1)'   > '(bigint,)  '
-ok 78 - '(smallint,-1)' !=  '(bigint,)  '
-ok 79 - '(smallint,0) ' <   '(integer,) '
-ok 80 - '(smallint,0) ' <=  '(integer,) '
-ok 81 - '(smallint,0) '  =  '(integer,) '
-ok 82 - '(smallint,0) '  >= '(integer,) '
-ok 83 - '(smallint,0) '   > '(integer,) '
-ok 84 - '(smallint,0) ' !=  '(integer,) '
-ok 85 - '(bigint,1)   ' <   '(integer,) '
-ok 86 - '(bigint,1)   ' <=  '(integer,) '
-ok 87 - '(bigint,1)   '  =  '(integer,) '
-ok 88 - '(bigint,1)   '  >= '(integer,) '
-ok 89 - '(bigint,1)   '   > '(integer,) '
-ok 90 - '(bigint,1)   ' !=  '(integer,) '
-ok 91 - '(smallint,)  ' <   '(bigint,)  '
-ok 92 - '(smallint,)  ' <=  '(bigint,)  '
-ok 93 - '(smallint,)  '  =  '(bigint,)  '
-ok 94 - '(smallint,)  '  >= '(bigint,)  '
-ok 95 - '(smallint,)  '   > '(bigint,)  '
-ok 96 - '(smallint,)  ' !=  '(bigint,)  '
-ok 97 - '(smallint,)  ' <   '(integer,) '
-ok 98 - '(smallint,)  ' <=  '(integer,) '
-ok 99 - '(smallint,)  '  =  '(integer,) '
-ok 100 - '(smallint,)  '  >= '(integer,) '
-ok 101 - '(smallint,)  '   > '(integer,) '
-ok 102 - '(smallint,)  ' !=  '(integer,) '
-ok 103 - '(bigint,)    ' <   '(integer,) '
-ok 104 - '(bigint,)    ' <=  '(integer,) '
-ok 105 - '(bigint,)    '  =  '(integer,) '
-ok 106 - '(bigint,)    '  >= '(integer,) '
-ok 107 - '(bigint,)    '   > '(integer,) '
-ok 108 - '(bigint,)    ' !=  '(integer,) '
-ok 109 - '(smallint[],"{0,1,1}")        '::numeric[] <   '(smallint[],"{0,0,1}")           '::numeric[]
-ok 110 - '(smallint[],"{0,1,1}")        '::numeric[] <=  '(smallint[],"{0,0,1}")           '::numeric[]
-ok 111 - '(smallint[],"{0,1,1}")        '::numeric[]  =  '(smallint[],"{0,0,1}")           '::numeric[]
-ok 112 - '(smallint[],"{0,1,1}")        '::numeric[]  >= '(smallint[],"{0,0,1}")           '::numeric[]
-ok 113 - '(smallint[],"{0,1,1}")        '::numeric[]   > '(smallint[],"{0,0,1}")           '::numeric[]
-ok 114 - '(smallint[],"{0,1,1}")        '::numeric[] !=  '(smallint[],"{0,0,1}")           '::numeric[]
-ok 115 - '(integer[],"{0,1,1}")         '::numeric[] <   '(integer[],"{0,0,1}")            '::numeric[]
-ok 116 - '(integer[],"{0,1,1}")         '::numeric[] <=  '(integer[],"{0,0,1}")            '::numeric[]
-ok 117 - '(integer[],"{0,1,1}")         '::numeric[]  =  '(integer[],"{0,0,1}")            '::numeric[]
-ok 118 - '(integer[],"{0,1,1}")         '::numeric[]  >= '(integer[],"{0,0,1}")            '::numeric[]
-ok 119 - '(integer[],"{0,1,1}")         '::numeric[]   > '(integer[],"{0,0,1}")            '::numeric[]
-ok 120 - '(integer[],"{0,1,1}")         '::numeric[] !=  '(integer[],"{0,0,1}")            '::numeric[]
-ok 121 - '(bigint[],"{0,1,1}")          '::numeric[] <   '(bigint[],"{0,0,1}")             '::numeric[]
-ok 122 - '(bigint[],"{0,1,1}")          '::numeric[] <=  '(bigint[],"{0,0,1}")             '::numeric[]
-ok 123 - '(bigint[],"{0,1,1}")          '::numeric[]  =  '(bigint[],"{0,0,1}")             '::numeric[]
-ok 124 - '(bigint[],"{0,1,1}")          '::numeric[]  >= '(bigint[],"{0,0,1}")             '::numeric[]
-ok 125 - '(bigint[],"{0,1,1}")          '::numeric[]   > '(bigint[],"{0,0,1}")             '::numeric[]
-ok 126 - '(bigint[],"{0,1,1}")          '::numeric[] !=  '(bigint[],"{0,0,1}")             '::numeric[]
-ok 127 - '(double precision[],"{0,1,1}")'::numeric[] <   '(double precision[],"{0,0,1}")   '::numeric[]
-ok 128 - '(double precision[],"{0,1,1}")'::numeric[] <=  '(double precision[],"{0,0,1}")   '::numeric[]
-ok 129 - '(double precision[],"{0,1,1}")'::numeric[]  =  '(double precision[],"{0,0,1}")   '::numeric[]
-ok 130 - '(double precision[],"{0,1,1}")'::numeric[]  >= '(double precision[],"{0,0,1}")   '::numeric[]
-ok 131 - '(double precision[],"{0,1,1}")'::numeric[]   > '(double precision[],"{0,0,1}")   '::numeric[]
-ok 132 - '(double precision[],"{0,1,1}")'::numeric[] !=  '(double precision[],"{0,0,1}")   '::numeric[]
-ok 133 - '(real[],"{0,1,1}")            '::numeric[] <   '(real[],"{0,0,1}")               '::numeric[]
-ok 134 - '(real[],"{0,1,1}")            '::numeric[] <=  '(real[],"{0,0,1}")               '::numeric[]
-ok 135 - '(real[],"{0,1,1}")            '::numeric[]  =  '(real[],"{0,0,1}")               '::numeric[]
-ok 136 - '(real[],"{0,1,1}")            '::numeric[]  >= '(real[],"{0,0,1}")               '::numeric[]
-ok 137 - '(real[],"{0,1,1}")            '::numeric[]   > '(real[],"{0,0,1}")               '::numeric[]
-ok 138 - '(real[],"{0,1,1}")            '::numeric[] !=  '(real[],"{0,0,1}")               '::numeric[]
-ok 139 - '(numeric[],"{0,1,1}")         '::numeric[] <   '(numeric[],"{0,0,1}")            '::numeric[]
-ok 140 - '(numeric[],"{0,1,1}")         '::numeric[] <=  '(numeric[],"{0,0,1}")            '::numeric[]
-ok 141 - '(numeric[],"{0,1,1}")         '::numeric[]  =  '(numeric[],"{0,0,1}")            '::numeric[]
-ok 142 - '(numeric[],"{0,1,1}")         '::numeric[]  >= '(numeric[],"{0,0,1}")            '::numeric[]
-ok 143 - '(numeric[],"{0,1,1}")         '::numeric[]   > '(numeric[],"{0,0,1}")            '::numeric[]
-ok 144 - '(numeric[],"{0,1,1}")         '::numeric[] !=  '(numeric[],"{0,0,1}")            '::numeric[]
-ok 145 - '(smallint[],"{0,1,1}")        '::numeric[] <   '(smallint[],"{0,1,1}")           '::numeric[]
-ok 146 - '(smallint[],"{0,1,1}")        '::numeric[] <=  '(smallint[],"{0,1,1}")           '::numeric[]
-ok 147 - '(smallint[],"{0,1,1}")        '::numeric[]  =  '(smallint[],"{0,1,1}")           '::numeric[]
-ok 148 - '(smallint[],"{0,1,1}")        '::numeric[]  >= '(smallint[],"{0,1,1}")           '::numeric[]
-ok 149 - '(smallint[],"{0,1,1}")        '::numeric[]   > '(smallint[],"{0,1,1}")           '::numeric[]
-ok 150 - '(smallint[],"{0,1,1}")        '::numeric[] !=  '(smallint[],"{0,1,1}")           '::numeric[]
-ok 151 - '(integer[],"{0,1,1}")         '::numeric[] <   '(integer[],"{0,1,1}")            '::numeric[]
-ok 152 - '(integer[],"{0,1,1}")         '::numeric[] <=  '(integer[],"{0,1,1}")            '::numeric[]
-ok 153 - '(integer[],"{0,1,1}")         '::numeric[]  =  '(integer[],"{0,1,1}")            '::numeric[]
-ok 154 - '(integer[],"{0,1,1}")         '::numeric[]  >= '(integer[],"{0,1,1}")            '::numeric[]
-ok 155 - '(integer[],"{0,1,1}")         '::numeric[]   > '(integer[],"{0,1,1}")            '::numeric[]
-ok 156 - '(integer[],"{0,1,1}")         '::numeric[] !=  '(integer[],"{0,1,1}")            '::numeric[]
-ok 157 - '(bigint[],"{0,1,1}")          '::numeric[] <   '(bigint[],"{0,1,1}")             '::numeric[]
-ok 158 - '(bigint[],"{0,1,1}")          '::numeric[] <=  '(bigint[],"{0,1,1}")             '::numeric[]
-ok 159 - '(bigint[],"{0,1,1}")          '::numeric[]  =  '(bigint[],"{0,1,1}")             '::numeric[]
-ok 160 - '(bigint[],"{0,1,1}")          '::numeric[]  >= '(bigint[],"{0,1,1}")             '::numeric[]
-ok 161 - '(bigint[],"{0,1,1}")          '::numeric[]   > '(bigint[],"{0,1,1}")             '::numeric[]
-ok 162 - '(bigint[],"{0,1,1}")          '::numeric[] !=  '(bigint[],"{0,1,1}")             '::numeric[]
-ok 163 - '(double precision[],"{0,1,1}")'::numeric[] <   '(double precision[],"{0,1,1}")   '::numeric[]
-ok 164 - '(double precision[],"{0,1,1}")'::numeric[] <=  '(double precision[],"{0,1,1}")   '::numeric[]
-ok 165 - '(double precision[],"{0,1,1}")'::numeric[]  =  '(double precision[],"{0,1,1}")   '::numeric[]
-ok 166 - '(double precision[],"{0,1,1}")'::numeric[]  >= '(double precision[],"{0,1,1}")   '::numeric[]
-ok 167 - '(double precision[],"{0,1,1}")'::numeric[]   > '(double precision[],"{0,1,1}")   '::numeric[]
-ok 168 - '(double precision[],"{0,1,1}")'::numeric[] !=  '(double precision[],"{0,1,1}")   '::numeric[]
-ok 169 - '(real[],"{0,1,1}")            '::numeric[] <   '(real[],"{0,1,1}")               '::numeric[]
-ok 170 - '(real[],"{0,1,1}")            '::numeric[] <=  '(real[],"{0,1,1}")               '::numeric[]
-ok 171 - '(real[],"{0,1,1}")            '::numeric[]  =  '(real[],"{0,1,1}")               '::numeric[]
-ok 172 - '(real[],"{0,1,1}")            '::numeric[]  >= '(real[],"{0,1,1}")               '::numeric[]
-ok 173 - '(real[],"{0,1,1}")            '::numeric[]   > '(real[],"{0,1,1}")               '::numeric[]
-ok 174 - '(real[],"{0,1,1}")            '::numeric[] !=  '(real[],"{0,1,1}")               '::numeric[]
-ok 175 - '(numeric[],"{0,1,1}")         '::numeric[] <   '(numeric[],"{0,1,1}")            '::numeric[]
-ok 176 - '(numeric[],"{0,1,1}")         '::numeric[] <=  '(numeric[],"{0,1,1}")            '::numeric[]
-ok 177 - '(numeric[],"{0,1,1}")         '::numeric[]  =  '(numeric[],"{0,1,1}")            '::numeric[]
-ok 178 - '(numeric[],"{0,1,1}")         '::numeric[]  >= '(numeric[],"{0,1,1}")            '::numeric[]
-ok 179 - '(numeric[],"{0,1,1}")         '::numeric[]   > '(numeric[],"{0,1,1}")            '::numeric[]
-ok 180 - '(numeric[],"{0,1,1}")         '::numeric[] !=  '(numeric[],"{0,1,1}")            '::numeric[]
-ok 181 - '(smallint[],"{0,1,1}")        '::numeric[] <   '(smallint[],"{0,2,1}")           '::numeric[]
-ok 182 - '(smallint[],"{0,1,1}")        '::numeric[] <=  '(smallint[],"{0,2,1}")           '::numeric[]
-ok 183 - '(smallint[],"{0,1,1}")        '::numeric[]  =  '(smallint[],"{0,2,1}")           '::numeric[]
-ok 184 - '(smallint[],"{0,1,1}")        '::numeric[]  >= '(smallint[],"{0,2,1}")           '::numeric[]
-ok 185 - '(smallint[],"{0,1,1}")        '::numeric[]   > '(smallint[],"{0,2,1}")           '::numeric[]
-ok 186 - '(smallint[],"{0,1,1}")        '::numeric[] !=  '(smallint[],"{0,2,1}")           '::numeric[]
-ok 187 - '(integer[],"{0,1,1}")         '::numeric[] <   '(integer[],"{0,2,1}")            '::numeric[]
-ok 188 - '(integer[],"{0,1,1}")         '::numeric[] <=  '(integer[],"{0,2,1}")            '::numeric[]
-ok 189 - '(integer[],"{0,1,1}")         '::numeric[]  =  '(integer[],"{0,2,1}")            '::numeric[]
-ok 190 - '(integer[],"{0,1,1}")         '::numeric[]  >= '(integer[],"{0,2,1}")            '::numeric[]
-ok 191 - '(integer[],"{0,1,1}")         '::numeric[]   > '(integer[],"{0,2,1}")            '::numeric[]
-ok 192 - '(integer[],"{0,1,1}")         '::numeric[] !=  '(integer[],"{0,2,1}")            '::numeric[]
-ok 193 - '(bigint[],"{0,1,1}")          '::numeric[] <   '(bigint[],"{0,2,1}")             '::numeric[]
-ok 194 - '(bigint[],"{0,1,1}")          '::numeric[] <=  '(bigint[],"{0,2,1}")             '::numeric[]
-ok 195 - '(bigint[],"{0,1,1}")          '::numeric[]  =  '(bigint[],"{0,2,1}")             '::numeric[]
-ok 196 - '(bigint[],"{0,1,1}")          '::numeric[]  >= '(bigint[],"{0,2,1}")             '::numeric[]
-ok 197 - '(bigint[],"{0,1,1}")          '::numeric[]   > '(bigint[],"{0,2,1}")             '::numeric[]
-ok 198 - '(bigint[],"{0,1,1}")          '::numeric[] !=  '(bigint[],"{0,2,1}")             '::numeric[]
-ok 199 - '(double precision[],"{0,1,1}")'::numeric[] <   '(double precision[],"{0,2,1}")   '::numeric[]
-ok 200 - '(double precision[],"{0,1,1}")'::numeric[] <=  '(double precision[],"{0,2,1}")   '::numeric[]
-ok 201 - '(double precision[],"{0,1,1}")'::numeric[]  =  '(double precision[],"{0,2,1}")   '::numeric[]
-ok 202 - '(double precision[],"{0,1,1}")'::numeric[]  >= '(double precision[],"{0,2,1}")   '::numeric[]
-ok 203 - '(double precision[],"{0,1,1}")'::numeric[]   > '(double precision[],"{0,2,1}")   '::numeric[]
-ok 204 - '(double precision[],"{0,1,1}")'::numeric[] !=  '(double precision[],"{0,2,1}")   '::numeric[]
-ok 205 - '(real[],"{0,1,1}")            '::numeric[] <   '(real[],"{0,2,1}")               '::numeric[]
-ok 206 - '(real[],"{0,1,1}")            '::numeric[] <=  '(real[],"{0,2,1}")               '::numeric[]
-ok 207 - '(real[],"{0,1,1}")            '::numeric[]  =  '(real[],"{0,2,1}")               '::numeric[]
-ok 208 - '(real[],"{0,1,1}")            '::numeric[]  >= '(real[],"{0,2,1}")               '::numeric[]
-ok 209 - '(real[],"{0,1,1}")            '::numeric[]   > '(real[],"{0,2,1}")               '::numeric[]
-ok 210 - '(real[],"{0,1,1}")            '::numeric[] !=  '(real[],"{0,2,1}")               '::numeric[]
-ok 211 - '(numeric[],"{0,1,1}")         '::numeric[] <   '(numeric[],"{0,2,1}")            '::numeric[]
-ok 212 - '(numeric[],"{0,1,1}")         '::numeric[] <=  '(numeric[],"{0,2,1}")            '::numeric[]
-ok 213 - '(numeric[],"{0,1,1}")         '::numeric[]  =  '(numeric[],"{0,2,1}")            '::numeric[]
-ok 214 - '(numeric[],"{0,1,1}")         '::numeric[]  >= '(numeric[],"{0,2,1}")            '::numeric[]
-ok 215 - '(numeric[],"{0,1,1}")         '::numeric[]   > '(numeric[],"{0,2,1}")            '::numeric[]
-ok 216 - '(numeric[],"{0,1,1}")         '::numeric[] !=  '(numeric[],"{0,2,1}")            '::numeric[]
-ok 217 - '(smallint[],"{0,1,1}")        '::numeric[] <   '(smallint[],"{NULL,1,1}")        '::numeric[]
-ok 218 - '(smallint[],"{0,1,1}")        '::numeric[] <=  '(smallint[],"{NULL,1,1}")        '::numeric[]
-ok 219 - '(smallint[],"{0,1,1}")        '::numeric[]  =  '(smallint[],"{NULL,1,1}")        '::numeric[]
-ok 220 - '(smallint[],"{0,1,1}")        '::numeric[]  >= '(smallint[],"{NULL,1,1}")        '::numeric[]
-ok 221 - '(smallint[],"{0,1,1}")        '::numeric[]   > '(smallint[],"{NULL,1,1}")        '::numeric[]
-ok 222 - '(smallint[],"{0,1,1}")        '::numeric[] !=  '(smallint[],"{NULL,1,1}")        '::numeric[]
-ok 223 - '(integer[],"{0,1,1}")         '::numeric[] <   '(integer[],"{NULL,1,1}")         '::numeric[]
-ok 224 - '(integer[],"{0,1,1}")         '::numeric[] <=  '(integer[],"{NULL,1,1}")         '::numeric[]
-ok 225 - '(integer[],"{0,1,1}")         '::numeric[]  =  '(integer[],"{NULL,1,1}")         '::numeric[]
-ok 226 - '(integer[],"{0,1,1}")         '::numeric[]  >= '(integer[],"{NULL,1,1}")         '::numeric[]
-ok 227 - '(integer[],"{0,1,1}")         '::numeric[]   > '(integer[],"{NULL,1,1}")         '::numeric[]
-ok 228 - '(integer[],"{0,1,1}")         '::numeric[] !=  '(integer[],"{NULL,1,1}")         '::numeric[]
-ok 229 - '(bigint[],"{0,1,1}")          '::numeric[] <   '(bigint[],"{NULL,1,1}")          '::numeric[]
-ok 230 - '(bigint[],"{0,1,1}")          '::numeric[] <=  '(bigint[],"{NULL,1,1}")          '::numeric[]
-ok 231 - '(bigint[],"{0,1,1}")          '::numeric[]  =  '(bigint[],"{NULL,1,1}")          '::numeric[]
-ok 232 - '(bigint[],"{0,1,1}")          '::numeric[]  >= '(bigint[],"{NULL,1,1}")          '::numeric[]
-ok 233 - '(bigint[],"{0,1,1}")          '::numeric[]   > '(bigint[],"{NULL,1,1}")          '::numeric[]
-ok 234 - '(bigint[],"{0,1,1}")          '::numeric[] !=  '(bigint[],"{NULL,1,1}")          '::numeric[]
-ok 235 - '(double precision[],"{0,1,1}")'::numeric[] <   '(double precision[],"{NULL,1,1}")'::numeric[]
-ok 236 - '(double precision[],"{0,1,1}")'::numeric[] <=  '(double precision[],"{NULL,1,1}")'::numeric[]
-ok 237 - '(double precision[],"{0,1,1}")'::numeric[]  =  '(double precision[],"{NULL,1,1}")'::numeric[]
-ok 238 - '(double precision[],"{0,1,1}")'::numeric[]  >= '(double precision[],"{NULL,1,1}")'::numeric[]
-ok 239 - '(double precision[],"{0,1,1}")'::numeric[]   > '(double precision[],"{NULL,1,1}")'::numeric[]
-ok 240 - '(double precision[],"{0,1,1}")'::numeric[] !=  '(double precision[],"{NULL,1,1}")'::numeric[]
-ok 241 - '(real[],"{0,1,1}")            '::numeric[] <   '(real[],"{NULL,1,1}")            '::numeric[]
-ok 242 - '(real[],"{0,1,1}")            '::numeric[] <=  '(real[],"{NULL,1,1}")            '::numeric[]
-ok 243 - '(real[],"{0,1,1}")            '::numeric[]  =  '(real[],"{NULL,1,1}")            '::numeric[]
-ok 244 - '(real[],"{0,1,1}")            '::numeric[]  >= '(real[],"{NULL,1,1}")            '::numeric[]
-ok 245 - '(real[],"{0,1,1}")            '::numeric[]   > '(real[],"{NULL,1,1}")            '::numeric[]
-ok 246 - '(real[],"{0,1,1}")            '::numeric[] !=  '(real[],"{NULL,1,1}")            '::numeric[]
-ok 247 - '(numeric[],"{0,1,1}")         '::numeric[] <   '(numeric[],"{NULL,1,1}")         '::numeric[]
-ok 248 - '(numeric[],"{0,1,1}")         '::numeric[] <=  '(numeric[],"{NULL,1,1}")         '::numeric[]
-ok 249 - '(numeric[],"{0,1,1}")         '::numeric[]  =  '(numeric[],"{NULL,1,1}")         '::numeric[]
-ok 250 - '(numeric[],"{0,1,1}")         '::numeric[]  >= '(numeric[],"{NULL,1,1}")         '::numeric[]
-ok 251 - '(numeric[],"{0,1,1}")         '::numeric[]   > '(numeric[],"{NULL,1,1}")         '::numeric[]
-ok 252 - '(numeric[],"{0,1,1}")         '::numeric[] !=  '(numeric[],"{NULL,1,1}")         '::numeric[]
-ok 253 - '(smallint[],"{0,1,1}")        '::numeric[] <   '(smallint[],"{0,NULL,1}")        '::numeric[]
-ok 254 - '(smallint[],"{0,1,1}")        '::numeric[] <=  '(smallint[],"{0,NULL,1}")        '::numeric[]
-ok 255 - '(smallint[],"{0,1,1}")        '::numeric[]  =  '(smallint[],"{0,NULL,1}")        '::numeric[]
-ok 256 - '(smallint[],"{0,1,1}")        '::numeric[]  >= '(smallint[],"{0,NULL,1}")        '::numeric[]
-ok 257 - '(smallint[],"{0,1,1}")        '::numeric[]   > '(smallint[],"{0,NULL,1}")        '::numeric[]
-ok 258 - '(smallint[],"{0,1,1}")        '::numeric[] !=  '(smallint[],"{0,NULL,1}")        '::numeric[]
-ok 259 - '(integer[],"{0,1,1}")         '::numeric[] <   '(integer[],"{0,NULL,1}")         '::numeric[]
-ok 260 - '(integer[],"{0,1,1}")         '::numeric[] <=  '(integer[],"{0,NULL,1}")         '::numeric[]
-ok 261 - '(integer[],"{0,1,1}")         '::numeric[]  =  '(integer[],"{0,NULL,1}")         '::numeric[]
-ok 262 - '(integer[],"{0,1,1}")         '::numeric[]  >= '(integer[],"{0,NULL,1}")         '::numeric[]
-ok 263 - '(integer[],"{0,1,1}")         '::numeric[]   > '(integer[],"{0,NULL,1}")         '::numeric[]
-ok 264 - '(integer[],"{0,1,1}")         '::numeric[] !=  '(integer[],"{0,NULL,1}")         '::numeric[]
-ok 265 - '(bigint[],"{0,1,1}")          '::numeric[] <   '(bigint[],"{0,NULL,1}")          '::numeric[]
-ok 266 - '(bigint[],"{0,1,1}")          '::numeric[] <=  '(bigint[],"{0,NULL,1}")          '::numeric[]
-ok 267 - '(bigint[],"{0,1,1}")          '::numeric[]  =  '(bigint[],"{0,NULL,1}")          '::numeric[]
-ok 268 - '(bigint[],"{0,1,1}")          '::numeric[]  >= '(bigint[],"{0,NULL,1}")          '::numeric[]
-ok 269 - '(bigint[],"{0,1,1}")          '::numeric[]   > '(bigint[],"{0,NULL,1}")          '::numeric[]
-ok 270 - '(bigint[],"{0,1,1}")          '::numeric[] !=  '(bigint[],"{0,NULL,1}")          '::numeric[]
-ok 271 - '(double precision[],"{0,1,1}")'::numeric[] <   '(double precision[],"{0,NULL,1}")'::numeric[]
-ok 272 - '(double precision[],"{0,1,1}")'::numeric[] <=  '(double precision[],"{0,NULL,1}")'::numeric[]
-ok 273 - '(double precision[],"{0,1,1}")'::numeric[]  =  '(double precision[],"{0,NULL,1}")'::numeric[]
-ok 274 - '(double precision[],"{0,1,1}")'::numeric[]  >= '(double precision[],"{0,NULL,1}")'::numeric[]
-ok 275 - '(double precision[],"{0,1,1}")'::numeric[]   > '(double precision[],"{0,NULL,1}")'::numeric[]
-ok 276 - '(double precision[],"{0,1,1}")'::numeric[] !=  '(double precision[],"{0,NULL,1}")'::numeric[]
-ok 277 - '(real[],"{0,1,1}")            '::numeric[] <   '(real[],"{0,NULL,1}")            '::numeric[]
-ok 278 - '(real[],"{0,1,1}")            '::numeric[] <=  '(real[],"{0,NULL,1}")            '::numeric[]
-ok 279 - '(real[],"{0,1,1}")            '::numeric[]  =  '(real[],"{0,NULL,1}")            '::numeric[]
-ok 280 - '(real[],"{0,1,1}")            '::numeric[]  >= '(real[],"{0,NULL,1}")            '::numeric[]
-ok 281 - '(real[],"{0,1,1}")            '::numeric[]   > '(real[],"{0,NULL,1}")            '::numeric[]
-ok 282 - '(real[],"{0,1,1}")            '::numeric[] !=  '(real[],"{0,NULL,1}")            '::numeric[]
-ok 283 - '(numeric[],"{0,1,1}")         '::numeric[] <   '(numeric[],"{0,NULL,1}")         '::numeric[]
-ok 284 - '(numeric[],"{0,1,1}")         '::numeric[] <=  '(numeric[],"{0,NULL,1}")         '::numeric[]
-ok 285 - '(numeric[],"{0,1,1}")         '::numeric[]  =  '(numeric[],"{0,NULL,1}")         '::numeric[]
-ok 286 - '(numeric[],"{0,1,1}")         '::numeric[]  >= '(numeric[],"{0,NULL,1}")         '::numeric[]
-ok 287 - '(numeric[],"{0,1,1}")         '::numeric[]   > '(numeric[],"{0,NULL,1}")         '::numeric[]
-ok 288 - '(numeric[],"{0,1,1}")         '::numeric[] !=  '(numeric[],"{0,NULL,1}")         '::numeric[]
-ok 289 - '(smallint[],"{0,1,1}")        '::numeric[] <   '(smallint[],"{0,1,NULL}")        '::numeric[]
-ok 290 - '(smallint[],"{0,1,1}")        '::numeric[] <=  '(smallint[],"{0,1,NULL}")        '::numeric[]
-ok 291 - '(smallint[],"{0,1,1}")        '::numeric[]  =  '(smallint[],"{0,1,NULL}")        '::numeric[]
-ok 292 - '(smallint[],"{0,1,1}")        '::numeric[]  >= '(smallint[],"{0,1,NULL}")        '::numeric[]
-ok 293 - '(smallint[],"{0,1,1}")        '::numeric[]   > '(smallint[],"{0,1,NULL}")        '::numeric[]
-ok 294 - '(smallint[],"{0,1,1}")        '::numeric[] !=  '(smallint[],"{0,1,NULL}")        '::numeric[]
-ok 295 - '(integer[],"{0,1,1}")         '::numeric[] <   '(integer[],"{0,1,NULL}")         '::numeric[]
-ok 296 - '(integer[],"{0,1,1}")         '::numeric[] <=  '(integer[],"{0,1,NULL}")         '::numeric[]
-ok 297 - '(integer[],"{0,1,1}")         '::numeric[]  =  '(integer[],"{0,1,NULL}")         '::numeric[]
-ok 298 - '(integer[],"{0,1,1}")         '::numeric[]  >= '(integer[],"{0,1,NULL}")         '::numeric[]
-ok 299 - '(integer[],"{0,1,1}")         '::numeric[]   > '(integer[],"{0,1,NULL}")         '::numeric[]
-ok 300 - '(integer[],"{0,1,1}")         '::numeric[] !=  '(integer[],"{0,1,NULL}")         '::numeric[]
-ok 301 - '(bigint[],"{0,1,1}")          '::numeric[] <   '(bigint[],"{0,1,NULL}")          '::numeric[]
-ok 302 - '(bigint[],"{0,1,1}")          '::numeric[] <=  '(bigint[],"{0,1,NULL}")          '::numeric[]
-ok 303 - '(bigint[],"{0,1,1}")          '::numeric[]  =  '(bigint[],"{0,1,NULL}")          '::numeric[]
-ok 304 - '(bigint[],"{0,1,1}")          '::numeric[]  >= '(bigint[],"{0,1,NULL}")          '::numeric[]
-ok 305 - '(bigint[],"{0,1,1}")          '::numeric[]   > '(bigint[],"{0,1,NULL}")          '::numeric[]
-ok 306 - '(bigint[],"{0,1,1}")          '::numeric[] !=  '(bigint[],"{0,1,NULL}")          '::numeric[]
-ok 307 - '(double precision[],"{0,1,1}")'::numeric[] <   '(double precision[],"{0,1,NULL}")'::numeric[]
-ok 308 - '(double precision[],"{0,1,1}")'::numeric[] <=  '(double precision[],"{0,1,NULL}")'::numeric[]
-ok 309 - '(double precision[],"{0,1,1}")'::numeric[]  =  '(double precision[],"{0,1,NULL}")'::numeric[]
-ok 310 - '(double precision[],"{0,1,1}")'::numeric[]  >= '(double precision[],"{0,1,NULL}")'::numeric[]
-ok 311 - '(double precision[],"{0,1,1}")'::numeric[]   > '(double precision[],"{0,1,NULL}")'::numeric[]
-ok 312 - '(double precision[],"{0,1,1}")'::numeric[] !=  '(double precision[],"{0,1,NULL}")'::numeric[]
-ok 313 - '(real[],"{0,1,1}")            '::numeric[] <   '(real[],"{0,1,NULL}")            '::numeric[]
-ok 314 - '(real[],"{0,1,1}")            '::numeric[] <=  '(real[],"{0,1,NULL}")            '::numeric[]
-ok 315 - '(real[],"{0,1,1}")            '::numeric[]  =  '(real[],"{0,1,NULL}")            '::numeric[]
-ok 316 - '(real[],"{0,1,1}")            '::numeric[]  >= '(real[],"{0,1,NULL}")            '::numeric[]
-ok 317 - '(real[],"{0,1,1}")            '::numeric[]   > '(real[],"{0,1,NULL}")            '::numeric[]
-ok 318 - '(real[],"{0,1,1}")            '::numeric[] !=  '(real[],"{0,1,NULL}")            '::numeric[]
-ok 319 - '(numeric[],"{0,1,1}")         '::numeric[] <   '(numeric[],"{0,1,NULL}")         '::numeric[]
-ok 320 - '(numeric[],"{0,1,1}")         '::numeric[] <=  '(numeric[],"{0,1,NULL}")         '::numeric[]
-ok 321 - '(numeric[],"{0,1,1}")         '::numeric[]  =  '(numeric[],"{0,1,NULL}")         '::numeric[]
-ok 322 - '(numeric[],"{0,1,1}")         '::numeric[]  >= '(numeric[],"{0,1,NULL}")         '::numeric[]
-ok 323 - '(numeric[],"{0,1,1}")         '::numeric[]   > '(numeric[],"{0,1,NULL}")         '::numeric[]
-ok 324 - '(numeric[],"{0,1,1}")         '::numeric[] !=  '(numeric[],"{0,1,NULL}")         '::numeric[]
-ok 325 - '(smallint[],"{0,1,1}")        '::numeric[] <   '(smallint[],)                    '::numeric[]
-ok 326 - '(smallint[],"{0,1,1}")        '::numeric[] <=  '(smallint[],)                    '::numeric[]
-ok 327 - '(smallint[],"{0,1,1}")        '::numeric[]  =  '(smallint[],)                    '::numeric[]
-ok 328 - '(smallint[],"{0,1,1}")        '::numeric[]  >= '(smallint[],)                    '::numeric[]
-ok 329 - '(smallint[],"{0,1,1}")        '::numeric[]   > '(smallint[],)                    '::numeric[]
-ok 330 - '(smallint[],"{0,1,1}")        '::numeric[] !=  '(smallint[],)                    '::numeric[]
-ok 331 - '(integer[],"{0,1,1}")         '::numeric[] <   '(integer[],)                     '::numeric[]
-ok 332 - '(integer[],"{0,1,1}")         '::numeric[] <=  '(integer[],)                     '::numeric[]
-ok 333 - '(integer[],"{0,1,1}")         '::numeric[]  =  '(integer[],)                     '::numeric[]
-ok 334 - '(integer[],"{0,1,1}")         '::numeric[]  >= '(integer[],)                     '::numeric[]
-ok 335 - '(integer[],"{0,1,1}")         '::numeric[]   > '(integer[],)                     '::numeric[]
-ok 336 - '(integer[],"{0,1,1}")         '::numeric[] !=  '(integer[],)                     '::numeric[]
-ok 337 - '(bigint[],"{0,1,1}")          '::numeric[] <   '(bigint[],)                      '::numeric[]
-ok 338 - '(bigint[],"{0,1,1}")          '::numeric[] <=  '(bigint[],)                      '::numeric[]
-ok 339 - '(bigint[],"{0,1,1}")          '::numeric[]  =  '(bigint[],)                      '::numeric[]
-ok 340 - '(bigint[],"{0,1,1}")          '::numeric[]  >= '(bigint[],)                      '::numeric[]
-ok 341 - '(bigint[],"{0,1,1}")          '::numeric[]   > '(bigint[],)                      '::numeric[]
-ok 342 - '(bigint[],"{0,1,1}")          '::numeric[] !=  '(bigint[],)                      '::numeric[]
-ok 343 - '(double precision[],"{0,1,1}")'::numeric[] <   '(double precision[],)            '::numeric[]
-ok 344 - '(double precision[],"{0,1,1}")'::numeric[] <=  '(double precision[],)            '::numeric[]
-ok 345 - '(double precision[],"{0,1,1}")'::numeric[]  =  '(double precision[],)            '::numeric[]
-ok 346 - '(double precision[],"{0,1,1}")'::numeric[]  >= '(double precision[],)            '::numeric[]
-ok 347 - '(double precision[],"{0,1,1}")'::numeric[]   > '(double precision[],)            '::numeric[]
-ok 348 - '(double precision[],"{0,1,1}")'::numeric[] !=  '(double precision[],)            '::numeric[]
-ok 349 - '(real[],"{0,1,1}")            '::numeric[] <   '(real[],)                        '::numeric[]
-ok 350 - '(real[],"{0,1,1}")            '::numeric[] <=  '(real[],)                        '::numeric[]
-ok 351 - '(real[],"{0,1,1}")            '::numeric[]  =  '(real[],)                        '::numeric[]
-ok 352 - '(real[],"{0,1,1}")            '::numeric[]  >= '(real[],)                        '::numeric[]
-ok 353 - '(real[],"{0,1,1}")            '::numeric[]   > '(real[],)                        '::numeric[]
-ok 354 - '(real[],"{0,1,1}")            '::numeric[] !=  '(real[],)                        '::numeric[]
-ok 355 - '(numeric[],"{0,1,1}")         '::numeric[] <   '(numeric[],)                     '::numeric[]
-ok 356 - '(numeric[],"{0,1,1}")         '::numeric[] <=  '(numeric[],)                     '::numeric[]
-ok 357 - '(numeric[],"{0,1,1}")         '::numeric[]  =  '(numeric[],)                     '::numeric[]
-ok 358 - '(numeric[],"{0,1,1}")         '::numeric[]  >= '(numeric[],)                     '::numeric[]
-ok 359 - '(numeric[],"{0,1,1}")         '::numeric[]   > '(numeric[],)                     '::numeric[]
-ok 360 - '(numeric[],"{0,1,1}")         '::numeric[] !=  '(numeric[],)                     '::numeric[]
-ok 361 - NULL::text <   NULL::text
-ok 362 - NULL::text <=  NULL::text
-ok 363 - NULL::text  =  NULL::text
-ok 364 - NULL::text  >= NULL::text
-ok 365 - NULL::text   > NULL::text
-ok 366 - NULL::text !=  NULL::text
-ok 367 - '(text,A)'::text <   '(text,x)'::text
-ok 368 - '(text,A)'::text <=  '(text,x)'::text
-ok 369 - '(text,A)'::text  =  '(text,x)'::text
-ok 370 - '(text,A)'::text  >= '(text,x)'::text
-ok 371 - '(text,A)'::text   > '(text,x)'::text
-ok 372 - '(text,A)'::text !=  '(text,x)'::text
-ok 373 - '(text,x)'::text <   '(text,x)'::text
-ok 374 - '(text,x)'::text <=  '(text,x)'::text
-ok 375 - '(text,x)'::text  =  '(text,x)'::text
-ok 376 - '(text,x)'::text  >= '(text,x)'::text
-ok 377 - '(text,x)'::text   > '(text,x)'::text
-ok 378 - '(text,x)'::text !=  '(text,x)'::text
-ok 379 - '(text,y)'::text <   '(text,x)'::text
-ok 380 - '(text,y)'::text <=  '(text,x)'::text
-ok 381 - '(text,y)'::text  =  '(text,x)'::text
-ok 382 - '(text,y)'::text  >= '(text,x)'::text
-ok 383 - '(text,y)'::text   > '(text,x)'::text
-ok 384 - '(text,y)'::text !=  '(text,x)'::text
-ok 385 - '(text,) '::text <   '(text,x)'::text
-ok 386 - '(text,) '::text <=  '(text,x)'::text
-ok 387 - '(text,) '::text  =  '(text,x)'::text
-ok 388 - '(text,) '::text  >= '(text,x)'::text
-ok 389 - '(text,) '::text   > '(text,x)'::text
-ok 390 - '(text,) '::text !=  '(text,x)'::text
+ok 27 - _variant.registered( text )
+ok 28 - _variant.registered( int )
+ok 29 - threw 22023: Invalid variant type bullshit registered test variant that should never actually exist
+ok 30 - threw 22023: Invalid variant type <>
+ok 31 - threw 22023: Invalid typmod -2
+ok 32 - threw 22023: Invalid typmod <>
+ok 33 - (int,)::int = NULL
+ok 34 - (int,1)::int != NULL
+ok 35 - (int,)::int = NULL is NULL
+ok 36 - (int,1)::int != NULL is NULL
+ok 37 - NULL <   NULL
+ok 38 - NULL <=  NULL
+ok 39 - NULL  =  NULL
+ok 40 - NULL  >= NULL
+ok 41 - NULL   > NULL
+ok 42 - NULL !=  NULL
+ok 43 - '(smallint,-1)' <   '(bigint,0) '
+ok 44 - '(smallint,-1)' <=  '(bigint,0) '
+ok 45 - '(smallint,-1)'  =  '(bigint,0) '
+ok 46 - '(smallint,-1)'  >= '(bigint,0) '
+ok 47 - '(smallint,-1)'   > '(bigint,0) '
+ok 48 - '(smallint,-1)' !=  '(bigint,0) '
+ok 49 - '(smallint,0) ' <   '(integer,0)'
+ok 50 - '(smallint,0) ' <=  '(integer,0)'
+ok 51 - '(smallint,0) '  =  '(integer,0)'
+ok 52 - '(smallint,0) '  >= '(integer,0)'
+ok 53 - '(smallint,0) '   > '(integer,0)'
+ok 54 - '(smallint,0) ' !=  '(integer,0)'
+ok 55 - '(bigint,1)   ' <   '(integer,0)'
+ok 56 - '(bigint,1)   ' <=  '(integer,0)'
+ok 57 - '(bigint,1)   '  =  '(integer,0)'
+ok 58 - '(bigint,1)   '  >= '(integer,0)'
+ok 59 - '(bigint,1)   '   > '(integer,0)'
+ok 60 - '(bigint,1)   ' !=  '(integer,0)'
+ok 61 - '(smallint,)  ' <   '(bigint,0) '
+ok 62 - '(smallint,)  ' <=  '(bigint,0) '
+ok 63 - '(smallint,)  '  =  '(bigint,0) '
+ok 64 - '(smallint,)  '  >= '(bigint,0) '
+ok 65 - '(smallint,)  '   > '(bigint,0) '
+ok 66 - '(smallint,)  ' !=  '(bigint,0) '
+ok 67 - '(smallint,)  ' <   '(integer,0)'
+ok 68 - '(smallint,)  ' <=  '(integer,0)'
+ok 69 - '(smallint,)  '  =  '(integer,0)'
+ok 70 - '(smallint,)  '  >= '(integer,0)'
+ok 71 - '(smallint,)  '   > '(integer,0)'
+ok 72 - '(smallint,)  ' !=  '(integer,0)'
+ok 73 - '(bigint,)    ' <   '(integer,0)'
+ok 74 - '(bigint,)    ' <=  '(integer,0)'
+ok 75 - '(bigint,)    '  =  '(integer,0)'
+ok 76 - '(bigint,)    '  >= '(integer,0)'
+ok 77 - '(bigint,)    '   > '(integer,0)'
+ok 78 - '(bigint,)    ' !=  '(integer,0)'
+ok 79 - '(smallint,-1)' <   '(bigint,)  '
+ok 80 - '(smallint,-1)' <=  '(bigint,)  '
+ok 81 - '(smallint,-1)'  =  '(bigint,)  '
+ok 82 - '(smallint,-1)'  >= '(bigint,)  '
+ok 83 - '(smallint,-1)'   > '(bigint,)  '
+ok 84 - '(smallint,-1)' !=  '(bigint,)  '
+ok 85 - '(smallint,0) ' <   '(integer,) '
+ok 86 - '(smallint,0) ' <=  '(integer,) '
+ok 87 - '(smallint,0) '  =  '(integer,) '
+ok 88 - '(smallint,0) '  >= '(integer,) '
+ok 89 - '(smallint,0) '   > '(integer,) '
+ok 90 - '(smallint,0) ' !=  '(integer,) '
+ok 91 - '(bigint,1)   ' <   '(integer,) '
+ok 92 - '(bigint,1)   ' <=  '(integer,) '
+ok 93 - '(bigint,1)   '  =  '(integer,) '
+ok 94 - '(bigint,1)   '  >= '(integer,) '
+ok 95 - '(bigint,1)   '   > '(integer,) '
+ok 96 - '(bigint,1)   ' !=  '(integer,) '
+ok 97 - '(smallint,)  ' <   '(bigint,)  '
+ok 98 - '(smallint,)  ' <=  '(bigint,)  '
+ok 99 - '(smallint,)  '  =  '(bigint,)  '
+ok 100 - '(smallint,)  '  >= '(bigint,)  '
+ok 101 - '(smallint,)  '   > '(bigint,)  '
+ok 102 - '(smallint,)  ' !=  '(bigint,)  '
+ok 103 - '(smallint,)  ' <   '(integer,) '
+ok 104 - '(smallint,)  ' <=  '(integer,) '
+ok 105 - '(smallint,)  '  =  '(integer,) '
+ok 106 - '(smallint,)  '  >= '(integer,) '
+ok 107 - '(smallint,)  '   > '(integer,) '
+ok 108 - '(smallint,)  ' !=  '(integer,) '
+ok 109 - '(bigint,)    ' <   '(integer,) '
+ok 110 - '(bigint,)    ' <=  '(integer,) '
+ok 111 - '(bigint,)    '  =  '(integer,) '
+ok 112 - '(bigint,)    '  >= '(integer,) '
+ok 113 - '(bigint,)    '   > '(integer,) '
+ok 114 - '(bigint,)    ' !=  '(integer,) '
+ok 115 - '(smallint[],"{0,1,1}")        '::numeric[] <   '(smallint[],"{0,0,1}")           '::numeric[]
+ok 116 - '(smallint[],"{0,1,1}")        '::numeric[] <=  '(smallint[],"{0,0,1}")           '::numeric[]
+ok 117 - '(smallint[],"{0,1,1}")        '::numeric[]  =  '(smallint[],"{0,0,1}")           '::numeric[]
+ok 118 - '(smallint[],"{0,1,1}")        '::numeric[]  >= '(smallint[],"{0,0,1}")           '::numeric[]
+ok 119 - '(smallint[],"{0,1,1}")        '::numeric[]   > '(smallint[],"{0,0,1}")           '::numeric[]
+ok 120 - '(smallint[],"{0,1,1}")        '::numeric[] !=  '(smallint[],"{0,0,1}")           '::numeric[]
+ok 121 - '(integer[],"{0,1,1}")         '::numeric[] <   '(integer[],"{0,0,1}")            '::numeric[]
+ok 122 - '(integer[],"{0,1,1}")         '::numeric[] <=  '(integer[],"{0,0,1}")            '::numeric[]
+ok 123 - '(integer[],"{0,1,1}")         '::numeric[]  =  '(integer[],"{0,0,1}")            '::numeric[]
+ok 124 - '(integer[],"{0,1,1}")         '::numeric[]  >= '(integer[],"{0,0,1}")            '::numeric[]
+ok 125 - '(integer[],"{0,1,1}")         '::numeric[]   > '(integer[],"{0,0,1}")            '::numeric[]
+ok 126 - '(integer[],"{0,1,1}")         '::numeric[] !=  '(integer[],"{0,0,1}")            '::numeric[]
+ok 127 - '(bigint[],"{0,1,1}")          '::numeric[] <   '(bigint[],"{0,0,1}")             '::numeric[]
+ok 128 - '(bigint[],"{0,1,1}")          '::numeric[] <=  '(bigint[],"{0,0,1}")             '::numeric[]
+ok 129 - '(bigint[],"{0,1,1}")          '::numeric[]  =  '(bigint[],"{0,0,1}")             '::numeric[]
+ok 130 - '(bigint[],"{0,1,1}")          '::numeric[]  >= '(bigint[],"{0,0,1}")             '::numeric[]
+ok 131 - '(bigint[],"{0,1,1}")          '::numeric[]   > '(bigint[],"{0,0,1}")             '::numeric[]
+ok 132 - '(bigint[],"{0,1,1}")          '::numeric[] !=  '(bigint[],"{0,0,1}")             '::numeric[]
+ok 133 - '(double precision[],"{0,1,1}")'::numeric[] <   '(double precision[],"{0,0,1}")   '::numeric[]
+ok 134 - '(double precision[],"{0,1,1}")'::numeric[] <=  '(double precision[],"{0,0,1}")   '::numeric[]
+ok 135 - '(double precision[],"{0,1,1}")'::numeric[]  =  '(double precision[],"{0,0,1}")   '::numeric[]
+ok 136 - '(double precision[],"{0,1,1}")'::numeric[]  >= '(double precision[],"{0,0,1}")   '::numeric[]
+ok 137 - '(double precision[],"{0,1,1}")'::numeric[]   > '(double precision[],"{0,0,1}")   '::numeric[]
+ok 138 - '(double precision[],"{0,1,1}")'::numeric[] !=  '(double precision[],"{0,0,1}")   '::numeric[]
+ok 139 - '(real[],"{0,1,1}")            '::numeric[] <   '(real[],"{0,0,1}")               '::numeric[]
+ok 140 - '(real[],"{0,1,1}")            '::numeric[] <=  '(real[],"{0,0,1}")               '::numeric[]
+ok 141 - '(real[],"{0,1,1}")            '::numeric[]  =  '(real[],"{0,0,1}")               '::numeric[]
+ok 142 - '(real[],"{0,1,1}")            '::numeric[]  >= '(real[],"{0,0,1}")               '::numeric[]
+ok 143 - '(real[],"{0,1,1}")            '::numeric[]   > '(real[],"{0,0,1}")               '::numeric[]
+ok 144 - '(real[],"{0,1,1}")            '::numeric[] !=  '(real[],"{0,0,1}")               '::numeric[]
+ok 145 - '(numeric[],"{0,1,1}")         '::numeric[] <   '(numeric[],"{0,0,1}")            '::numeric[]
+ok 146 - '(numeric[],"{0,1,1}")         '::numeric[] <=  '(numeric[],"{0,0,1}")            '::numeric[]
+ok 147 - '(numeric[],"{0,1,1}")         '::numeric[]  =  '(numeric[],"{0,0,1}")            '::numeric[]
+ok 148 - '(numeric[],"{0,1,1}")         '::numeric[]  >= '(numeric[],"{0,0,1}")            '::numeric[]
+ok 149 - '(numeric[],"{0,1,1}")         '::numeric[]   > '(numeric[],"{0,0,1}")            '::numeric[]
+ok 150 - '(numeric[],"{0,1,1}")         '::numeric[] !=  '(numeric[],"{0,0,1}")            '::numeric[]
+ok 151 - '(smallint[],"{0,1,1}")        '::numeric[] <   '(smallint[],"{0,1,1}")           '::numeric[]
+ok 152 - '(smallint[],"{0,1,1}")        '::numeric[] <=  '(smallint[],"{0,1,1}")           '::numeric[]
+ok 153 - '(smallint[],"{0,1,1}")        '::numeric[]  =  '(smallint[],"{0,1,1}")           '::numeric[]
+ok 154 - '(smallint[],"{0,1,1}")        '::numeric[]  >= '(smallint[],"{0,1,1}")           '::numeric[]
+ok 155 - '(smallint[],"{0,1,1}")        '::numeric[]   > '(smallint[],"{0,1,1}")           '::numeric[]
+ok 156 - '(smallint[],"{0,1,1}")        '::numeric[] !=  '(smallint[],"{0,1,1}")           '::numeric[]
+ok 157 - '(integer[],"{0,1,1}")         '::numeric[] <   '(integer[],"{0,1,1}")            '::numeric[]
+ok 158 - '(integer[],"{0,1,1}")         '::numeric[] <=  '(integer[],"{0,1,1}")            '::numeric[]
+ok 159 - '(integer[],"{0,1,1}")         '::numeric[]  =  '(integer[],"{0,1,1}")            '::numeric[]
+ok 160 - '(integer[],"{0,1,1}")         '::numeric[]  >= '(integer[],"{0,1,1}")            '::numeric[]
+ok 161 - '(integer[],"{0,1,1}")         '::numeric[]   > '(integer[],"{0,1,1}")            '::numeric[]
+ok 162 - '(integer[],"{0,1,1}")         '::numeric[] !=  '(integer[],"{0,1,1}")            '::numeric[]
+ok 163 - '(bigint[],"{0,1,1}")          '::numeric[] <   '(bigint[],"{0,1,1}")             '::numeric[]
+ok 164 - '(bigint[],"{0,1,1}")          '::numeric[] <=  '(bigint[],"{0,1,1}")             '::numeric[]
+ok 165 - '(bigint[],"{0,1,1}")          '::numeric[]  =  '(bigint[],"{0,1,1}")             '::numeric[]
+ok 166 - '(bigint[],"{0,1,1}")          '::numeric[]  >= '(bigint[],"{0,1,1}")             '::numeric[]
+ok 167 - '(bigint[],"{0,1,1}")          '::numeric[]   > '(bigint[],"{0,1,1}")             '::numeric[]
+ok 168 - '(bigint[],"{0,1,1}")          '::numeric[] !=  '(bigint[],"{0,1,1}")             '::numeric[]
+ok 169 - '(double precision[],"{0,1,1}")'::numeric[] <   '(double precision[],"{0,1,1}")   '::numeric[]
+ok 170 - '(double precision[],"{0,1,1}")'::numeric[] <=  '(double precision[],"{0,1,1}")   '::numeric[]
+ok 171 - '(double precision[],"{0,1,1}")'::numeric[]  =  '(double precision[],"{0,1,1}")   '::numeric[]
+ok 172 - '(double precision[],"{0,1,1}")'::numeric[]  >= '(double precision[],"{0,1,1}")   '::numeric[]
+ok 173 - '(double precision[],"{0,1,1}")'::numeric[]   > '(double precision[],"{0,1,1}")   '::numeric[]
+ok 174 - '(double precision[],"{0,1,1}")'::numeric[] !=  '(double precision[],"{0,1,1}")   '::numeric[]
+ok 175 - '(real[],"{0,1,1}")            '::numeric[] <   '(real[],"{0,1,1}")               '::numeric[]
+ok 176 - '(real[],"{0,1,1}")            '::numeric[] <=  '(real[],"{0,1,1}")               '::numeric[]
+ok 177 - '(real[],"{0,1,1}")            '::numeric[]  =  '(real[],"{0,1,1}")               '::numeric[]
+ok 178 - '(real[],"{0,1,1}")            '::numeric[]  >= '(real[],"{0,1,1}")               '::numeric[]
+ok 179 - '(real[],"{0,1,1}")            '::numeric[]   > '(real[],"{0,1,1}")               '::numeric[]
+ok 180 - '(real[],"{0,1,1}")            '::numeric[] !=  '(real[],"{0,1,1}")               '::numeric[]
+ok 181 - '(numeric[],"{0,1,1}")         '::numeric[] <   '(numeric[],"{0,1,1}")            '::numeric[]
+ok 182 - '(numeric[],"{0,1,1}")         '::numeric[] <=  '(numeric[],"{0,1,1}")            '::numeric[]
+ok 183 - '(numeric[],"{0,1,1}")         '::numeric[]  =  '(numeric[],"{0,1,1}")            '::numeric[]
+ok 184 - '(numeric[],"{0,1,1}")         '::numeric[]  >= '(numeric[],"{0,1,1}")            '::numeric[]
+ok 185 - '(numeric[],"{0,1,1}")         '::numeric[]   > '(numeric[],"{0,1,1}")            '::numeric[]
+ok 186 - '(numeric[],"{0,1,1}")         '::numeric[] !=  '(numeric[],"{0,1,1}")            '::numeric[]
+ok 187 - '(smallint[],"{0,1,1}")        '::numeric[] <   '(smallint[],"{0,2,1}")           '::numeric[]
+ok 188 - '(smallint[],"{0,1,1}")        '::numeric[] <=  '(smallint[],"{0,2,1}")           '::numeric[]
+ok 189 - '(smallint[],"{0,1,1}")        '::numeric[]  =  '(smallint[],"{0,2,1}")           '::numeric[]
+ok 190 - '(smallint[],"{0,1,1}")        '::numeric[]  >= '(smallint[],"{0,2,1}")           '::numeric[]
+ok 191 - '(smallint[],"{0,1,1}")        '::numeric[]   > '(smallint[],"{0,2,1}")           '::numeric[]
+ok 192 - '(smallint[],"{0,1,1}")        '::numeric[] !=  '(smallint[],"{0,2,1}")           '::numeric[]
+ok 193 - '(integer[],"{0,1,1}")         '::numeric[] <   '(integer[],"{0,2,1}")            '::numeric[]
+ok 194 - '(integer[],"{0,1,1}")         '::numeric[] <=  '(integer[],"{0,2,1}")            '::numeric[]
+ok 195 - '(integer[],"{0,1,1}")         '::numeric[]  =  '(integer[],"{0,2,1}")            '::numeric[]
+ok 196 - '(integer[],"{0,1,1}")         '::numeric[]  >= '(integer[],"{0,2,1}")            '::numeric[]
+ok 197 - '(integer[],"{0,1,1}")         '::numeric[]   > '(integer[],"{0,2,1}")            '::numeric[]
+ok 198 - '(integer[],"{0,1,1}")         '::numeric[] !=  '(integer[],"{0,2,1}")            '::numeric[]
+ok 199 - '(bigint[],"{0,1,1}")          '::numeric[] <   '(bigint[],"{0,2,1}")             '::numeric[]
+ok 200 - '(bigint[],"{0,1,1}")          '::numeric[] <=  '(bigint[],"{0,2,1}")             '::numeric[]
+ok 201 - '(bigint[],"{0,1,1}")          '::numeric[]  =  '(bigint[],"{0,2,1}")             '::numeric[]
+ok 202 - '(bigint[],"{0,1,1}")          '::numeric[]  >= '(bigint[],"{0,2,1}")             '::numeric[]
+ok 203 - '(bigint[],"{0,1,1}")          '::numeric[]   > '(bigint[],"{0,2,1}")             '::numeric[]
+ok 204 - '(bigint[],"{0,1,1}")          '::numeric[] !=  '(bigint[],"{0,2,1}")             '::numeric[]
+ok 205 - '(double precision[],"{0,1,1}")'::numeric[] <   '(double precision[],"{0,2,1}")   '::numeric[]
+ok 206 - '(double precision[],"{0,1,1}")'::numeric[] <=  '(double precision[],"{0,2,1}")   '::numeric[]
+ok 207 - '(double precision[],"{0,1,1}")'::numeric[]  =  '(double precision[],"{0,2,1}")   '::numeric[]
+ok 208 - '(double precision[],"{0,1,1}")'::numeric[]  >= '(double precision[],"{0,2,1}")   '::numeric[]
+ok 209 - '(double precision[],"{0,1,1}")'::numeric[]   > '(double precision[],"{0,2,1}")   '::numeric[]
+ok 210 - '(double precision[],"{0,1,1}")'::numeric[] !=  '(double precision[],"{0,2,1}")   '::numeric[]
+ok 211 - '(real[],"{0,1,1}")            '::numeric[] <   '(real[],"{0,2,1}")               '::numeric[]
+ok 212 - '(real[],"{0,1,1}")            '::numeric[] <=  '(real[],"{0,2,1}")               '::numeric[]
+ok 213 - '(real[],"{0,1,1}")            '::numeric[]  =  '(real[],"{0,2,1}")               '::numeric[]
+ok 214 - '(real[],"{0,1,1}")            '::numeric[]  >= '(real[],"{0,2,1}")               '::numeric[]
+ok 215 - '(real[],"{0,1,1}")            '::numeric[]   > '(real[],"{0,2,1}")               '::numeric[]
+ok 216 - '(real[],"{0,1,1}")            '::numeric[] !=  '(real[],"{0,2,1}")               '::numeric[]
+ok 217 - '(numeric[],"{0,1,1}")         '::numeric[] <   '(numeric[],"{0,2,1}")            '::numeric[]
+ok 218 - '(numeric[],"{0,1,1}")         '::numeric[] <=  '(numeric[],"{0,2,1}")            '::numeric[]
+ok 219 - '(numeric[],"{0,1,1}")         '::numeric[]  =  '(numeric[],"{0,2,1}")            '::numeric[]
+ok 220 - '(numeric[],"{0,1,1}")         '::numeric[]  >= '(numeric[],"{0,2,1}")            '::numeric[]
+ok 221 - '(numeric[],"{0,1,1}")         '::numeric[]   > '(numeric[],"{0,2,1}")            '::numeric[]
+ok 222 - '(numeric[],"{0,1,1}")         '::numeric[] !=  '(numeric[],"{0,2,1}")            '::numeric[]
+ok 223 - '(smallint[],"{0,1,1}")        '::numeric[] <   '(smallint[],"{NULL,1,1}")        '::numeric[]
+ok 224 - '(smallint[],"{0,1,1}")        '::numeric[] <=  '(smallint[],"{NULL,1,1}")        '::numeric[]
+ok 225 - '(smallint[],"{0,1,1}")        '::numeric[]  =  '(smallint[],"{NULL,1,1}")        '::numeric[]
+ok 226 - '(smallint[],"{0,1,1}")        '::numeric[]  >= '(smallint[],"{NULL,1,1}")        '::numeric[]
+ok 227 - '(smallint[],"{0,1,1}")        '::numeric[]   > '(smallint[],"{NULL,1,1}")        '::numeric[]
+ok 228 - '(smallint[],"{0,1,1}")        '::numeric[] !=  '(smallint[],"{NULL,1,1}")        '::numeric[]
+ok 229 - '(integer[],"{0,1,1}")         '::numeric[] <   '(integer[],"{NULL,1,1}")         '::numeric[]
+ok 230 - '(integer[],"{0,1,1}")         '::numeric[] <=  '(integer[],"{NULL,1,1}")         '::numeric[]
+ok 231 - '(integer[],"{0,1,1}")         '::numeric[]  =  '(integer[],"{NULL,1,1}")         '::numeric[]
+ok 232 - '(integer[],"{0,1,1}")         '::numeric[]  >= '(integer[],"{NULL,1,1}")         '::numeric[]
+ok 233 - '(integer[],"{0,1,1}")         '::numeric[]   > '(integer[],"{NULL,1,1}")         '::numeric[]
+ok 234 - '(integer[],"{0,1,1}")         '::numeric[] !=  '(integer[],"{NULL,1,1}")         '::numeric[]
+ok 235 - '(bigint[],"{0,1,1}")          '::numeric[] <   '(bigint[],"{NULL,1,1}")          '::numeric[]
+ok 236 - '(bigint[],"{0,1,1}")          '::numeric[] <=  '(bigint[],"{NULL,1,1}")          '::numeric[]
+ok 237 - '(bigint[],"{0,1,1}")          '::numeric[]  =  '(bigint[],"{NULL,1,1}")          '::numeric[]
+ok 238 - '(bigint[],"{0,1,1}")          '::numeric[]  >= '(bigint[],"{NULL,1,1}")          '::numeric[]
+ok 239 - '(bigint[],"{0,1,1}")          '::numeric[]   > '(bigint[],"{NULL,1,1}")          '::numeric[]
+ok 240 - '(bigint[],"{0,1,1}")          '::numeric[] !=  '(bigint[],"{NULL,1,1}")          '::numeric[]
+ok 241 - '(double precision[],"{0,1,1}")'::numeric[] <   '(double precision[],"{NULL,1,1}")'::numeric[]
+ok 242 - '(double precision[],"{0,1,1}")'::numeric[] <=  '(double precision[],"{NULL,1,1}")'::numeric[]
+ok 243 - '(double precision[],"{0,1,1}")'::numeric[]  =  '(double precision[],"{NULL,1,1}")'::numeric[]
+ok 244 - '(double precision[],"{0,1,1}")'::numeric[]  >= '(double precision[],"{NULL,1,1}")'::numeric[]
+ok 245 - '(double precision[],"{0,1,1}")'::numeric[]   > '(double precision[],"{NULL,1,1}")'::numeric[]
+ok 246 - '(double precision[],"{0,1,1}")'::numeric[] !=  '(double precision[],"{NULL,1,1}")'::numeric[]
+ok 247 - '(real[],"{0,1,1}")            '::numeric[] <   '(real[],"{NULL,1,1}")            '::numeric[]
+ok 248 - '(real[],"{0,1,1}")            '::numeric[] <=  '(real[],"{NULL,1,1}")            '::numeric[]
+ok 249 - '(real[],"{0,1,1}")            '::numeric[]  =  '(real[],"{NULL,1,1}")            '::numeric[]
+ok 250 - '(real[],"{0,1,1}")            '::numeric[]  >= '(real[],"{NULL,1,1}")            '::numeric[]
+ok 251 - '(real[],"{0,1,1}")            '::numeric[]   > '(real[],"{NULL,1,1}")            '::numeric[]
+ok 252 - '(real[],"{0,1,1}")            '::numeric[] !=  '(real[],"{NULL,1,1}")            '::numeric[]
+ok 253 - '(numeric[],"{0,1,1}")         '::numeric[] <   '(numeric[],"{NULL,1,1}")         '::numeric[]
+ok 254 - '(numeric[],"{0,1,1}")         '::numeric[] <=  '(numeric[],"{NULL,1,1}")         '::numeric[]
+ok 255 - '(numeric[],"{0,1,1}")         '::numeric[]  =  '(numeric[],"{NULL,1,1}")         '::numeric[]
+ok 256 - '(numeric[],"{0,1,1}")         '::numeric[]  >= '(numeric[],"{NULL,1,1}")         '::numeric[]
+ok 257 - '(numeric[],"{0,1,1}")         '::numeric[]   > '(numeric[],"{NULL,1,1}")         '::numeric[]
+ok 258 - '(numeric[],"{0,1,1}")         '::numeric[] !=  '(numeric[],"{NULL,1,1}")         '::numeric[]
+ok 259 - '(smallint[],"{0,1,1}")        '::numeric[] <   '(smallint[],"{0,NULL,1}")        '::numeric[]
+ok 260 - '(smallint[],"{0,1,1}")        '::numeric[] <=  '(smallint[],"{0,NULL,1}")        '::numeric[]
+ok 261 - '(smallint[],"{0,1,1}")        '::numeric[]  =  '(smallint[],"{0,NULL,1}")        '::numeric[]
+ok 262 - '(smallint[],"{0,1,1}")        '::numeric[]  >= '(smallint[],"{0,NULL,1}")        '::numeric[]
+ok 263 - '(smallint[],"{0,1,1}")        '::numeric[]   > '(smallint[],"{0,NULL,1}")        '::numeric[]
+ok 264 - '(smallint[],"{0,1,1}")        '::numeric[] !=  '(smallint[],"{0,NULL,1}")        '::numeric[]
+ok 265 - '(integer[],"{0,1,1}")         '::numeric[] <   '(integer[],"{0,NULL,1}")         '::numeric[]
+ok 266 - '(integer[],"{0,1,1}")         '::numeric[] <=  '(integer[],"{0,NULL,1}")         '::numeric[]
+ok 267 - '(integer[],"{0,1,1}")         '::numeric[]  =  '(integer[],"{0,NULL,1}")         '::numeric[]
+ok 268 - '(integer[],"{0,1,1}")         '::numeric[]  >= '(integer[],"{0,NULL,1}")         '::numeric[]
+ok 269 - '(integer[],"{0,1,1}")         '::numeric[]   > '(integer[],"{0,NULL,1}")         '::numeric[]
+ok 270 - '(integer[],"{0,1,1}")         '::numeric[] !=  '(integer[],"{0,NULL,1}")         '::numeric[]
+ok 271 - '(bigint[],"{0,1,1}")          '::numeric[] <   '(bigint[],"{0,NULL,1}")          '::numeric[]
+ok 272 - '(bigint[],"{0,1,1}")          '::numeric[] <=  '(bigint[],"{0,NULL,1}")          '::numeric[]
+ok 273 - '(bigint[],"{0,1,1}")          '::numeric[]  =  '(bigint[],"{0,NULL,1}")          '::numeric[]
+ok 274 - '(bigint[],"{0,1,1}")          '::numeric[]  >= '(bigint[],"{0,NULL,1}")          '::numeric[]
+ok 275 - '(bigint[],"{0,1,1}")          '::numeric[]   > '(bigint[],"{0,NULL,1}")          '::numeric[]
+ok 276 - '(bigint[],"{0,1,1}")          '::numeric[] !=  '(bigint[],"{0,NULL,1}")          '::numeric[]
+ok 277 - '(double precision[],"{0,1,1}")'::numeric[] <   '(double precision[],"{0,NULL,1}")'::numeric[]
+ok 278 - '(double precision[],"{0,1,1}")'::numeric[] <=  '(double precision[],"{0,NULL,1}")'::numeric[]
+ok 279 - '(double precision[],"{0,1,1}")'::numeric[]  =  '(double precision[],"{0,NULL,1}")'::numeric[]
+ok 280 - '(double precision[],"{0,1,1}")'::numeric[]  >= '(double precision[],"{0,NULL,1}")'::numeric[]
+ok 281 - '(double precision[],"{0,1,1}")'::numeric[]   > '(double precision[],"{0,NULL,1}")'::numeric[]
+ok 282 - '(double precision[],"{0,1,1}")'::numeric[] !=  '(double precision[],"{0,NULL,1}")'::numeric[]
+ok 283 - '(real[],"{0,1,1}")            '::numeric[] <   '(real[],"{0,NULL,1}")            '::numeric[]
+ok 284 - '(real[],"{0,1,1}")            '::numeric[] <=  '(real[],"{0,NULL,1}")            '::numeric[]
+ok 285 - '(real[],"{0,1,1}")            '::numeric[]  =  '(real[],"{0,NULL,1}")            '::numeric[]
+ok 286 - '(real[],"{0,1,1}")            '::numeric[]  >= '(real[],"{0,NULL,1}")            '::numeric[]
+ok 287 - '(real[],"{0,1,1}")            '::numeric[]   > '(real[],"{0,NULL,1}")            '::numeric[]
+ok 288 - '(real[],"{0,1,1}")            '::numeric[] !=  '(real[],"{0,NULL,1}")            '::numeric[]
+ok 289 - '(numeric[],"{0,1,1}")         '::numeric[] <   '(numeric[],"{0,NULL,1}")         '::numeric[]
+ok 290 - '(numeric[],"{0,1,1}")         '::numeric[] <=  '(numeric[],"{0,NULL,1}")         '::numeric[]
+ok 291 - '(numeric[],"{0,1,1}")         '::numeric[]  =  '(numeric[],"{0,NULL,1}")         '::numeric[]
+ok 292 - '(numeric[],"{0,1,1}")         '::numeric[]  >= '(numeric[],"{0,NULL,1}")         '::numeric[]
+ok 293 - '(numeric[],"{0,1,1}")         '::numeric[]   > '(numeric[],"{0,NULL,1}")         '::numeric[]
+ok 294 - '(numeric[],"{0,1,1}")         '::numeric[] !=  '(numeric[],"{0,NULL,1}")         '::numeric[]
+ok 295 - '(smallint[],"{0,1,1}")        '::numeric[] <   '(smallint[],"{0,1,NULL}")        '::numeric[]
+ok 296 - '(smallint[],"{0,1,1}")        '::numeric[] <=  '(smallint[],"{0,1,NULL}")        '::numeric[]
+ok 297 - '(smallint[],"{0,1,1}")        '::numeric[]  =  '(smallint[],"{0,1,NULL}")        '::numeric[]
+ok 298 - '(smallint[],"{0,1,1}")        '::numeric[]  >= '(smallint[],"{0,1,NULL}")        '::numeric[]
+ok 299 - '(smallint[],"{0,1,1}")        '::numeric[]   > '(smallint[],"{0,1,NULL}")        '::numeric[]
+ok 300 - '(smallint[],"{0,1,1}")        '::numeric[] !=  '(smallint[],"{0,1,NULL}")        '::numeric[]
+ok 301 - '(integer[],"{0,1,1}")         '::numeric[] <   '(integer[],"{0,1,NULL}")         '::numeric[]
+ok 302 - '(integer[],"{0,1,1}")         '::numeric[] <=  '(integer[],"{0,1,NULL}")         '::numeric[]
+ok 303 - '(integer[],"{0,1,1}")         '::numeric[]  =  '(integer[],"{0,1,NULL}")         '::numeric[]
+ok 304 - '(integer[],"{0,1,1}")         '::numeric[]  >= '(integer[],"{0,1,NULL}")         '::numeric[]
+ok 305 - '(integer[],"{0,1,1}")         '::numeric[]   > '(integer[],"{0,1,NULL}")         '::numeric[]
+ok 306 - '(integer[],"{0,1,1}")         '::numeric[] !=  '(integer[],"{0,1,NULL}")         '::numeric[]
+ok 307 - '(bigint[],"{0,1,1}")          '::numeric[] <   '(bigint[],"{0,1,NULL}")          '::numeric[]
+ok 308 - '(bigint[],"{0,1,1}")          '::numeric[] <=  '(bigint[],"{0,1,NULL}")          '::numeric[]
+ok 309 - '(bigint[],"{0,1,1}")          '::numeric[]  =  '(bigint[],"{0,1,NULL}")          '::numeric[]
+ok 310 - '(bigint[],"{0,1,1}")          '::numeric[]  >= '(bigint[],"{0,1,NULL}")          '::numeric[]
+ok 311 - '(bigint[],"{0,1,1}")          '::numeric[]   > '(bigint[],"{0,1,NULL}")          '::numeric[]
+ok 312 - '(bigint[],"{0,1,1}")          '::numeric[] !=  '(bigint[],"{0,1,NULL}")          '::numeric[]
+ok 313 - '(double precision[],"{0,1,1}")'::numeric[] <   '(double precision[],"{0,1,NULL}")'::numeric[]
+ok 314 - '(double precision[],"{0,1,1}")'::numeric[] <=  '(double precision[],"{0,1,NULL}")'::numeric[]
+ok 315 - '(double precision[],"{0,1,1}")'::numeric[]  =  '(double precision[],"{0,1,NULL}")'::numeric[]
+ok 316 - '(double precision[],"{0,1,1}")'::numeric[]  >= '(double precision[],"{0,1,NULL}")'::numeric[]
+ok 317 - '(double precision[],"{0,1,1}")'::numeric[]   > '(double precision[],"{0,1,NULL}")'::numeric[]
+ok 318 - '(double precision[],"{0,1,1}")'::numeric[] !=  '(double precision[],"{0,1,NULL}")'::numeric[]
+ok 319 - '(real[],"{0,1,1}")            '::numeric[] <   '(real[],"{0,1,NULL}")            '::numeric[]
+ok 320 - '(real[],"{0,1,1}")            '::numeric[] <=  '(real[],"{0,1,NULL}")            '::numeric[]
+ok 321 - '(real[],"{0,1,1}")            '::numeric[]  =  '(real[],"{0,1,NULL}")            '::numeric[]
+ok 322 - '(real[],"{0,1,1}")            '::numeric[]  >= '(real[],"{0,1,NULL}")            '::numeric[]
+ok 323 - '(real[],"{0,1,1}")            '::numeric[]   > '(real[],"{0,1,NULL}")            '::numeric[]
+ok 324 - '(real[],"{0,1,1}")            '::numeric[] !=  '(real[],"{0,1,NULL}")            '::numeric[]
+ok 325 - '(numeric[],"{0,1,1}")         '::numeric[] <   '(numeric[],"{0,1,NULL}")         '::numeric[]
+ok 326 - '(numeric[],"{0,1,1}")         '::numeric[] <=  '(numeric[],"{0,1,NULL}")         '::numeric[]
+ok 327 - '(numeric[],"{0,1,1}")         '::numeric[]  =  '(numeric[],"{0,1,NULL}")         '::numeric[]
+ok 328 - '(numeric[],"{0,1,1}")         '::numeric[]  >= '(numeric[],"{0,1,NULL}")         '::numeric[]
+ok 329 - '(numeric[],"{0,1,1}")         '::numeric[]   > '(numeric[],"{0,1,NULL}")         '::numeric[]
+ok 330 - '(numeric[],"{0,1,1}")         '::numeric[] !=  '(numeric[],"{0,1,NULL}")         '::numeric[]
+ok 331 - '(smallint[],"{0,1,1}")        '::numeric[] <   '(smallint[],)                    '::numeric[]
+ok 332 - '(smallint[],"{0,1,1}")        '::numeric[] <=  '(smallint[],)                    '::numeric[]
+ok 333 - '(smallint[],"{0,1,1}")        '::numeric[]  =  '(smallint[],)                    '::numeric[]
+ok 334 - '(smallint[],"{0,1,1}")        '::numeric[]  >= '(smallint[],)                    '::numeric[]
+ok 335 - '(smallint[],"{0,1,1}")        '::numeric[]   > '(smallint[],)                    '::numeric[]
+ok 336 - '(smallint[],"{0,1,1}")        '::numeric[] !=  '(smallint[],)                    '::numeric[]
+ok 337 - '(integer[],"{0,1,1}")         '::numeric[] <   '(integer[],)                     '::numeric[]
+ok 338 - '(integer[],"{0,1,1}")         '::numeric[] <=  '(integer[],)                     '::numeric[]
+ok 339 - '(integer[],"{0,1,1}")         '::numeric[]  =  '(integer[],)                     '::numeric[]
+ok 340 - '(integer[],"{0,1,1}")         '::numeric[]  >= '(integer[],)                     '::numeric[]
+ok 341 - '(integer[],"{0,1,1}")         '::numeric[]   > '(integer[],)                     '::numeric[]
+ok 342 - '(integer[],"{0,1,1}")         '::numeric[] !=  '(integer[],)                     '::numeric[]
+ok 343 - '(bigint[],"{0,1,1}")          '::numeric[] <   '(bigint[],)                      '::numeric[]
+ok 344 - '(bigint[],"{0,1,1}")          '::numeric[] <=  '(bigint[],)                      '::numeric[]
+ok 345 - '(bigint[],"{0,1,1}")          '::numeric[]  =  '(bigint[],)                      '::numeric[]
+ok 346 - '(bigint[],"{0,1,1}")          '::numeric[]  >= '(bigint[],)                      '::numeric[]
+ok 347 - '(bigint[],"{0,1,1}")          '::numeric[]   > '(bigint[],)                      '::numeric[]
+ok 348 - '(bigint[],"{0,1,1}")          '::numeric[] !=  '(bigint[],)                      '::numeric[]
+ok 349 - '(double precision[],"{0,1,1}")'::numeric[] <   '(double precision[],)            '::numeric[]
+ok 350 - '(double precision[],"{0,1,1}")'::numeric[] <=  '(double precision[],)            '::numeric[]
+ok 351 - '(double precision[],"{0,1,1}")'::numeric[]  =  '(double precision[],)            '::numeric[]
+ok 352 - '(double precision[],"{0,1,1}")'::numeric[]  >= '(double precision[],)            '::numeric[]
+ok 353 - '(double precision[],"{0,1,1}")'::numeric[]   > '(double precision[],)            '::numeric[]
+ok 354 - '(double precision[],"{0,1,1}")'::numeric[] !=  '(double precision[],)            '::numeric[]
+ok 355 - '(real[],"{0,1,1}")            '::numeric[] <   '(real[],)                        '::numeric[]
+ok 356 - '(real[],"{0,1,1}")            '::numeric[] <=  '(real[],)                        '::numeric[]
+ok 357 - '(real[],"{0,1,1}")            '::numeric[]  =  '(real[],)                        '::numeric[]
+ok 358 - '(real[],"{0,1,1}")            '::numeric[]  >= '(real[],)                        '::numeric[]
+ok 359 - '(real[],"{0,1,1}")            '::numeric[]   > '(real[],)                        '::numeric[]
+ok 360 - '(real[],"{0,1,1}")            '::numeric[] !=  '(real[],)                        '::numeric[]
+ok 361 - '(numeric[],"{0,1,1}")         '::numeric[] <   '(numeric[],)                     '::numeric[]
+ok 362 - '(numeric[],"{0,1,1}")         '::numeric[] <=  '(numeric[],)                     '::numeric[]
+ok 363 - '(numeric[],"{0,1,1}")         '::numeric[]  =  '(numeric[],)                     '::numeric[]
+ok 364 - '(numeric[],"{0,1,1}")         '::numeric[]  >= '(numeric[],)                     '::numeric[]
+ok 365 - '(numeric[],"{0,1,1}")         '::numeric[]   > '(numeric[],)                     '::numeric[]
+ok 366 - '(numeric[],"{0,1,1}")         '::numeric[] !=  '(numeric[],)                     '::numeric[]
+ok 367 - NULL::text <   NULL::text
+ok 368 - NULL::text <=  NULL::text
+ok 369 - NULL::text  =  NULL::text
+ok 370 - NULL::text  >= NULL::text
+ok 371 - NULL::text   > NULL::text
+ok 372 - NULL::text !=  NULL::text
+ok 373 - '(text,A)'::text <   '(text,x)'::text
+ok 374 - '(text,A)'::text <=  '(text,x)'::text
+ok 375 - '(text,A)'::text  =  '(text,x)'::text
+ok 376 - '(text,A)'::text  >= '(text,x)'::text
+ok 377 - '(text,A)'::text   > '(text,x)'::text
+ok 378 - '(text,A)'::text !=  '(text,x)'::text
+ok 379 - '(text,x)'::text <   '(text,x)'::text
+ok 380 - '(text,x)'::text <=  '(text,x)'::text
+ok 381 - '(text,x)'::text  =  '(text,x)'::text
+ok 382 - '(text,x)'::text  >= '(text,x)'::text
+ok 383 - '(text,x)'::text   > '(text,x)'::text
+ok 384 - '(text,x)'::text !=  '(text,x)'::text
+ok 385 - '(text,y)'::text <   '(text,x)'::text
+ok 386 - '(text,y)'::text <=  '(text,x)'::text
+ok 387 - '(text,y)'::text  =  '(text,x)'::text
+ok 388 - '(text,y)'::text  >= '(text,x)'::text
+ok 389 - '(text,y)'::text   > '(text,x)'::text
+ok 390 - '(text,y)'::text !=  '(text,x)'::text
 ok 391 - '(text,) '::text <   '(text,x)'::text
 ok 392 - '(text,) '::text <=  '(text,x)'::text
 ok 393 - '(text,) '::text  =  '(text,x)'::text
@@ -417,41 +417,47 @@ ok 399 - '(text,) '::text  =  '(text,x)'::text
 ok 400 - '(text,) '::text  >= '(text,x)'::text
 ok 401 - '(text,) '::text   > '(text,x)'::text
 ok 402 - '(text,) '::text !=  '(text,x)'::text
-ok 403 - '(text,A)'::text <   '(text,) '::text
-ok 404 - '(text,A)'::text <=  '(text,) '::text
-ok 405 - '(text,A)'::text  =  '(text,) '::text
-ok 406 - '(text,A)'::text  >= '(text,) '::text
-ok 407 - '(text,A)'::text   > '(text,) '::text
-ok 408 - '(text,A)'::text !=  '(text,) '::text
-ok 409 - '(text,x)'::text <   '(text,) '::text
-ok 410 - '(text,x)'::text <=  '(text,) '::text
-ok 411 - '(text,x)'::text  =  '(text,) '::text
-ok 412 - '(text,x)'::text  >= '(text,) '::text
-ok 413 - '(text,x)'::text   > '(text,) '::text
-ok 414 - '(text,x)'::text !=  '(text,) '::text
-ok 415 - '(text,y)'::text <   '(text,) '::text
-ok 416 - '(text,y)'::text <=  '(text,) '::text
-ok 417 - '(text,y)'::text  =  '(text,) '::text
-ok 418 - '(text,y)'::text  >= '(text,) '::text
-ok 419 - '(text,y)'::text   > '(text,) '::text
-ok 420 - '(text,y)'::text !=  '(text,) '::text
-ok 421 - NULL::box <   NULL::box
-ok 422 - NULL::box <=  NULL::box
-ok 423 - NULL::box  =  NULL::box
-ok 424 - NULL::box  >= NULL::box
-ok 425 - NULL::box   > NULL::box
-ok 426 - '(box,"(0.5,0.5),(0,0)")'::box <   '(box,"(1,1),(0,0)")'::box
-ok 427 - '(box,"(0.5,0.5),(0,0)")'::box <=  '(box,"(1,1),(0,0)")'::box
-ok 428 - '(box,"(0.5,0.5),(0,0)")'::box  =  '(box,"(1,1),(0,0)")'::box
-ok 429 - '(box,"(0.5,0.5),(0,0)")'::box  >= '(box,"(1,1),(0,0)")'::box
-ok 430 - '(box,"(0.5,0.5),(0,0)")'::box   > '(box,"(1,1),(0,0)")'::box
-ok 431 - '(box,"(1,1),(0,0)")    '::box <   '(box,"(1,1),(0,0)")'::box
-ok 432 - '(box,"(1,1),(0,0)")    '::box <=  '(box,"(1,1),(0,0)")'::box
-ok 433 - '(box,"(1,1),(0,0)")    '::box  =  '(box,"(1,1),(0,0)")'::box
-ok 434 - '(box,"(1,1),(0,0)")    '::box  >= '(box,"(1,1),(0,0)")'::box
-ok 435 - '(box,"(1,1),(0,0)")    '::box   > '(box,"(1,1),(0,0)")'::box
-ok 436 - '(box,"(1,1),(-1,-1)")  '::box <   '(box,"(1,1),(0,0)")'::box
-ok 437 - '(box,"(1,1),(-1,-1)")  '::box <=  '(box,"(1,1),(0,0)")'::box
-ok 438 - '(box,"(1,1),(-1,-1)")  '::box  =  '(box,"(1,1),(0,0)")'::box
-ok 439 - '(box,"(1,1),(-1,-1)")  '::box  >= '(box,"(1,1),(0,0)")'::box
-ok 440 - '(box,"(1,1),(-1,-1)")  '::box   > '(box,"(1,1),(0,0)")'::box
+ok 403 - '(text,) '::text <   '(text,x)'::text
+ok 404 - '(text,) '::text <=  '(text,x)'::text
+ok 405 - '(text,) '::text  =  '(text,x)'::text
+ok 406 - '(text,) '::text  >= '(text,x)'::text
+ok 407 - '(text,) '::text   > '(text,x)'::text
+ok 408 - '(text,) '::text !=  '(text,x)'::text
+ok 409 - '(text,A)'::text <   '(text,) '::text
+ok 410 - '(text,A)'::text <=  '(text,) '::text
+ok 411 - '(text,A)'::text  =  '(text,) '::text
+ok 412 - '(text,A)'::text  >= '(text,) '::text
+ok 413 - '(text,A)'::text   > '(text,) '::text
+ok 414 - '(text,A)'::text !=  '(text,) '::text
+ok 415 - '(text,x)'::text <   '(text,) '::text
+ok 416 - '(text,x)'::text <=  '(text,) '::text
+ok 417 - '(text,x)'::text  =  '(text,) '::text
+ok 418 - '(text,x)'::text  >= '(text,) '::text
+ok 419 - '(text,x)'::text   > '(text,) '::text
+ok 420 - '(text,x)'::text !=  '(text,) '::text
+ok 421 - '(text,y)'::text <   '(text,) '::text
+ok 422 - '(text,y)'::text <=  '(text,) '::text
+ok 423 - '(text,y)'::text  =  '(text,) '::text
+ok 424 - '(text,y)'::text  >= '(text,) '::text
+ok 425 - '(text,y)'::text   > '(text,) '::text
+ok 426 - '(text,y)'::text !=  '(text,) '::text
+ok 427 - NULL::box <   NULL::box
+ok 428 - NULL::box <=  NULL::box
+ok 429 - NULL::box  =  NULL::box
+ok 430 - NULL::box  >= NULL::box
+ok 431 - NULL::box   > NULL::box
+ok 432 - '(box,"(0.5,0.5),(0,0)")'::box <   '(box,"(1,1),(0,0)")'::box
+ok 433 - '(box,"(0.5,0.5),(0,0)")'::box <=  '(box,"(1,1),(0,0)")'::box
+ok 434 - '(box,"(0.5,0.5),(0,0)")'::box  =  '(box,"(1,1),(0,0)")'::box
+ok 435 - '(box,"(0.5,0.5),(0,0)")'::box  >= '(box,"(1,1),(0,0)")'::box
+ok 436 - '(box,"(0.5,0.5),(0,0)")'::box   > '(box,"(1,1),(0,0)")'::box
+ok 437 - '(box,"(1,1),(0,0)")    '::box <   '(box,"(1,1),(0,0)")'::box
+ok 438 - '(box,"(1,1),(0,0)")    '::box <=  '(box,"(1,1),(0,0)")'::box
+ok 439 - '(box,"(1,1),(0,0)")    '::box  =  '(box,"(1,1),(0,0)")'::box
+ok 440 - '(box,"(1,1),(0,0)")    '::box  >= '(box,"(1,1),(0,0)")'::box
+ok 441 - '(box,"(1,1),(0,0)")    '::box   > '(box,"(1,1),(0,0)")'::box
+ok 442 - '(box,"(1,1),(-1,-1)")  '::box <   '(box,"(1,1),(0,0)")'::box
+ok 443 - '(box,"(1,1),(-1,-1)")  '::box <=  '(box,"(1,1),(0,0)")'::box
+ok 444 - '(box,"(1,1),(-1,-1)")  '::box  =  '(box,"(1,1),(0,0)")'::box
+ok 445 - '(box,"(1,1),(-1,-1)")  '::box  >= '(box,"(1,1),(0,0)")'::box
+ok 446 - '(box,"(1,1),(-1,-1)")  '::box   > '(box,"(1,1),(0,0)")'::box

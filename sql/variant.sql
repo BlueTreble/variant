@@ -26,10 +26,14 @@ $f$;
 CREATE TYPE _variant._variant AS ( original_type text, data text );
 
 CREATE TYPE variant.variant;
-CREATE OR REPLACE FUNCTION _variant._variant_in(cstring)
+CREATE OR REPLACE FUNCTION _variant._variant_in(cstring, Oid, int)
 RETURNS variant.variant
 LANGUAGE c IMMUTABLE STRICT
 AS '$libdir/variant', 'variant_in';
+CREATE OR REPLACE FUNCTION _variant._variant_typmod_in(cstring[])
+RETURNS int
+LANGUAGE c IMMUTABLE STRICT
+AS '$libdir/variant', 'variant_typmod_in';
 CREATE OR REPLACE FUNCTION variant.text_in(text)
 RETURNS variant.variant
 LANGUAGE c IMMUTABLE STRICT
@@ -39,6 +43,10 @@ CREATE OR REPLACE FUNCTION _variant._variant_out(variant.variant)
 RETURNS cstring
 LANGUAGE c IMMUTABLE STRICT
 AS '$libdir/variant', 'variant_out';
+CREATE OR REPLACE FUNCTION _variant._variant_typmod_out(int)
+RETURNS cstring
+LANGUAGE c IMMUTABLE STRICT
+AS '$libdir/variant', 'variant_typmod_out';
 CREATE OR REPLACE FUNCTION variant.text_out(variant.variant)
 RETURNS text
 LANGUAGE c IMMUTABLE STRICT
@@ -47,6 +55,8 @@ AS '$libdir/variant', 'variant_text_out';
 CREATE TYPE variant.variant(
   INPUT = _variant._variant_in
   , OUTPUT = _variant._variant_out
+  , TYPMOD_IN = _variant._variant_typmod_in
+  , TYPMOD_OUT = _variant._variant_typmod_out
   , STORAGE = extended
 );
 
@@ -259,8 +269,10 @@ SELECT variant.create_casts();
 CREATE TABLE _variant._registered(
   variant_typmod    SERIAL        PRIMARY KEY
       CONSTRAINT variant_typemod_minimum_value CHECK( variant_typmod >= -1 )
-  , variant_name    varchar(100)  NOT NULL UNIQUE
+  , variant_name    varchar(100)  NOT NULL
 );
+CREATE UNIQUE INDEX _registered_u_lcase_variant_name ON _variant._registered( lower( variant_name ) );
+
 INSERT INTO _variant._registered VALUES( -1, 'DEFAULT' );
 
 CREATE VIEW variant.registered AS SELECT * FROM _variant._registered;
@@ -285,5 +297,57 @@ BEGIN
   RETURN ret;
 END
 $func$;
+
+CREATE OR REPLACE FUNCTION _variant.registered__get(
+  p_variant_typmod  _variant._registered.variant_typmod%TYPE
+) RETURNS _variant._registered LANGUAGE plpgsql STABLE AS $f$
+DECLARE
+  r_variant _variant._registered%ROWTYPE;
+BEGIN
+  SELECT * INTO STRICT r_variant
+      FROM _variant._registered
+      WHERE variant_typmod = p_variant_typmod
+  ;
+  -- TODO: verify variant is enabled
+  RETURN r_variant;
+
+  EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+      RAISE EXCEPTION 'Invalid typmod %', coalesce(p_variant_typmod::text, '<>')
+        USING ERRCODE = 'invalid_parameter_value'
+      ;
+END
+$f$;
+CREATE OR REPLACE FUNCTION _variant.registered__get__variant_name(
+  _variant._registered.variant_typmod%TYPE
+) RETURNS _variant._registered.variant_name%TYPE LANGUAGE sql STABLE AS $f$
+SELECT variant_name FROM _variant.registered__get( $1 )
+$f$;
+
+CREATE OR REPLACE FUNCTION _variant.registered__get(
+  p_variant_name _variant._registered.variant_name%TYPE
+) RETURNS _variant._registered LANGUAGE plpgsql STABLE AS $f$
+DECLARE
+  r_variant _variant._registered%ROWTYPE;
+BEGIN
+  SELECT * INTO STRICT r_variant
+      FROM _variant._registered
+      WHERE lower( variant_name ) = lower( p_variant_name )
+  ;
+  -- TODO: verify variant is enabled
+  RETURN r_variant;
+
+  EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+      RAISE EXCEPTION 'Invalid variant type %', coalesce(p_variant_name, '<>')
+        USING ERRCODE = 'invalid_parameter_value'
+      ;
+END
+$f$;
+CREATE OR REPLACE FUNCTION _variant.registered__get__typmod(
+  _variant._registered.variant_name%TYPE
+) RETURNS _variant._registered.variant_typmod%TYPE LANGUAGE sql STABLE AS $f$
+SELECT variant_typmod FROM _variant.registered__get( $1 )
+$f$;
 
 -- vi: expandtab sw=2 ts=2

@@ -170,13 +170,14 @@ CREATE OR REPLACE TEMP VIEW box_cmp AS
 ;
 CREATE OR REPLACE TEMP VIEW box_cmp_ops AS SELECT * FROM box_cmp, ops WHERE btrim(op) NOT IN ( '!=', '<>' );
 
-\set ON_ERROR_STOP false
+\set ON_ERROR_STOP true
 
 SELECT plan( (
 	3 -- Simple cast, equality, NULL
 	+ (SELECT count(*) FROM numtest)
 	+2 -- text in/out
 	+3 -- register
+	+6 -- register__get*
 	+4 -- NULL
 	+ (SELECT count(*) FROM ncmp_ops)
 	+ (SELECT count(*) FROM _ncmp_ops)
@@ -215,22 +216,59 @@ SELECT is(
 	, 'variant.text_out()'
 );
 
-
+/*
+ * variant register
+ */
 SELECT row_eq(
 	'SELECT * FROM variant.registered WHERE variant_typmod = -1'
 	, ROW( -1, 'DEFAULT' )::variant.registered
 	, 'valid variant(DEFAULT)'
 );
-
 SELECT lives_ok(
-	$test$CREATE TEMP TABLE variant_typmod AS SELECT * FROM variant.register( 'test variant' )$test$
+	$test$CREATE TEMP TABLE test_typmod AS SELECT *, ' test variant '::text AS variant_name FROM variant.register( ' test variant ' ) AS r(variant_typmod)$test$
 	, 'Register variant'
 );
 SELECT bag_eq(
-	$$SELECT * FROM variant.registered WHERE variant_typmod IN (SELECT * FROM variant_typmod)$$
-	, $$SELECT *, 'test variant'::text FROM variant_typmod$$
+	$$SELECT * FROM variant.registered WHERE variant_typmod IN (SELECT variant_typmod FROM test_typmod)$$
+	, $$SELECT * FROM test_typmod$$
 	, 'test variant correctly added'
 );
+
+/*
+ * _variant.registered__get
+ */
+SELECT bag_eq(
+	$$SELECT * FROM _variant.registered__get( ' TEST variant ' )$$ -- Verify case insensitive
+	, $$SELECT * FROM test_typmod$$
+	, '_variant.registered( text )'
+);
+SELECT bag_eq(
+	$$SELECT * FROM _variant.registered__get( (SELECT variant_typmod FROM test_typmod) )$$
+	, $$SELECT * FROM test_typmod$$
+	, '_variant.registered( int )'
+);
+SELECT throws_ok(
+	$$SELECT * FROM _variant.registered__get( 'bullshit registered test variant that should never actually exist' )$$
+	, '22023'
+	, 'Invalid variant type bullshit registered test variant that should never actually exist'
+);
+SELECT throws_ok(
+	$$SELECT * FROM _variant.registered__get( NULL::text )$$
+	, '22023'
+	, 'Invalid variant type <>'
+);
+SELECT throws_ok(
+	$$SELECT * FROM _variant.registered__get( -2 )$$
+	, '22023'
+	, 'Invalid typmod -2'
+);
+SELECT throws_ok(
+	$$SELECT * FROM _variant.registered__get( NULL::int )$$
+	, '22023'
+	, 'Invalid typmod <>'
+);
+
+
 
 SET transform_null_equals = on;
 SELECT is( '(int,)'::variant.variant::int = NULL, true, '(int,)::int = NULL' );
