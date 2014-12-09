@@ -1,8 +1,8 @@
 \set ECHO 0
 \set QUIET 1
 BEGIN;
-\i test/tap_setup.sql
-\i test/common.sql
+\i test/helpers/tap_setup.sql
+\i test/helpers/common.sql
 
 CREATE TEMP VIEW test_type AS
   SELECT * FROM unnest( string_to_array(
@@ -23,12 +23,11 @@ CREATE TEMP VIEW compare_value AS
 
 \set baseline_type text
 
-\i test/type_setup.sql
+\i test/helpers/type_setup.sql
 
 SELECT plan(sum(test_count)::int) FROM plan;
 
-\i test/type.sql
+\i test/helpers/type.sql
 
-ROLLBACK;
 
 -- vi: expandtab sw=2 ts=2

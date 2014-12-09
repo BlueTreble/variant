@@ -1,7 +1,7 @@
 \set ECHO 0
 BEGIN;
-\i test/tap_setup.sql
-\i test/common.sql
+\i test/helpers/tap_setup.sql
+\i test/helpers/common.sql
 
 CREATE TEMP TABLE ncmp_raw(
 	l		variant.variant("test variant")
@@ -104,6 +104,7 @@ CREATE OR REPLACE TEMP VIEW box_cmp_ops AS SELECT * FROM box_cmp, ops WHERE btri
 
 SELECT plan( (
 	3 -- Simple cast, equality, NULL
+	+1 -- DEFAULT is disabled
 	+2 -- text in/out
 	+3 -- register
 	+6 -- register__get*
@@ -206,7 +207,6 @@ SET transform_null_equals = off;
 SELECT is( NULL::int::variant.variant("test variant")::int = NULL, NULL, '(int,)::int = NULL is NULL' );
 SELECT is( 1::int::variant.variant("test variant")::int = NULL, NULL, '(int,1)::int != NULL is NULL' );
 
-SELECT is( (SELECT count(*)::int FROM ncmp WHERE r IS NULL), 1 );
 SELECT pg_temp.exec_text(
 			$$SELECT is( %s )$$
 			, format( $fmt$variant.text_in(%L, 'test variant') %s variant.text_in(%L, 'test variant')
@@ -220,7 +220,6 @@ SELECT pg_temp.exec_text(
 	FROM ncmp_ops
 		, (SELECT max(length(l_text)) AS len_l, max(length(r_text)) AS len_r FROM ncmp) l
 ;
-SELECT is( (SELECT count(*)::int FROM _ncmp WHERE r IS NULL), 1 );
 SELECT pg_temp.exec_text(
 			$$SELECT is( %s )$$
 			, format( $fmt$variant.text_in(%L, 'test variant') %s variant.text_in(%L, 'test variant')
@@ -236,7 +235,6 @@ SELECT pg_temp.exec_text(
 ;
 
 --SET client_min_messages = debug;
-SELECT is( (SELECT count(*)::int FROM box_cmp WHERE r IS NULL), 1 );
 SELECT pg_temp.exec_text(
 			$$SELECT is( %s )$$
 			, format( $fmt$variant.text_in(%L, 'test variant') %s variant.text_in(%L, 'test variant')
