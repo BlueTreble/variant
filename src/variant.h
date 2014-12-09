@@ -54,7 +54,6 @@ typedef struct {
 	Datum					data;
 	Oid						typid;
     int                     typmod;
-    bool                    havetypmod;
 
     /* This is the only flag from VariantData that we care about internally. */
 	bool					isnull;

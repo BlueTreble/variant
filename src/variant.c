@@ -16,6 +16,7 @@
 #include "fmgr.h"
 #include "lib/stringinfo.h"
 #include "access/htup_details.h"
+#include "nodes/nodeFuncs.h"
 #include "parser/parse_type.h"
 #include "utils/builtins.h"
 #include "utils/datum.h"
@@ -39,7 +40,7 @@ typedef struct VariantCache
 	bool 						typbyval;
 	char						typalign;
 	IOFuncSelector	IOfunc; /* We should always either be in or out; make sure we're not mixing. */
-	char						*outString;	/* Initial part of output string. NULL for input functions. */
+	char						*formatted_name;	/* Formatted type string. Only set when IOfunc is output/send */
 } VariantCache;
 
 #define GetCache(fcinfo) ((VariantCache *) fcinfo->flinfo->fn_extra)
@@ -55,6 +56,9 @@ static Oid getIntOid();
 static Oid get_oid(Variant v, uint *flags);
 static bool _SPI_conn();
 static void _SPI_disc(bool pop);
+
+static int32 get_fn_expr_argtypmod(FmgrInfo *flinfo, int argnum);
+static int32 get_call_expr_argtypmod(Node *expr, int argnum);
 
 /*
  * You can include more files here if needed.
@@ -78,6 +82,8 @@ PG_FUNCTION_INFO_V1(variant_in);
 Datum
 variant_in(PG_FUNCTION_ARGS)
 {
+	Assert(fcinfo->flinfo->fn_strict); /* Must be strict */
+	
 	PG_RETURN_VARIANT( variant_in_int(fcinfo, PG_GETARG_CSTRING(0), PG_GETARG_INT32(2)) );
 }
 
@@ -86,7 +92,7 @@ variant_in(PG_FUNCTION_ARGS)
  *
  * Arguments:
  * 	Original data
- * 	Original typmod
+ * 	Target typmod
  *
  * Returns:
  * 	Variant
@@ -99,14 +105,17 @@ variant_cast_in(PG_FUNCTION_ARGS)
 
 	vi->isnull = PG_ARGISNULL(0);
 	vi->typid = get_fn_expr_argtype(fcinfo->flinfo, 0);
+	vi->typmod = get_fn_expr_argtypmod(fcinfo->flinfo, 0);
 
 	Assert(!fcinfo->flinfo->fn_strict); /* Must be callable on NULL input */
 
 	if (!OidIsValid(vi->typid))
 		elog(ERROR, "could not determine data type of input");
+
+	/* Validate that we're casting to a registered variant */
 	if( PG_ARGISNULL(1) )
-		elog( ERROR, "Original typemod must not be NULL" );
-	vi->typmod = PG_GETARG_INT32(1);
+		elog( ERROR, "Target typemod must not be NULL" );
+	variant_get_variant_name(PG_GETARG_INT32(1));
 
 	if( !vi->isnull )
 		vi->data = PG_GETARG_DATUM(0);
@@ -140,17 +149,19 @@ variant_cast_out(PG_FUNCTION_ARGS)
 	if( PG_ARGISNULL(0) )
 		PG_RETURN_NULL();
 
-	vi = make_variant_int(PG_GETARG_VARIANT(0), fcinfo, IOFunc_output);
+	/* No reason to format type name, so use IOFunc_input instead of IOFunc_output */
+	vi = make_variant_int(PG_GETARG_VARIANT(0), fcinfo, IOFunc_input);
 
 	/* If original was NULL then we MUST return NULL */
 	if( vi->isnull )
 		PG_RETURN_NULL();
 
-	/* If our types match exactly we can just return */
+	/* If our types match exactly we don't need to cast */
 	if( vi->typid == targettypid )
 		PG_RETURN_DATUM(vi->data);
 
 	/* Keep cruft localized to just here */
+	{
 		bool						do_pop;
 		int							ret;
 		bool						isnull;
@@ -181,6 +192,7 @@ variant_cast_out(PG_FUNCTION_ARGS)
 
 		/* Remember this frees everything palloc'd since our connect/push call */
 		_SPI_disc(do_pop);
+	}
 	/* End cruft */
 
 	PG_RETURN_DATUM(out);
@@ -193,6 +205,8 @@ variant_typmod_in(PG_FUNCTION_ARGS)
 	ArrayType	*arr = PG_GETARG_ARRAYTYPE_P(0);
 	Datum	   	*elem_values;
 	int				arr_nelem;
+	char			*inputCString;
+	Datum			inputDatum;
 	Datum			out;
 
 	Assert(fcinfo->flinfo->fn_strict); /* Must be strict */
@@ -201,6 +215,9 @@ variant_typmod_in(PG_FUNCTION_ARGS)
 					  -2, false, 'c', /* elmlen, elmbyval, elmalign */
 					  &elem_values, NULL, &arr_nelem); /* elements, nulls, number_of_elements */
 	/* TODO: Sanity check array */
+	/* PointerGetDatum is equivalent to TextGetDatum, which doesn't exist */
+	inputCString = DatumGetCString(elem_values[0]);
+	inputDatum = PointerGetDatum( cstring_to_text( inputCString ) );
 
 	/* TODO: cache this stuff */
 	/* Keep cruft localized to just here */
@@ -209,17 +226,42 @@ variant_typmod_in(PG_FUNCTION_ARGS)
 		bool						isnull;
 		int							ret;
 		Oid							type = TEXTOID;
-		char						*cmd = "SELECT _variant.registered__get__typmod( $1 )";
+		char						*cmd = "SELECT variant_typmod, variant_enabled FROM _variant._registered WHERE lower(variant_name) = lower($1)";
 
 		/* command, nargs, Oid *argument_types, *values, *nulls, read_only, count */
-		if( !(ret =SPI_execute_with_args( cmd, 1, &type, elem_values, " ", true, 0 )) )
+		if( !(ret =SPI_execute_with_args( cmd, 1, &type, &inputDatum, " ", true, 0 )) )
 			elog( ERROR, "SPI_execute_with_args(%s) returned %s", cmd, SPI_result_code_string(ret));
+
+		Assert( SPI_tuptable );
+		if ( SPI_processed > 1 )
+			ereport(ERROR,
+				( errmsg( "Got %u records for variant.variant(%s)", SPI_processed, inputCString ),
+					errhint( "This means _variant._registered is corrupted" )
+				)
+			);
+
+
+		if ( SPI_processed < 1 )
+			elog( ERROR, "variant.variant(%s) is not registered", inputCString );
 
 		/* Note 0 vs 1 based numbering */
 		Assert(SPI_tuptable->tupdesc->attrs[0]->atttypid == INT4OID);
+		Assert(SPI_tuptable->tupdesc->attrs[1]->atttypid == BOOLOID);
+		out = heap_getattr( SPI_tuptable->vals[0], 2, SPI_tuptable->tupdesc, &isnull );
+		if( !DatumGetBool(out) )
+			ereport( ERROR,
+					( errcode(ERRCODE_INVALID_PARAMETER_VALUE),
+						errmsg( "variant.variant(%s) is disabled", inputCString )
+					)
+			);
+
 		out = heap_getattr( SPI_tuptable->vals[0], 1, SPI_tuptable->tupdesc, &isnull );
 		if( isnull )
-			elog( ERROR, "Got null from %s", cmd );
+			ereport( ERROR,
+					( errmsg( "Found NULL variant_typmod for variant.variant(%s)", inputCString ),
+						errhint( "This should never happen; is _variant._registered corrupted?" )
+					)
+			);
 
 		_SPI_disc(do_pop);
 	}
@@ -246,8 +288,16 @@ PG_FUNCTION_INFO_V1(variant_text_in);
 Datum
 variant_text_in(PG_FUNCTION_ARGS)
 {
-	/* TODO: Support passing a typmod in */
-	PG_RETURN_VARIANT( variant_in_int(fcinfo, TextDatumGetCString(PG_GETARG_DATUM(0)), -1 ) );
+	Assert(!fcinfo->flinfo->fn_strict);
+	Assert(fcinfo->nargs == 2);
+
+
+	PG_RETURN_VARIANT(
+			variant_in_int(fcinfo,
+				TextDatumGetCString(PG_GETARG_DATUM(0)),
+				PG_ARGISNULL(1) ? -1 : PG_GETARG_INT32(1)
+			)
+	);
 }
 PG_FUNCTION_INFO_V1(variant_text_out);
 Datum
@@ -256,6 +306,22 @@ variant_text_out(PG_FUNCTION_ARGS)
 	PG_RETURN_DATUM( CStringGetTextDatum( variant_out_int(fcinfo, PG_GETARG_VARIANT(0)) ) );
 }
 
+PG_FUNCTION_INFO_V1(variant_type_out);
+Datum
+variant_type_out(PG_FUNCTION_ARGS)
+{
+	VariantCache	*cache;
+
+	Assert(fcinfo->flinfo->fn_strict); /* Must not be callable on NULL input */
+	make_variant_int(PG_GETARG_VARIANT(0), fcinfo, IOFunc_output);
+
+	cache = GetCache(fcinfo);
+	PG_RETURN_TEXT_P(cstring_to_text(cache->formatted_name));
+}
+
+/*
+ * COMPARISON FUNCTIONS
+ */
 PG_FUNCTION_INFO_V1(variant_cmp);
 Datum
 variant_cmp(PG_FUNCTION_ARGS)
@@ -384,8 +450,6 @@ variant_in_int(FunctionCallInfo fcinfo, char *input, int variant_typmod)
 	text					*orgData;
 	VariantInt		vi = palloc0(sizeof(*vi));
 
-	Assert(fcinfo->flinfo->fn_strict); /* Must be strict */
-	
 	/* Eventually getting rid of this crap, so segregate it */
 		intTypeOid = getIntOid();
 
@@ -440,10 +504,40 @@ variant_out_int(FunctionCallInfo fcinfo, Variant input)
 
 	vi = make_variant_int(input, fcinfo, IOFunc_output);
 	cache = GetCache(fcinfo);
+	Assert(cache->formatted_name);
 
 	/* Start building string */
 	initStringInfo(&out);
-	appendStringInfoString(&out, cache->outString);
+	need_quote = false;
+	for (tmp = cache->formatted_name; *tmp; tmp++)
+	{
+		char		ch = *tmp;
+
+		if (ch == '"' || ch == '\\' ||
+			ch == '(' || ch == ')' || ch == ',' ||
+			isspace((unsigned char) ch))
+		{
+			need_quote = true;
+			break;
+		}
+	}
+	if(!need_quote)
+		appendStringInfo(&out, "(%s", cache->formatted_name);
+	else
+	{
+		appendStringInfoChar(&out, '(');
+		appendStringInfoChar(&out, '"');
+		for (tmp = cache->formatted_name; *tmp; tmp++)
+		{
+			char		ch = *tmp;
+
+			if (ch == '"' || ch == '\\')
+				appendStringInfoCharMacro(&out, ch);
+			appendStringInfoCharMacro(&out, ch);
+		}
+		appendStringInfoChar(&out, '"');
+	}
+	appendStringInfoChar(&out, ',');
 
 	if(!vi->isnull)
 	{
@@ -504,7 +598,7 @@ variant_get_variant_name(int typmod)
 	bool						do_pop = _SPI_conn();
 	bool						isnull;
 	Oid							type = INT4OID;
-	char						*cmd = "SELECT _variant.registered__get__variant_name( $1 )";
+	char						*cmd = "SELECT variant_name, variant_enabled FROM _variant._registered WHERE variant_typmod = $1";
 	int							ret;
 	Datum						result;
 	char						*out;
@@ -512,15 +606,40 @@ variant_get_variant_name(int typmod)
 	/* command, nargs, Oid *argument_types, *values, *nulls, read_only, count */
 	if( !(ret =SPI_execute_with_args( cmd, 1, &type, &typmod_datum, " ", true, 0 )) )
 		elog( ERROR, "SPI_execute_with_args(%s) returned %s", cmd, SPI_result_code_string(ret));
+	Assert( SPI_tuptable );
+	if ( SPI_processed > 1 )
+		ereport(ERROR,
+			( errmsg( "Got %u records for variant typmod %i", SPI_processed, typmod ),
+				errhint( "This means _variant._registered is corrupted" )
+			)
+		);
+
+
+	if ( SPI_processed < 1 )
+		elog( ERROR, "invalid typmod %i", typmod );
 
 	/* Note 0 vs 1 based numbering */
 	Assert(SPI_tuptable->tupdesc->attrs[0]->atttypid == VARCHAROID);
+	Assert(SPI_tuptable->tupdesc->attrs[1]->atttypid == BOOLOID);
 	result = heap_getattr( SPI_tuptable->vals[0], 1, SPI_tuptable->tupdesc, &isnull );
 	if( isnull )
-		elog( ERROR, "Got null from %s", cmd );
+		ereport( ERROR,
+				( errmsg( "Found NULL variant_name for typmod %i", typmod ),
+					errhint( "This should never happen; is _variant._registered corrupted?" )
+				)
+		);
 
 	MemoryContextSwitchTo(cctx);
 	out = text_to_cstring(DatumGetTextP(result));
+
+	result = heap_getattr( SPI_tuptable->vals[0], 2, SPI_tuptable->tupdesc, &isnull );
+	if( !DatumGetBool(result) )
+		ereport( ERROR,
+				( errcode(ERRCODE_INVALID_PARAMETER_VALUE),
+					errmsg( "variant.variant(%s) is disabled", out )
+				)
+			);
+
 	_SPI_disc(do_pop); /* pfree's all SPI stuff */
 
 	return out;
@@ -562,10 +681,21 @@ variant_cmp_int(FunctionCallInfo fcinfo)
 	 * TODO: Improve caching so it will handle more than just one type :(
 	 */
 	li = make_variant_int(l, fcinfo, IOFunc_input);
-	if(li->isnull)
-		PG_RETURN_NULL();
 	ri = make_variant_int(r, fcinfo, IOFunc_input);
-	if(ri->isnull)
+
+	/*
+	 * We need to special-case IS DISTINCT, because it considers NULL to be the
+	 * same as NULL.
+	 */
+	if(fcinfo->flinfo->fn_expr &&
+			IsA(fcinfo->flinfo->fn_expr, DistinctExpr))
+	{
+		if( li->isnull && ri->isnull )
+			return 0;
+		else if( li->isnull || ri->isnull )
+			return -1;
+	}
+	else if(li->isnull || ri->isnull )
 		PG_RETURN_NULL();
 
 	/* TODO: If both variants are of the same type try comparing directly */
@@ -680,6 +810,12 @@ make_variant_int(Variant v, FunctionCallInfo fcinfo, IOFuncSelector func)
 	}
 	else /* Fixed size, pass by reference */
 	{
+		if(vi->isnull)
+		{
+			vi->data = NULL;
+			return vi;
+		}
+
 		Assert(data_length == cache->typlen);
 		ptr = palloc0(data_length);
 		Assert(ptr == (char *) att_align_nominal(ptr, cache->typalign));
@@ -863,12 +999,11 @@ get_cache(FunctionCallInfo fcinfo, VariantInt vi, IOFuncSelector func)
 
 		if (func == IOFunc_output || func == IOFunc_send)
 		{
-			char *t = format_type_with_typemod(cache->typid, cache->typmod);
-			cache->outString = MemoryContextAlloc(fcinfo->flinfo->fn_mcxt, strlen(t) + 3); /* "(", ",", and "\0" */
-			sprintf(cache->outString, "(%s,", t);
+			cache->formatted_name = MemoryContextStrdup(fcinfo->flinfo->fn_mcxt,
+					format_type_with_typemod(cache->typid, cache->typmod));
 		}
 		else
-			cache->outString="\0";
+			cache->formatted_name="\0";
 
 		fcinfo->flinfo->fn_extra = (void *) cache;
 	}
@@ -920,5 +1055,89 @@ _SPI_disc(bool pop)
 	else
 		SPI_finish();
 }
+
+/*
+ * Stolen from fmgr.c and modified for typmod
+ */
+
+/*
+ * Get the actual type OID of a specific function argument (counting from 0)
+ *
+ * Returns InvalidOid if information is not available
+ */
+static int32
+get_fn_expr_argtypmod(FmgrInfo *flinfo, int argnum)
+{
+	/*
+	 * can't return anything useful if we have no FmgrInfo or if its fn_expr
+	 * node has not been initialized
+	 */
+	if (!flinfo || !flinfo->fn_expr)
+		return InvalidOid;
+
+	return get_call_expr_argtypmod(flinfo->fn_expr, argnum);
+}
+
+/*
+ * Get the actual type OID of a specific function argument (counting from 0),
+ * but working from the calling expression tree instead of FmgrInfo
+ *
+ * Returns InvalidOid if information is not available
+ */
+static int32
+get_call_expr_argtypmod(Node *expr, int argnum)
+{
+	List	   *args;
+	int32			argtypmod;
+
+	if (expr == NULL)
+		return -1;
+
+	if (IsA(expr, FuncExpr))
+		args = ((FuncExpr *) expr)->args;
+	else if (IsA(expr, OpExpr))
+		args = ((OpExpr *) expr)->args;
+	else if (IsA(expr, DistinctExpr))
+		args = ((DistinctExpr *) expr)->args;
+	else if (IsA(expr, ScalarArrayOpExpr))
+		// See below
+		// args = ((ScalarArrayOpExpr *) expr)->args;
+		elog(ERROR, "castnig a variant as part of an ANY/ALL [array] expression is not supported" );
+	else if (IsA(expr, ArrayCoerceExpr))
+		// See below
+		// args = list_make1(((ArrayCoerceExpr *) expr)->arg);
+		elog(ERROR, "castnig a variant as part of an array cast is not supported" );
+	else if (IsA(expr, NullIfExpr))
+		args = ((NullIfExpr *) expr)->args;
+	else if (IsA(expr, WindowFunc))
+		args = ((WindowFunc *) expr)->args;
+	else
+		return -1;
+
+	if (argnum < 0 || argnum >= list_length(args))
+		return -1;
+
+	argtypmod = exprTypmod((Node *) list_nth(args, argnum));
+
+	/*
+	 * get_call_expr_argtyp has these hacks in place. I don't know if they're
+	 * needed for typmods or not. For now, punt.
+	 *
+	 * special hack for ScalarArrayOpExpr and ArrayCoerceExpr: what the
+	 * underlying function will actually get passed is the element type of the
+	 * array.
+	 */
+	if (IsA(expr, ScalarArrayOpExpr) &&
+		argnum == 1)
+		// argtypmod = get_base_element_type(argtypmod);
+		elog(ERROR, "castnig a variant as part of an ANY/ALL [array] expression is not supported" );
+	else if (IsA(expr, ArrayCoerceExpr) &&
+			 argnum == 0)
+		// argtypmod = get_base_element_type(argtypmod);
+		elog(ERROR, "castnig a variant as part of an array cast is not supported" );
+
+	return argtypmod;
+}
+
 
 // vi: noexpandtab sw=2 ts=2

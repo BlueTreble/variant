@@ -34,9 +34,10 @@ CREATE OR REPLACE FUNCTION _variant._variant_typmod_in(cstring[])
 RETURNS int
 LANGUAGE c IMMUTABLE STRICT
 AS '$libdir/variant', 'variant_typmod_in';
-CREATE OR REPLACE FUNCTION variant.text_in(text)
+-- See also second definition at bottom of file
+CREATE OR REPLACE FUNCTION variant.text_in(text, int)
 RETURNS variant.variant
-LANGUAGE c IMMUTABLE STRICT
+LANGUAGE c IMMUTABLE
 AS '$libdir/variant', 'variant_text_in';
 
 CREATE OR REPLACE FUNCTION _variant._variant_out(variant.variant)
@@ -60,13 +61,29 @@ CREATE TYPE variant.variant(
   , STORAGE = extended
 );
 
+-- Can only create this after type is fully created
+CREATE OR REPLACE FUNCTION variant.text_in(text)
+RETURNS variant.variant LANGUAGE sql IMMUTABLE STRICT AS $f$
+SELECT variant.text_in( $1, -1 )
+$f$;
+
+CREATE OR REPLACE FUNCTION variant.type_text(variant.variant)
+RETURNS text LANGUAGE c IMMUTABLE STRICT
+AS '$libdir/variant', 'variant_type_out';
+CREATE OR REPLACE FUNCTION variant.type_type(variant.variant)
+RETURNS regtype LANGUAGE sql IMMUTABLE STRICT AS $f$
+SELECT variant.type_text($1)::regtype
+$f$;
+
+SELECT NULL = count(*) FROM ( -- Supress tons of blank lines
 SELECT _variant.exec( format($$
 CREATE OR REPLACE FUNCTION _variant.variant_%1$s(variant.variant, variant.variant)
   RETURNS boolean LANGUAGE c IMMUTABLE STRICT AS '$libdir/variant', 'variant_%1$s';
   $$
   , op
 ) )
-FROM unnest(string_to_array('lt le eq ne ge gt', ' ')) AS op;
+FROM unnest(string_to_array('lt le eq ne ge gt', ' ')) AS op
+) a;
 
 CREATE OPERATOR < (
   PROCEDURE = _variant.variant_lt
@@ -175,15 +192,6 @@ CREATE OR REPLACE VIEW variant.missing_casts AS
     FROM _variant.missing_casts_out
 ;
 
-CREATE OR REPLACE FUNCTION _variant.exec(
-  sql text
-) RETURNS void LANGUAGE plpgsql AS $f$
-BEGIN
-  RAISE DEBUG 'Executing SQL %s', sql;
-  EXECUTE sql;
-END
-$f$;
-
 CREATE OR REPLACE FUNCTION _variant.create_cast_in(
   p_source    regtype
 ) RETURNS void LANGUAGE plpgsql AS $f$
@@ -270,10 +278,11 @@ CREATE TABLE _variant._registered(
   variant_typmod    SERIAL        PRIMARY KEY
       CONSTRAINT variant_typemod_minimum_value CHECK( variant_typmod >= -1 )
   , variant_name    varchar(100)  NOT NULL
+  , variant_enabled boolean       NOT NULL DEFAULT true
 );
 CREATE UNIQUE INDEX _registered_u_lcase_variant_name ON _variant._registered( lower( variant_name ) );
 
-INSERT INTO _variant._registered VALUES( -1, 'DEFAULT' );
+INSERT INTO _variant._registered VALUES( -1, 'DEFAULT', false );
 
 CREATE VIEW variant.registered AS SELECT * FROM _variant._registered;
 
@@ -308,7 +317,6 @@ BEGIN
       FROM _variant._registered
       WHERE variant_typmod = p_variant_typmod
   ;
-  -- TODO: verify variant is enabled
   RETURN r_variant;
 
   EXCEPTION
@@ -318,10 +326,13 @@ BEGIN
       ;
 END
 $f$;
-CREATE OR REPLACE FUNCTION _variant.registered__get__variant_name(
+CREATE OR REPLACE FUNCTION _variant.registered__get__variant_name__enabled(
   _variant._registered.variant_typmod%TYPE
-) RETURNS _variant._registered.variant_name%TYPE LANGUAGE sql STABLE AS $f$
-SELECT variant_name FROM _variant.registered__get( $1 )
+) RETURNS TABLE(
+  variant_name _variant._registered.variant_name%TYPE
+  , variant_enabled _variant._registered.variant_enabled%TYPE
+) LANGUAGE sql STABLE AS $f$
+SELECT variant_name, variant_enabled FROM _variant.registered__get( $1 )
 $f$;
 
 CREATE OR REPLACE FUNCTION _variant.registered__get(
@@ -334,7 +345,6 @@ BEGIN
       FROM _variant._registered
       WHERE lower( variant_name ) = lower( p_variant_name )
   ;
-  -- TODO: verify variant is enabled
   RETURN r_variant;
 
   EXCEPTION
@@ -348,6 +358,11 @@ CREATE OR REPLACE FUNCTION _variant.registered__get__typmod(
   _variant._registered.variant_name%TYPE
 ) RETURNS _variant._registered.variant_typmod%TYPE LANGUAGE sql STABLE AS $f$
 SELECT variant_typmod FROM _variant.registered__get( $1 )
+$f$;
+
+CREATE OR REPLACE FUNCTION variant.text_in(text, text)
+RETURNS variant.variant LANGUAGE sql IMMUTABLE STRICT AS $f$
+SELECT variant.text_in( $1, _variant.registered__get__typmod($2) )
 $f$;
 
 -- vi: expandtab sw=2 ts=2
