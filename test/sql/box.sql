@@ -26,6 +26,7 @@
 
 -- Box also doesn't have a != operator
 DELETE FROM operator WHERE op ~ '!=';
+DELETE FROM plan WHERE test_desc ~ '!= *$';
 
 SELECT plan(sum(test_count)::int) FROM plan;
 

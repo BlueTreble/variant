@@ -141,8 +141,9 @@ INSERT INTO plan SELECT count(*), 'Verify text_in(text_out())' FROM compare_data
  * Operator testing setup
  */
 CREATE TEMP VIEW op_test_data AS SELECT * FROM compare_data, base_data;
-INSERT INTO plan SELECT count(*), 'Check casted vs uncasted' FROM operator, op_test_data;
-INSERT INTO plan SELECT count(*), 'Check variant vs uncasted' FROM operator, op_test_data;
-INSERT INTO plan SELECT count(*), 'Check variant vs casted' FROM operator, op_test_data;
+-- If you change the tail of these descriptions then check the box test!
+INSERT INTO plan SELECT count(*), 'Check casted vs uncasted for ' || op FROM operator, op_test_data GROUP BY 2;
+INSERT INTO plan SELECT count(*), 'Check variant vs uncasted for ' || op FROM operator, op_test_data GROUP BY 2;
+INSERT INTO plan SELECT count(*), 'Check variant vs casted for ' || op FROM operator, op_test_data GROUP BY 2;
 
 -- vi: expandtab sw=2 ts=2

@@ -3,7 +3,7 @@
 
 
 
-1..86
+1..74
 ok 1 - No NULL variants
 ok 2 - Verify result of cast '(0.5,0.5),(0,0)'::box
 ok 3 - Verify result of cast '(1,1),(0,0)'::box
@@ -78,4 +78,3 @@ ok 71 - check variant vs casted for '''(1,1),(0,0)''::box'   > '''(0.5,0.5),(0,0
 ok 72 - check variant vs casted for '''(1,1),(0,0)''::box'   > '''(1,1),(-1,-1)''::box'
 ok 73 - check variant vs casted for '''(1,1),(0,0)''::box'   > '''(1,1),(0,0)''::box'
 ok 74 - check variant vs casted for '''(1,1),(0,0)''::box'   > 'NULL::box'
-# Looks like you planned 86 tests but ran 74
