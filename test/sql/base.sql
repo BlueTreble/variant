@@ -3,39 +3,6 @@ BEGIN;
 \i test/helpers/tap_setup.sql
 \i test/helpers/common.sql
 
-CREATE TEMP TABLE box_cmp_raw(
-	l		variant.variant("test variant")
-	, r		variant.variant("test variant")
-	, lr	box
-	, rr	box
-);
--- DO NOT TOUCH! Change to the pattern we're using for _ncmp_raw's insert instead!
-INSERT INTO box_cmp_raw(	l,		r								, lr					, rr	)
-SELECT l, r, lr, rr
-FROM (
-	SELECT *
-			/*
-			 * Need to cast lr/rr to text because "blah" isn't actually a valid array and format() gets mad.
-			 */
-			, variant.text_in(format( $$(%s,%s)$$, t, '"' || lr::text || '"' ), 'test variant') AS l
-			, variant.text_in(format( $$(%s,%s)$$, t, '"' || rr::text || '"' ), 'test variant') AS r
-		FROM (
-				SELECT *, '((0,0),(1,1))'::box AS lr, v::box AS rr
-					FROM unnest(array[ '((0,0),(0.5,0.5))', '((0,0),(1,1))', '((-1,-1),(1,1))', NULL ]) AS vals(v) -- '' becomes a NULL
-						, unnest( string_to_array( 'box', ' ' ) ) AS types(t)
-			) a
-	) a
-;
-CREATE OR REPLACE TEMP VIEW box_cmp AS
-	SELECT *
-			, variant.text_out(l) AS l_text
-			, variant.text_out(r) AS r_text
-			, coalesce(lr::text, 'NULL') AS lr_text
-			, coalesce(rr::text, 'NULL') AS rr_text
-	FROM box_cmp_raw
-;
-CREATE OR REPLACE TEMP VIEW box_cmp_ops AS SELECT * FROM box_cmp, ops WHERE btrim(op) NOT IN ( '!=', '<>' );
-
 \set ON_ERROR_STOP true
 
 SELECT plan( (
@@ -45,7 +12,6 @@ SELECT plan( (
 	+3 -- register
 	+6 -- register__get*
 	+4 -- NULL
-	+ (SELECT count(*)::int FROM box_cmp_ops)
 )::int );
 
 SELECT is(
@@ -140,21 +106,6 @@ SELECT is( 1::int::variant.variant("test variant")::int = NULL, false, '(int,1):
 SET transform_null_equals = off;
 SELECT is( NULL::int::variant.variant("test variant")::int = NULL, NULL, '(int,)::int = NULL is NULL' );
 SELECT is( 1::int::variant.variant("test variant")::int = NULL, NULL, '(int,1)::int != NULL is NULL' );
-
---SET client_min_messages = debug;
-SELECT pg_temp.exec_text(
-			$$SELECT is( %s )$$
-			, format( $fmt$variant.text_in(%L, 'test variant') %s variant.text_in(%L, 'test variant')
-					, %L::box %s %L::box
-					, $$%L::box %s %L::box$$$fmt$
-				, l, op, r
-				, lr, op, rr
-				, rpad(l_text, len_l), op, rpad(r_text, len_r)
-			)
-		)
-	FROM box_cmp_ops
-		, (SELECT max(length(l_text)) AS len_l, max(length(r_text)) AS len_r FROM box_cmp) l
-;
 
 SELECT finish();
 ROLLBACK;

@@ -1,0 +1,34 @@
+\set ECHO 0
+
+
+
+
+1..86
+ok 1 - No NULL variants
+ok 2 - Verify result of cast '(0.5,0.5),(0,0)'::box
+ok 3 - Verify result of cast '(1,1),(0,0)'::box
+ok 4 - Verify result of cast '(1,1),(-1,-1)'::box
+ok 5 - Verify result of cast NULL::box
+ok 6 - SET base_variant_b
+ok 7 - Verify text_in(text_out()) works for (box,"(0.5,0.5),(0,0)")
+ok 8 - Verify text_in(text_out()) works for (box,"(1,1),(0,0)")
+ok 9 - Verify text_in(text_out()) works for (box,"(1,1),(-1,-1)")
+ok 10 - Verify text_in(text_out()) works for (box,)
+ok 11 - No NULL variants
+ok 12 - Verify result of cast '(1,1),(0,0)'::box
+ok 13 - SET compare_variant_b
+ok 14 - Verify text_in(text_out()) works for (box,"(1,1),(0,0)")
+psql:test/helpers/type.sql:135: ERROR:  operator does not exist: box <> box
+LINE 2:       compare__casted !=  base__casted
+                              ^
+HINT:  No operator matches the given name and argument type(s). You might need to add explicit type casts.
+QUERY:  SELECT is(
+      compare__casted !=  base__casted
+      , compare_value !=  base_value
+      , format( 'check casted vs uncasted for %s !=  %s', compare_cast_string, base_cast_string )
+    )
+  FROM (
+    SELECT * FROM op_test_data ORDER BY compare_type, base_type, compare_value::text, base_value::text
+  ) ordered -- Need to order first otherwise our test numbers get re-arranged, which is confusing
+
+CONTEXT:  PL/pgSQL function pg_temp_2.exec_text(text,anyarray) line 7 at FOR over EXECUTE statement
