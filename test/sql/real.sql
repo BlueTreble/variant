@@ -7,9 +7,10 @@
  * 0.0::float < 0.0::real = true
  */
 
-\set baseline_type numeric
+
+\set baseline_type real
 -- Space separated string
-\set test_types 'numeric(2,1) numeric'
+\set test_types 'real'
 -- Used in array[ :base_values ]
 \set base_values '-1.1, 0.1, 1.1, NULL' 
 \set compare_value 0.1
