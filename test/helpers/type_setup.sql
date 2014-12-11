@@ -5,6 +5,27 @@
  * base_value is a table of the values to test, represented in the "big" type format
  */
 
+BEGIN;
+\i test/helpers/tap_setup.sql
+\i test/helpers/common.sql
+
+CREATE TEMP VIEW test_type AS
+  SELECT * FROM unnest( string_to_array(
+      :'test_types'
+      , ' '
+    ) ) AS u(test_type)
+;
+
+CREATE TEMP VIEW base_value AS
+  SELECT base_value:::baseline_type FROM unnest(
+    array[ :base_values ]
+  ) AS bv(base_value)
+;
+
+CREATE TEMP VIEW compare_value AS
+  SELECT :'compare_value':::baseline_type AS compare_value
+;
+
 -- Create a text representation of how to cast our test data to each test type
 CREATE TEMP VIEW base_casted AS
   SELECT *

@@ -5,17 +5,17 @@
 
 1..464
 ok 1 - No NULL variants
-ok 2 - Verify result of cast '{a,a,c}'::char[]
-ok 3 - Verify result of cast '{a,b,c}'::char[]
-ok 4 - Verify result of cast '{a,c,c}'::char[]
-ok 5 - Verify result of cast '{a,NULL,c}'::char[]
-ok 6 - Verify result of cast '{NULL,b,c}'::char[]
+ok 2 - Verify result of cast '{"a         ","a         ","c         "}'::char[]
+ok 3 - Verify result of cast '{"a         ","b         ","c         "}'::char[]
+ok 4 - Verify result of cast '{"a         ","c         ","c         "}'::char[]
+ok 5 - Verify result of cast '{"a         ",NULL,"c         "}'::char[]
+ok 6 - Verify result of cast '{NULL,"b         ","c         "}'::char[]
 ok 7 - Verify result of cast NULL::char[]
-ok 8 - Verify result of cast '{a,a,c}'::char(10)[]
-ok 9 - Verify result of cast '{a,b,c}'::char(10)[]
-ok 10 - Verify result of cast '{a,c,c}'::char(10)[]
-ok 11 - Verify result of cast '{a,NULL,c}'::char(10)[]
-ok 12 - Verify result of cast '{NULL,b,c}'::char(10)[]
+ok 8 - Verify result of cast '{"a         ","a         ","c         "}'::char(10)[]
+ok 9 - Verify result of cast '{"a         ","b         ","c         "}'::char(10)[]
+ok 10 - Verify result of cast '{"a         ","c         ","c         "}'::char(10)[]
+ok 11 - Verify result of cast '{"a         ",NULL,"c         "}'::char(10)[]
+ok 12 - Verify result of cast '{NULL,"b         ","c         "}'::char(10)[]
 ok 13 - Verify result of cast NULL::char(10)[]
 ok 14 - SET base_variant_b
 ok 15 - Verify text_in(text_out()) works for ("character(1)[]","{a,a,c}")
@@ -31,440 +31,440 @@ ok 24 - Verify text_in(text_out()) works for ("character(10)[]","{""a         ""
 ok 25 - Verify text_in(text_out()) works for ("character(10)[]","{NULL,""b         "",""c         ""}")
 ok 26 - Verify text_in(text_out()) works for ("character(10)[]",)
 ok 27 - No NULL variants
-ok 28 - Verify result of cast '{a,b,c}'::char[]
-ok 29 - Verify result of cast '{a,b,c}'::char(10)[]
+ok 28 - Verify result of cast '{"a         ","b         ","c         "}'::char[]
+ok 29 - Verify result of cast '{"a         ","b         ","c         "}'::char(10)[]
 ok 30 - SET compare_variant_b
 ok 31 - Verify text_in(text_out()) works for ("character(1)[]","{a,b,c}")
 ok 32 - Verify text_in(text_out()) works for ("character(10)[]","{""a         "",""b         "",""c         ""}")
-ok 33 - check casted vs uncasted for '{a,b,c}'::char(10)[] <   '{a,a,c}'::char(10)[]
-ok 34 - check casted vs uncasted for '{a,b,c}'::char(10)[] <   '{a,b,c}'::char(10)[]
-ok 35 - check casted vs uncasted for '{a,b,c}'::char(10)[] <   '{a,c,c}'::char(10)[]
-ok 36 - check casted vs uncasted for '{a,b,c}'::char(10)[] <   '{a,NULL,c}'::char(10)[]
-ok 37 - check casted vs uncasted for '{a,b,c}'::char(10)[] <   '{NULL,b,c}'::char(10)[]
-ok 38 - check casted vs uncasted for '{a,b,c}'::char(10)[] <   NULL::char(10)[]
-ok 39 - check casted vs uncasted for '{a,b,c}'::char(10)[] <   '{a,a,c}'::char[]
-ok 40 - check casted vs uncasted for '{a,b,c}'::char(10)[] <   '{a,b,c}'::char[]
-ok 41 - check casted vs uncasted for '{a,b,c}'::char(10)[] <   '{a,c,c}'::char[]
-ok 42 - check casted vs uncasted for '{a,b,c}'::char(10)[] <   '{a,NULL,c}'::char[]
-ok 43 - check casted vs uncasted for '{a,b,c}'::char(10)[] <   '{NULL,b,c}'::char[]
-ok 44 - check casted vs uncasted for '{a,b,c}'::char(10)[] <   NULL::char[]
-ok 45 - check casted vs uncasted for '{a,b,c}'::char[] <   '{a,a,c}'::char(10)[]
-ok 46 - check casted vs uncasted for '{a,b,c}'::char[] <   '{a,b,c}'::char(10)[]
-ok 47 - check casted vs uncasted for '{a,b,c}'::char[] <   '{a,c,c}'::char(10)[]
-ok 48 - check casted vs uncasted for '{a,b,c}'::char[] <   '{a,NULL,c}'::char(10)[]
-ok 49 - check casted vs uncasted for '{a,b,c}'::char[] <   '{NULL,b,c}'::char(10)[]
-ok 50 - check casted vs uncasted for '{a,b,c}'::char[] <   NULL::char(10)[]
-ok 51 - check casted vs uncasted for '{a,b,c}'::char[] <   '{a,a,c}'::char[]
-ok 52 - check casted vs uncasted for '{a,b,c}'::char[] <   '{a,b,c}'::char[]
-ok 53 - check casted vs uncasted for '{a,b,c}'::char[] <   '{a,c,c}'::char[]
-ok 54 - check casted vs uncasted for '{a,b,c}'::char[] <   '{a,NULL,c}'::char[]
-ok 55 - check casted vs uncasted for '{a,b,c}'::char[] <   '{NULL,b,c}'::char[]
-ok 56 - check casted vs uncasted for '{a,b,c}'::char[] <   NULL::char[]
-ok 57 - check casted vs uncasted for '{a,b,c}'::char(10)[] <=  '{a,a,c}'::char(10)[]
-ok 58 - check casted vs uncasted for '{a,b,c}'::char(10)[] <=  '{a,b,c}'::char(10)[]
-ok 59 - check casted vs uncasted for '{a,b,c}'::char(10)[] <=  '{a,c,c}'::char(10)[]
-ok 60 - check casted vs uncasted for '{a,b,c}'::char(10)[] <=  '{a,NULL,c}'::char(10)[]
-ok 61 - check casted vs uncasted for '{a,b,c}'::char(10)[] <=  '{NULL,b,c}'::char(10)[]
-ok 62 - check casted vs uncasted for '{a,b,c}'::char(10)[] <=  NULL::char(10)[]
-ok 63 - check casted vs uncasted for '{a,b,c}'::char(10)[] <=  '{a,a,c}'::char[]
-ok 64 - check casted vs uncasted for '{a,b,c}'::char(10)[] <=  '{a,b,c}'::char[]
-ok 65 - check casted vs uncasted for '{a,b,c}'::char(10)[] <=  '{a,c,c}'::char[]
-ok 66 - check casted vs uncasted for '{a,b,c}'::char(10)[] <=  '{a,NULL,c}'::char[]
-ok 67 - check casted vs uncasted for '{a,b,c}'::char(10)[] <=  '{NULL,b,c}'::char[]
-ok 68 - check casted vs uncasted for '{a,b,c}'::char(10)[] <=  NULL::char[]
-ok 69 - check casted vs uncasted for '{a,b,c}'::char[] <=  '{a,a,c}'::char(10)[]
-ok 70 - check casted vs uncasted for '{a,b,c}'::char[] <=  '{a,b,c}'::char(10)[]
-ok 71 - check casted vs uncasted for '{a,b,c}'::char[] <=  '{a,c,c}'::char(10)[]
-ok 72 - check casted vs uncasted for '{a,b,c}'::char[] <=  '{a,NULL,c}'::char(10)[]
-ok 73 - check casted vs uncasted for '{a,b,c}'::char[] <=  '{NULL,b,c}'::char(10)[]
-ok 74 - check casted vs uncasted for '{a,b,c}'::char[] <=  NULL::char(10)[]
-ok 75 - check casted vs uncasted for '{a,b,c}'::char[] <=  '{a,a,c}'::char[]
-ok 76 - check casted vs uncasted for '{a,b,c}'::char[] <=  '{a,b,c}'::char[]
-ok 77 - check casted vs uncasted for '{a,b,c}'::char[] <=  '{a,c,c}'::char[]
-ok 78 - check casted vs uncasted for '{a,b,c}'::char[] <=  '{a,NULL,c}'::char[]
-ok 79 - check casted vs uncasted for '{a,b,c}'::char[] <=  '{NULL,b,c}'::char[]
-ok 80 - check casted vs uncasted for '{a,b,c}'::char[] <=  NULL::char[]
-ok 81 - check casted vs uncasted for '{a,b,c}'::char(10)[]  =  '{a,a,c}'::char(10)[]
-ok 82 - check casted vs uncasted for '{a,b,c}'::char(10)[]  =  '{a,b,c}'::char(10)[]
-ok 83 - check casted vs uncasted for '{a,b,c}'::char(10)[]  =  '{a,c,c}'::char(10)[]
-ok 84 - check casted vs uncasted for '{a,b,c}'::char(10)[]  =  '{a,NULL,c}'::char(10)[]
-ok 85 - check casted vs uncasted for '{a,b,c}'::char(10)[]  =  '{NULL,b,c}'::char(10)[]
-ok 86 - check casted vs uncasted for '{a,b,c}'::char(10)[]  =  NULL::char(10)[]
-ok 87 - check casted vs uncasted for '{a,b,c}'::char(10)[]  =  '{a,a,c}'::char[]
-ok 88 - check casted vs uncasted for '{a,b,c}'::char(10)[]  =  '{a,b,c}'::char[]
-ok 89 - check casted vs uncasted for '{a,b,c}'::char(10)[]  =  '{a,c,c}'::char[]
-ok 90 - check casted vs uncasted for '{a,b,c}'::char(10)[]  =  '{a,NULL,c}'::char[]
-ok 91 - check casted vs uncasted for '{a,b,c}'::char(10)[]  =  '{NULL,b,c}'::char[]
-ok 92 - check casted vs uncasted for '{a,b,c}'::char(10)[]  =  NULL::char[]
-ok 93 - check casted vs uncasted for '{a,b,c}'::char[]  =  '{a,a,c}'::char(10)[]
-ok 94 - check casted vs uncasted for '{a,b,c}'::char[]  =  '{a,b,c}'::char(10)[]
-ok 95 - check casted vs uncasted for '{a,b,c}'::char[]  =  '{a,c,c}'::char(10)[]
-ok 96 - check casted vs uncasted for '{a,b,c}'::char[]  =  '{a,NULL,c}'::char(10)[]
-ok 97 - check casted vs uncasted for '{a,b,c}'::char[]  =  '{NULL,b,c}'::char(10)[]
-ok 98 - check casted vs uncasted for '{a,b,c}'::char[]  =  NULL::char(10)[]
-ok 99 - check casted vs uncasted for '{a,b,c}'::char[]  =  '{a,a,c}'::char[]
-ok 100 - check casted vs uncasted for '{a,b,c}'::char[]  =  '{a,b,c}'::char[]
-ok 101 - check casted vs uncasted for '{a,b,c}'::char[]  =  '{a,c,c}'::char[]
-ok 102 - check casted vs uncasted for '{a,b,c}'::char[]  =  '{a,NULL,c}'::char[]
-ok 103 - check casted vs uncasted for '{a,b,c}'::char[]  =  '{NULL,b,c}'::char[]
-ok 104 - check casted vs uncasted for '{a,b,c}'::char[]  =  NULL::char[]
-ok 105 - check casted vs uncasted for '{a,b,c}'::char(10)[]  >= '{a,a,c}'::char(10)[]
-ok 106 - check casted vs uncasted for '{a,b,c}'::char(10)[]  >= '{a,b,c}'::char(10)[]
-ok 107 - check casted vs uncasted for '{a,b,c}'::char(10)[]  >= '{a,c,c}'::char(10)[]
-ok 108 - check casted vs uncasted for '{a,b,c}'::char(10)[]  >= '{a,NULL,c}'::char(10)[]
-ok 109 - check casted vs uncasted for '{a,b,c}'::char(10)[]  >= '{NULL,b,c}'::char(10)[]
-ok 110 - check casted vs uncasted for '{a,b,c}'::char(10)[]  >= NULL::char(10)[]
-ok 111 - check casted vs uncasted for '{a,b,c}'::char(10)[]  >= '{a,a,c}'::char[]
-ok 112 - check casted vs uncasted for '{a,b,c}'::char(10)[]  >= '{a,b,c}'::char[]
-ok 113 - check casted vs uncasted for '{a,b,c}'::char(10)[]  >= '{a,c,c}'::char[]
-ok 114 - check casted vs uncasted for '{a,b,c}'::char(10)[]  >= '{a,NULL,c}'::char[]
-ok 115 - check casted vs uncasted for '{a,b,c}'::char(10)[]  >= '{NULL,b,c}'::char[]
-ok 116 - check casted vs uncasted for '{a,b,c}'::char(10)[]  >= NULL::char[]
-ok 117 - check casted vs uncasted for '{a,b,c}'::char[]  >= '{a,a,c}'::char(10)[]
-ok 118 - check casted vs uncasted for '{a,b,c}'::char[]  >= '{a,b,c}'::char(10)[]
-ok 119 - check casted vs uncasted for '{a,b,c}'::char[]  >= '{a,c,c}'::char(10)[]
-ok 120 - check casted vs uncasted for '{a,b,c}'::char[]  >= '{a,NULL,c}'::char(10)[]
-ok 121 - check casted vs uncasted for '{a,b,c}'::char[]  >= '{NULL,b,c}'::char(10)[]
-ok 122 - check casted vs uncasted for '{a,b,c}'::char[]  >= NULL::char(10)[]
-ok 123 - check casted vs uncasted for '{a,b,c}'::char[]  >= '{a,a,c}'::char[]
-ok 124 - check casted vs uncasted for '{a,b,c}'::char[]  >= '{a,b,c}'::char[]
-ok 125 - check casted vs uncasted for '{a,b,c}'::char[]  >= '{a,c,c}'::char[]
-ok 126 - check casted vs uncasted for '{a,b,c}'::char[]  >= '{a,NULL,c}'::char[]
-ok 127 - check casted vs uncasted for '{a,b,c}'::char[]  >= '{NULL,b,c}'::char[]
-ok 128 - check casted vs uncasted for '{a,b,c}'::char[]  >= NULL::char[]
-ok 129 - check casted vs uncasted for '{a,b,c}'::char(10)[]   > '{a,a,c}'::char(10)[]
-ok 130 - check casted vs uncasted for '{a,b,c}'::char(10)[]   > '{a,b,c}'::char(10)[]
-ok 131 - check casted vs uncasted for '{a,b,c}'::char(10)[]   > '{a,c,c}'::char(10)[]
-ok 132 - check casted vs uncasted for '{a,b,c}'::char(10)[]   > '{a,NULL,c}'::char(10)[]
-ok 133 - check casted vs uncasted for '{a,b,c}'::char(10)[]   > '{NULL,b,c}'::char(10)[]
-ok 134 - check casted vs uncasted for '{a,b,c}'::char(10)[]   > NULL::char(10)[]
-ok 135 - check casted vs uncasted for '{a,b,c}'::char(10)[]   > '{a,a,c}'::char[]
-ok 136 - check casted vs uncasted for '{a,b,c}'::char(10)[]   > '{a,b,c}'::char[]
-ok 137 - check casted vs uncasted for '{a,b,c}'::char(10)[]   > '{a,c,c}'::char[]
-ok 138 - check casted vs uncasted for '{a,b,c}'::char(10)[]   > '{a,NULL,c}'::char[]
-ok 139 - check casted vs uncasted for '{a,b,c}'::char(10)[]   > '{NULL,b,c}'::char[]
-ok 140 - check casted vs uncasted for '{a,b,c}'::char(10)[]   > NULL::char[]
-ok 141 - check casted vs uncasted for '{a,b,c}'::char[]   > '{a,a,c}'::char(10)[]
-ok 142 - check casted vs uncasted for '{a,b,c}'::char[]   > '{a,b,c}'::char(10)[]
-ok 143 - check casted vs uncasted for '{a,b,c}'::char[]   > '{a,c,c}'::char(10)[]
-ok 144 - check casted vs uncasted for '{a,b,c}'::char[]   > '{a,NULL,c}'::char(10)[]
-ok 145 - check casted vs uncasted for '{a,b,c}'::char[]   > '{NULL,b,c}'::char(10)[]
-ok 146 - check casted vs uncasted for '{a,b,c}'::char[]   > NULL::char(10)[]
-ok 147 - check casted vs uncasted for '{a,b,c}'::char[]   > '{a,a,c}'::char[]
-ok 148 - check casted vs uncasted for '{a,b,c}'::char[]   > '{a,b,c}'::char[]
-ok 149 - check casted vs uncasted for '{a,b,c}'::char[]   > '{a,c,c}'::char[]
-ok 150 - check casted vs uncasted for '{a,b,c}'::char[]   > '{a,NULL,c}'::char[]
-ok 151 - check casted vs uncasted for '{a,b,c}'::char[]   > '{NULL,b,c}'::char[]
-ok 152 - check casted vs uncasted for '{a,b,c}'::char[]   > NULL::char[]
-ok 153 - check casted vs uncasted for '{a,b,c}'::char(10)[] !=  '{a,a,c}'::char(10)[]
-ok 154 - check casted vs uncasted for '{a,b,c}'::char(10)[] !=  '{a,b,c}'::char(10)[]
-ok 155 - check casted vs uncasted for '{a,b,c}'::char(10)[] !=  '{a,c,c}'::char(10)[]
-ok 156 - check casted vs uncasted for '{a,b,c}'::char(10)[] !=  '{a,NULL,c}'::char(10)[]
-ok 157 - check casted vs uncasted for '{a,b,c}'::char(10)[] !=  '{NULL,b,c}'::char(10)[]
-ok 158 - check casted vs uncasted for '{a,b,c}'::char(10)[] !=  NULL::char(10)[]
-ok 159 - check casted vs uncasted for '{a,b,c}'::char(10)[] !=  '{a,a,c}'::char[]
-ok 160 - check casted vs uncasted for '{a,b,c}'::char(10)[] !=  '{a,b,c}'::char[]
-ok 161 - check casted vs uncasted for '{a,b,c}'::char(10)[] !=  '{a,c,c}'::char[]
-ok 162 - check casted vs uncasted for '{a,b,c}'::char(10)[] !=  '{a,NULL,c}'::char[]
-ok 163 - check casted vs uncasted for '{a,b,c}'::char(10)[] !=  '{NULL,b,c}'::char[]
-ok 164 - check casted vs uncasted for '{a,b,c}'::char(10)[] !=  NULL::char[]
-ok 165 - check casted vs uncasted for '{a,b,c}'::char[] !=  '{a,a,c}'::char(10)[]
-ok 166 - check casted vs uncasted for '{a,b,c}'::char[] !=  '{a,b,c}'::char(10)[]
-ok 167 - check casted vs uncasted for '{a,b,c}'::char[] !=  '{a,c,c}'::char(10)[]
-ok 168 - check casted vs uncasted for '{a,b,c}'::char[] !=  '{a,NULL,c}'::char(10)[]
-ok 169 - check casted vs uncasted for '{a,b,c}'::char[] !=  '{NULL,b,c}'::char(10)[]
-ok 170 - check casted vs uncasted for '{a,b,c}'::char[] !=  NULL::char(10)[]
-ok 171 - check casted vs uncasted for '{a,b,c}'::char[] !=  '{a,a,c}'::char[]
-ok 172 - check casted vs uncasted for '{a,b,c}'::char[] !=  '{a,b,c}'::char[]
-ok 173 - check casted vs uncasted for '{a,b,c}'::char[] !=  '{a,c,c}'::char[]
-ok 174 - check casted vs uncasted for '{a,b,c}'::char[] !=  '{a,NULL,c}'::char[]
-ok 175 - check casted vs uncasted for '{a,b,c}'::char[] !=  '{NULL,b,c}'::char[]
-ok 176 - check casted vs uncasted for '{a,b,c}'::char[] !=  NULL::char[]
-ok 177 - check variant vs uncasted for '{a,b,c}'::char(10)[] <   '{a,a,c}'::char(10)[]
-ok 178 - check variant vs uncasted for '{a,b,c}'::char(10)[] <   '{a,b,c}'::char(10)[]
-ok 179 - check variant vs uncasted for '{a,b,c}'::char(10)[] <   '{a,c,c}'::char(10)[]
-ok 180 - check variant vs uncasted for '{a,b,c}'::char(10)[] <   '{a,NULL,c}'::char(10)[]
-ok 181 - check variant vs uncasted for '{a,b,c}'::char(10)[] <   '{NULL,b,c}'::char(10)[]
-ok 182 - check variant vs uncasted for '{a,b,c}'::char(10)[] <   NULL::char(10)[]
-ok 183 - check variant vs uncasted for '{a,b,c}'::char(10)[] <   '{a,a,c}'::char[]
-ok 184 - check variant vs uncasted for '{a,b,c}'::char(10)[] <   '{a,b,c}'::char[]
-ok 185 - check variant vs uncasted for '{a,b,c}'::char(10)[] <   '{a,c,c}'::char[]
-ok 186 - check variant vs uncasted for '{a,b,c}'::char(10)[] <   '{a,NULL,c}'::char[]
-ok 187 - check variant vs uncasted for '{a,b,c}'::char(10)[] <   '{NULL,b,c}'::char[]
-ok 188 - check variant vs uncasted for '{a,b,c}'::char(10)[] <   NULL::char[]
-ok 189 - check variant vs uncasted for '{a,b,c}'::char[] <   '{a,a,c}'::char(10)[]
-ok 190 - check variant vs uncasted for '{a,b,c}'::char[] <   '{a,b,c}'::char(10)[]
-ok 191 - check variant vs uncasted for '{a,b,c}'::char[] <   '{a,c,c}'::char(10)[]
-ok 192 - check variant vs uncasted for '{a,b,c}'::char[] <   '{a,NULL,c}'::char(10)[]
-ok 193 - check variant vs uncasted for '{a,b,c}'::char[] <   '{NULL,b,c}'::char(10)[]
-ok 194 - check variant vs uncasted for '{a,b,c}'::char[] <   NULL::char(10)[]
-ok 195 - check variant vs uncasted for '{a,b,c}'::char[] <   '{a,a,c}'::char[]
-ok 196 - check variant vs uncasted for '{a,b,c}'::char[] <   '{a,b,c}'::char[]
-ok 197 - check variant vs uncasted for '{a,b,c}'::char[] <   '{a,c,c}'::char[]
-ok 198 - check variant vs uncasted for '{a,b,c}'::char[] <   '{a,NULL,c}'::char[]
-ok 199 - check variant vs uncasted for '{a,b,c}'::char[] <   '{NULL,b,c}'::char[]
-ok 200 - check variant vs uncasted for '{a,b,c}'::char[] <   NULL::char[]
-ok 201 - check variant vs uncasted for '{a,b,c}'::char(10)[] <=  '{a,a,c}'::char(10)[]
-ok 202 - check variant vs uncasted for '{a,b,c}'::char(10)[] <=  '{a,b,c}'::char(10)[]
-ok 203 - check variant vs uncasted for '{a,b,c}'::char(10)[] <=  '{a,c,c}'::char(10)[]
-ok 204 - check variant vs uncasted for '{a,b,c}'::char(10)[] <=  '{a,NULL,c}'::char(10)[]
-ok 205 - check variant vs uncasted for '{a,b,c}'::char(10)[] <=  '{NULL,b,c}'::char(10)[]
-ok 206 - check variant vs uncasted for '{a,b,c}'::char(10)[] <=  NULL::char(10)[]
-ok 207 - check variant vs uncasted for '{a,b,c}'::char(10)[] <=  '{a,a,c}'::char[]
-ok 208 - check variant vs uncasted for '{a,b,c}'::char(10)[] <=  '{a,b,c}'::char[]
-ok 209 - check variant vs uncasted for '{a,b,c}'::char(10)[] <=  '{a,c,c}'::char[]
-ok 210 - check variant vs uncasted for '{a,b,c}'::char(10)[] <=  '{a,NULL,c}'::char[]
-ok 211 - check variant vs uncasted for '{a,b,c}'::char(10)[] <=  '{NULL,b,c}'::char[]
-ok 212 - check variant vs uncasted for '{a,b,c}'::char(10)[] <=  NULL::char[]
-ok 213 - check variant vs uncasted for '{a,b,c}'::char[] <=  '{a,a,c}'::char(10)[]
-ok 214 - check variant vs uncasted for '{a,b,c}'::char[] <=  '{a,b,c}'::char(10)[]
-ok 215 - check variant vs uncasted for '{a,b,c}'::char[] <=  '{a,c,c}'::char(10)[]
-ok 216 - check variant vs uncasted for '{a,b,c}'::char[] <=  '{a,NULL,c}'::char(10)[]
-ok 217 - check variant vs uncasted for '{a,b,c}'::char[] <=  '{NULL,b,c}'::char(10)[]
-ok 218 - check variant vs uncasted for '{a,b,c}'::char[] <=  NULL::char(10)[]
-ok 219 - check variant vs uncasted for '{a,b,c}'::char[] <=  '{a,a,c}'::char[]
-ok 220 - check variant vs uncasted for '{a,b,c}'::char[] <=  '{a,b,c}'::char[]
-ok 221 - check variant vs uncasted for '{a,b,c}'::char[] <=  '{a,c,c}'::char[]
-ok 222 - check variant vs uncasted for '{a,b,c}'::char[] <=  '{a,NULL,c}'::char[]
-ok 223 - check variant vs uncasted for '{a,b,c}'::char[] <=  '{NULL,b,c}'::char[]
-ok 224 - check variant vs uncasted for '{a,b,c}'::char[] <=  NULL::char[]
-ok 225 - check variant vs uncasted for '{a,b,c}'::char(10)[]  =  '{a,a,c}'::char(10)[]
-ok 226 - check variant vs uncasted for '{a,b,c}'::char(10)[]  =  '{a,b,c}'::char(10)[]
-ok 227 - check variant vs uncasted for '{a,b,c}'::char(10)[]  =  '{a,c,c}'::char(10)[]
-ok 228 - check variant vs uncasted for '{a,b,c}'::char(10)[]  =  '{a,NULL,c}'::char(10)[]
-ok 229 - check variant vs uncasted for '{a,b,c}'::char(10)[]  =  '{NULL,b,c}'::char(10)[]
-ok 230 - check variant vs uncasted for '{a,b,c}'::char(10)[]  =  NULL::char(10)[]
-ok 231 - check variant vs uncasted for '{a,b,c}'::char(10)[]  =  '{a,a,c}'::char[]
-ok 232 - check variant vs uncasted for '{a,b,c}'::char(10)[]  =  '{a,b,c}'::char[]
-ok 233 - check variant vs uncasted for '{a,b,c}'::char(10)[]  =  '{a,c,c}'::char[]
-ok 234 - check variant vs uncasted for '{a,b,c}'::char(10)[]  =  '{a,NULL,c}'::char[]
-ok 235 - check variant vs uncasted for '{a,b,c}'::char(10)[]  =  '{NULL,b,c}'::char[]
-ok 236 - check variant vs uncasted for '{a,b,c}'::char(10)[]  =  NULL::char[]
-ok 237 - check variant vs uncasted for '{a,b,c}'::char[]  =  '{a,a,c}'::char(10)[]
-ok 238 - check variant vs uncasted for '{a,b,c}'::char[]  =  '{a,b,c}'::char(10)[]
-ok 239 - check variant vs uncasted for '{a,b,c}'::char[]  =  '{a,c,c}'::char(10)[]
-ok 240 - check variant vs uncasted for '{a,b,c}'::char[]  =  '{a,NULL,c}'::char(10)[]
-ok 241 - check variant vs uncasted for '{a,b,c}'::char[]  =  '{NULL,b,c}'::char(10)[]
-ok 242 - check variant vs uncasted for '{a,b,c}'::char[]  =  NULL::char(10)[]
-ok 243 - check variant vs uncasted for '{a,b,c}'::char[]  =  '{a,a,c}'::char[]
-ok 244 - check variant vs uncasted for '{a,b,c}'::char[]  =  '{a,b,c}'::char[]
-ok 245 - check variant vs uncasted for '{a,b,c}'::char[]  =  '{a,c,c}'::char[]
-ok 246 - check variant vs uncasted for '{a,b,c}'::char[]  =  '{a,NULL,c}'::char[]
-ok 247 - check variant vs uncasted for '{a,b,c}'::char[]  =  '{NULL,b,c}'::char[]
-ok 248 - check variant vs uncasted for '{a,b,c}'::char[]  =  NULL::char[]
-ok 249 - check variant vs uncasted for '{a,b,c}'::char(10)[]  >= '{a,a,c}'::char(10)[]
-ok 250 - check variant vs uncasted for '{a,b,c}'::char(10)[]  >= '{a,b,c}'::char(10)[]
-ok 251 - check variant vs uncasted for '{a,b,c}'::char(10)[]  >= '{a,c,c}'::char(10)[]
-ok 252 - check variant vs uncasted for '{a,b,c}'::char(10)[]  >= '{a,NULL,c}'::char(10)[]
-ok 253 - check variant vs uncasted for '{a,b,c}'::char(10)[]  >= '{NULL,b,c}'::char(10)[]
-ok 254 - check variant vs uncasted for '{a,b,c}'::char(10)[]  >= NULL::char(10)[]
-ok 255 - check variant vs uncasted for '{a,b,c}'::char(10)[]  >= '{a,a,c}'::char[]
-ok 256 - check variant vs uncasted for '{a,b,c}'::char(10)[]  >= '{a,b,c}'::char[]
-ok 257 - check variant vs uncasted for '{a,b,c}'::char(10)[]  >= '{a,c,c}'::char[]
-ok 258 - check variant vs uncasted for '{a,b,c}'::char(10)[]  >= '{a,NULL,c}'::char[]
-ok 259 - check variant vs uncasted for '{a,b,c}'::char(10)[]  >= '{NULL,b,c}'::char[]
-ok 260 - check variant vs uncasted for '{a,b,c}'::char(10)[]  >= NULL::char[]
-ok 261 - check variant vs uncasted for '{a,b,c}'::char[]  >= '{a,a,c}'::char(10)[]
-ok 262 - check variant vs uncasted for '{a,b,c}'::char[]  >= '{a,b,c}'::char(10)[]
-ok 263 - check variant vs uncasted for '{a,b,c}'::char[]  >= '{a,c,c}'::char(10)[]
-ok 264 - check variant vs uncasted for '{a,b,c}'::char[]  >= '{a,NULL,c}'::char(10)[]
-ok 265 - check variant vs uncasted for '{a,b,c}'::char[]  >= '{NULL,b,c}'::char(10)[]
-ok 266 - check variant vs uncasted for '{a,b,c}'::char[]  >= NULL::char(10)[]
-ok 267 - check variant vs uncasted for '{a,b,c}'::char[]  >= '{a,a,c}'::char[]
-ok 268 - check variant vs uncasted for '{a,b,c}'::char[]  >= '{a,b,c}'::char[]
-ok 269 - check variant vs uncasted for '{a,b,c}'::char[]  >= '{a,c,c}'::char[]
-ok 270 - check variant vs uncasted for '{a,b,c}'::char[]  >= '{a,NULL,c}'::char[]
-ok 271 - check variant vs uncasted for '{a,b,c}'::char[]  >= '{NULL,b,c}'::char[]
-ok 272 - check variant vs uncasted for '{a,b,c}'::char[]  >= NULL::char[]
-ok 273 - check variant vs uncasted for '{a,b,c}'::char(10)[]   > '{a,a,c}'::char(10)[]
-ok 274 - check variant vs uncasted for '{a,b,c}'::char(10)[]   > '{a,b,c}'::char(10)[]
-ok 275 - check variant vs uncasted for '{a,b,c}'::char(10)[]   > '{a,c,c}'::char(10)[]
-ok 276 - check variant vs uncasted for '{a,b,c}'::char(10)[]   > '{a,NULL,c}'::char(10)[]
-ok 277 - check variant vs uncasted for '{a,b,c}'::char(10)[]   > '{NULL,b,c}'::char(10)[]
-ok 278 - check variant vs uncasted for '{a,b,c}'::char(10)[]   > NULL::char(10)[]
-ok 279 - check variant vs uncasted for '{a,b,c}'::char(10)[]   > '{a,a,c}'::char[]
-ok 280 - check variant vs uncasted for '{a,b,c}'::char(10)[]   > '{a,b,c}'::char[]
-ok 281 - check variant vs uncasted for '{a,b,c}'::char(10)[]   > '{a,c,c}'::char[]
-ok 282 - check variant vs uncasted for '{a,b,c}'::char(10)[]   > '{a,NULL,c}'::char[]
-ok 283 - check variant vs uncasted for '{a,b,c}'::char(10)[]   > '{NULL,b,c}'::char[]
-ok 284 - check variant vs uncasted for '{a,b,c}'::char(10)[]   > NULL::char[]
-ok 285 - check variant vs uncasted for '{a,b,c}'::char[]   > '{a,a,c}'::char(10)[]
-ok 286 - check variant vs uncasted for '{a,b,c}'::char[]   > '{a,b,c}'::char(10)[]
-ok 287 - check variant vs uncasted for '{a,b,c}'::char[]   > '{a,c,c}'::char(10)[]
-ok 288 - check variant vs uncasted for '{a,b,c}'::char[]   > '{a,NULL,c}'::char(10)[]
-ok 289 - check variant vs uncasted for '{a,b,c}'::char[]   > '{NULL,b,c}'::char(10)[]
-ok 290 - check variant vs uncasted for '{a,b,c}'::char[]   > NULL::char(10)[]
-ok 291 - check variant vs uncasted for '{a,b,c}'::char[]   > '{a,a,c}'::char[]
-ok 292 - check variant vs uncasted for '{a,b,c}'::char[]   > '{a,b,c}'::char[]
-ok 293 - check variant vs uncasted for '{a,b,c}'::char[]   > '{a,c,c}'::char[]
-ok 294 - check variant vs uncasted for '{a,b,c}'::char[]   > '{a,NULL,c}'::char[]
-ok 295 - check variant vs uncasted for '{a,b,c}'::char[]   > '{NULL,b,c}'::char[]
-ok 296 - check variant vs uncasted for '{a,b,c}'::char[]   > NULL::char[]
-ok 297 - check variant vs uncasted for '{a,b,c}'::char(10)[] !=  '{a,a,c}'::char(10)[]
-ok 298 - check variant vs uncasted for '{a,b,c}'::char(10)[] !=  '{a,b,c}'::char(10)[]
-ok 299 - check variant vs uncasted for '{a,b,c}'::char(10)[] !=  '{a,c,c}'::char(10)[]
-ok 300 - check variant vs uncasted for '{a,b,c}'::char(10)[] !=  '{a,NULL,c}'::char(10)[]
-ok 301 - check variant vs uncasted for '{a,b,c}'::char(10)[] !=  '{NULL,b,c}'::char(10)[]
-ok 302 - check variant vs uncasted for '{a,b,c}'::char(10)[] !=  NULL::char(10)[]
-ok 303 - check variant vs uncasted for '{a,b,c}'::char(10)[] !=  '{a,a,c}'::char[]
-ok 304 - check variant vs uncasted for '{a,b,c}'::char(10)[] !=  '{a,b,c}'::char[]
-ok 305 - check variant vs uncasted for '{a,b,c}'::char(10)[] !=  '{a,c,c}'::char[]
-ok 306 - check variant vs uncasted for '{a,b,c}'::char(10)[] !=  '{a,NULL,c}'::char[]
-ok 307 - check variant vs uncasted for '{a,b,c}'::char(10)[] !=  '{NULL,b,c}'::char[]
-ok 308 - check variant vs uncasted for '{a,b,c}'::char(10)[] !=  NULL::char[]
-ok 309 - check variant vs uncasted for '{a,b,c}'::char[] !=  '{a,a,c}'::char(10)[]
-ok 310 - check variant vs uncasted for '{a,b,c}'::char[] !=  '{a,b,c}'::char(10)[]
-ok 311 - check variant vs uncasted for '{a,b,c}'::char[] !=  '{a,c,c}'::char(10)[]
-ok 312 - check variant vs uncasted for '{a,b,c}'::char[] !=  '{a,NULL,c}'::char(10)[]
-ok 313 - check variant vs uncasted for '{a,b,c}'::char[] !=  '{NULL,b,c}'::char(10)[]
-ok 314 - check variant vs uncasted for '{a,b,c}'::char[] !=  NULL::char(10)[]
-ok 315 - check variant vs uncasted for '{a,b,c}'::char[] !=  '{a,a,c}'::char[]
-ok 316 - check variant vs uncasted for '{a,b,c}'::char[] !=  '{a,b,c}'::char[]
-ok 317 - check variant vs uncasted for '{a,b,c}'::char[] !=  '{a,c,c}'::char[]
-ok 318 - check variant vs uncasted for '{a,b,c}'::char[] !=  '{a,NULL,c}'::char[]
-ok 319 - check variant vs uncasted for '{a,b,c}'::char[] !=  '{NULL,b,c}'::char[]
-ok 320 - check variant vs uncasted for '{a,b,c}'::char[] !=  NULL::char[]
-ok 321 - check variant vs casted for '''{a,b,c}''::char(10)[]' <   '''{a,a,c}''::char(10)[]'
-ok 322 - check variant vs casted for '''{a,b,c}''::char(10)[]' <   '''{a,b,c}''::char(10)[]'
-ok 323 - check variant vs casted for '''{a,b,c}''::char(10)[]' <   '''{a,c,c}''::char(10)[]'
-ok 324 - check variant vs casted for '''{a,b,c}''::char(10)[]' <   '''{a,NULL,c}''::char(10)[]'
-ok 325 - check variant vs casted for '''{a,b,c}''::char(10)[]' <   '''{NULL,b,c}''::char(10)[]'
-ok 326 - check variant vs casted for '''{a,b,c}''::char(10)[]' <   'NULL::char(10)[]'
-ok 327 - check variant vs casted for '''{a,b,c}''::char(10)[]' <   '''{a,a,c}''::char[]'
-ok 328 - check variant vs casted for '''{a,b,c}''::char(10)[]' <   '''{a,b,c}''::char[]'
-ok 329 - check variant vs casted for '''{a,b,c}''::char(10)[]' <   '''{a,c,c}''::char[]'
-ok 330 - check variant vs casted for '''{a,b,c}''::char(10)[]' <   '''{a,NULL,c}''::char[]'
-ok 331 - check variant vs casted for '''{a,b,c}''::char(10)[]' <   '''{NULL,b,c}''::char[]'
-ok 332 - check variant vs casted for '''{a,b,c}''::char(10)[]' <   'NULL::char[]'
-ok 333 - check variant vs casted for '''{a,b,c}''::char[]' <   '''{a,a,c}''::char(10)[]'
-ok 334 - check variant vs casted for '''{a,b,c}''::char[]' <   '''{a,b,c}''::char(10)[]'
-ok 335 - check variant vs casted for '''{a,b,c}''::char[]' <   '''{a,c,c}''::char(10)[]'
-ok 336 - check variant vs casted for '''{a,b,c}''::char[]' <   '''{a,NULL,c}''::char(10)[]'
-ok 337 - check variant vs casted for '''{a,b,c}''::char[]' <   '''{NULL,b,c}''::char(10)[]'
-ok 338 - check variant vs casted for '''{a,b,c}''::char[]' <   'NULL::char(10)[]'
-ok 339 - check variant vs casted for '''{a,b,c}''::char[]' <   '''{a,a,c}''::char[]'
-ok 340 - check variant vs casted for '''{a,b,c}''::char[]' <   '''{a,b,c}''::char[]'
-ok 341 - check variant vs casted for '''{a,b,c}''::char[]' <   '''{a,c,c}''::char[]'
-ok 342 - check variant vs casted for '''{a,b,c}''::char[]' <   '''{a,NULL,c}''::char[]'
-ok 343 - check variant vs casted for '''{a,b,c}''::char[]' <   '''{NULL,b,c}''::char[]'
-ok 344 - check variant vs casted for '''{a,b,c}''::char[]' <   'NULL::char[]'
-ok 345 - check variant vs casted for '''{a,b,c}''::char(10)[]' <=  '''{a,a,c}''::char(10)[]'
-ok 346 - check variant vs casted for '''{a,b,c}''::char(10)[]' <=  '''{a,b,c}''::char(10)[]'
-ok 347 - check variant vs casted for '''{a,b,c}''::char(10)[]' <=  '''{a,c,c}''::char(10)[]'
-ok 348 - check variant vs casted for '''{a,b,c}''::char(10)[]' <=  '''{a,NULL,c}''::char(10)[]'
-ok 349 - check variant vs casted for '''{a,b,c}''::char(10)[]' <=  '''{NULL,b,c}''::char(10)[]'
-ok 350 - check variant vs casted for '''{a,b,c}''::char(10)[]' <=  'NULL::char(10)[]'
-ok 351 - check variant vs casted for '''{a,b,c}''::char(10)[]' <=  '''{a,a,c}''::char[]'
-ok 352 - check variant vs casted for '''{a,b,c}''::char(10)[]' <=  '''{a,b,c}''::char[]'
-ok 353 - check variant vs casted for '''{a,b,c}''::char(10)[]' <=  '''{a,c,c}''::char[]'
-ok 354 - check variant vs casted for '''{a,b,c}''::char(10)[]' <=  '''{a,NULL,c}''::char[]'
-ok 355 - check variant vs casted for '''{a,b,c}''::char(10)[]' <=  '''{NULL,b,c}''::char[]'
-ok 356 - check variant vs casted for '''{a,b,c}''::char(10)[]' <=  'NULL::char[]'
-ok 357 - check variant vs casted for '''{a,b,c}''::char[]' <=  '''{a,a,c}''::char(10)[]'
-ok 358 - check variant vs casted for '''{a,b,c}''::char[]' <=  '''{a,b,c}''::char(10)[]'
-ok 359 - check variant vs casted for '''{a,b,c}''::char[]' <=  '''{a,c,c}''::char(10)[]'
-ok 360 - check variant vs casted for '''{a,b,c}''::char[]' <=  '''{a,NULL,c}''::char(10)[]'
-ok 361 - check variant vs casted for '''{a,b,c}''::char[]' <=  '''{NULL,b,c}''::char(10)[]'
-ok 362 - check variant vs casted for '''{a,b,c}''::char[]' <=  'NULL::char(10)[]'
-ok 363 - check variant vs casted for '''{a,b,c}''::char[]' <=  '''{a,a,c}''::char[]'
-ok 364 - check variant vs casted for '''{a,b,c}''::char[]' <=  '''{a,b,c}''::char[]'
-ok 365 - check variant vs casted for '''{a,b,c}''::char[]' <=  '''{a,c,c}''::char[]'
-ok 366 - check variant vs casted for '''{a,b,c}''::char[]' <=  '''{a,NULL,c}''::char[]'
-ok 367 - check variant vs casted for '''{a,b,c}''::char[]' <=  '''{NULL,b,c}''::char[]'
-ok 368 - check variant vs casted for '''{a,b,c}''::char[]' <=  'NULL::char[]'
-ok 369 - check variant vs casted for '''{a,b,c}''::char(10)[]'  =  '''{a,a,c}''::char(10)[]'
-ok 370 - check variant vs casted for '''{a,b,c}''::char(10)[]'  =  '''{a,b,c}''::char(10)[]'
-ok 371 - check variant vs casted for '''{a,b,c}''::char(10)[]'  =  '''{a,c,c}''::char(10)[]'
-ok 372 - check variant vs casted for '''{a,b,c}''::char(10)[]'  =  '''{a,NULL,c}''::char(10)[]'
-ok 373 - check variant vs casted for '''{a,b,c}''::char(10)[]'  =  '''{NULL,b,c}''::char(10)[]'
-ok 374 - check variant vs casted for '''{a,b,c}''::char(10)[]'  =  'NULL::char(10)[]'
-ok 375 - check variant vs casted for '''{a,b,c}''::char(10)[]'  =  '''{a,a,c}''::char[]'
-ok 376 - check variant vs casted for '''{a,b,c}''::char(10)[]'  =  '''{a,b,c}''::char[]'
-ok 377 - check variant vs casted for '''{a,b,c}''::char(10)[]'  =  '''{a,c,c}''::char[]'
-ok 378 - check variant vs casted for '''{a,b,c}''::char(10)[]'  =  '''{a,NULL,c}''::char[]'
-ok 379 - check variant vs casted for '''{a,b,c}''::char(10)[]'  =  '''{NULL,b,c}''::char[]'
-ok 380 - check variant vs casted for '''{a,b,c}''::char(10)[]'  =  'NULL::char[]'
-ok 381 - check variant vs casted for '''{a,b,c}''::char[]'  =  '''{a,a,c}''::char(10)[]'
-ok 382 - check variant vs casted for '''{a,b,c}''::char[]'  =  '''{a,b,c}''::char(10)[]'
-ok 383 - check variant vs casted for '''{a,b,c}''::char[]'  =  '''{a,c,c}''::char(10)[]'
-ok 384 - check variant vs casted for '''{a,b,c}''::char[]'  =  '''{a,NULL,c}''::char(10)[]'
-ok 385 - check variant vs casted for '''{a,b,c}''::char[]'  =  '''{NULL,b,c}''::char(10)[]'
-ok 386 - check variant vs casted for '''{a,b,c}''::char[]'  =  'NULL::char(10)[]'
-ok 387 - check variant vs casted for '''{a,b,c}''::char[]'  =  '''{a,a,c}''::char[]'
-ok 388 - check variant vs casted for '''{a,b,c}''::char[]'  =  '''{a,b,c}''::char[]'
-ok 389 - check variant vs casted for '''{a,b,c}''::char[]'  =  '''{a,c,c}''::char[]'
-ok 390 - check variant vs casted for '''{a,b,c}''::char[]'  =  '''{a,NULL,c}''::char[]'
-ok 391 - check variant vs casted for '''{a,b,c}''::char[]'  =  '''{NULL,b,c}''::char[]'
-ok 392 - check variant vs casted for '''{a,b,c}''::char[]'  =  'NULL::char[]'
-ok 393 - check variant vs casted for '''{a,b,c}''::char(10)[]'  >= '''{a,a,c}''::char(10)[]'
-ok 394 - check variant vs casted for '''{a,b,c}''::char(10)[]'  >= '''{a,b,c}''::char(10)[]'
-ok 395 - check variant vs casted for '''{a,b,c}''::char(10)[]'  >= '''{a,c,c}''::char(10)[]'
-ok 396 - check variant vs casted for '''{a,b,c}''::char(10)[]'  >= '''{a,NULL,c}''::char(10)[]'
-ok 397 - check variant vs casted for '''{a,b,c}''::char(10)[]'  >= '''{NULL,b,c}''::char(10)[]'
-ok 398 - check variant vs casted for '''{a,b,c}''::char(10)[]'  >= 'NULL::char(10)[]'
-ok 399 - check variant vs casted for '''{a,b,c}''::char(10)[]'  >= '''{a,a,c}''::char[]'
-ok 400 - check variant vs casted for '''{a,b,c}''::char(10)[]'  >= '''{a,b,c}''::char[]'
-ok 401 - check variant vs casted for '''{a,b,c}''::char(10)[]'  >= '''{a,c,c}''::char[]'
-ok 402 - check variant vs casted for '''{a,b,c}''::char(10)[]'  >= '''{a,NULL,c}''::char[]'
-ok 403 - check variant vs casted for '''{a,b,c}''::char(10)[]'  >= '''{NULL,b,c}''::char[]'
-ok 404 - check variant vs casted for '''{a,b,c}''::char(10)[]'  >= 'NULL::char[]'
-ok 405 - check variant vs casted for '''{a,b,c}''::char[]'  >= '''{a,a,c}''::char(10)[]'
-ok 406 - check variant vs casted for '''{a,b,c}''::char[]'  >= '''{a,b,c}''::char(10)[]'
-ok 407 - check variant vs casted for '''{a,b,c}''::char[]'  >= '''{a,c,c}''::char(10)[]'
-ok 408 - check variant vs casted for '''{a,b,c}''::char[]'  >= '''{a,NULL,c}''::char(10)[]'
-ok 409 - check variant vs casted for '''{a,b,c}''::char[]'  >= '''{NULL,b,c}''::char(10)[]'
-ok 410 - check variant vs casted for '''{a,b,c}''::char[]'  >= 'NULL::char(10)[]'
-ok 411 - check variant vs casted for '''{a,b,c}''::char[]'  >= '''{a,a,c}''::char[]'
-ok 412 - check variant vs casted for '''{a,b,c}''::char[]'  >= '''{a,b,c}''::char[]'
-ok 413 - check variant vs casted for '''{a,b,c}''::char[]'  >= '''{a,c,c}''::char[]'
-ok 414 - check variant vs casted for '''{a,b,c}''::char[]'  >= '''{a,NULL,c}''::char[]'
-ok 415 - check variant vs casted for '''{a,b,c}''::char[]'  >= '''{NULL,b,c}''::char[]'
-ok 416 - check variant vs casted for '''{a,b,c}''::char[]'  >= 'NULL::char[]'
-ok 417 - check variant vs casted for '''{a,b,c}''::char(10)[]'   > '''{a,a,c}''::char(10)[]'
-ok 418 - check variant vs casted for '''{a,b,c}''::char(10)[]'   > '''{a,b,c}''::char(10)[]'
-ok 419 - check variant vs casted for '''{a,b,c}''::char(10)[]'   > '''{a,c,c}''::char(10)[]'
-ok 420 - check variant vs casted for '''{a,b,c}''::char(10)[]'   > '''{a,NULL,c}''::char(10)[]'
-ok 421 - check variant vs casted for '''{a,b,c}''::char(10)[]'   > '''{NULL,b,c}''::char(10)[]'
-ok 422 - check variant vs casted for '''{a,b,c}''::char(10)[]'   > 'NULL::char(10)[]'
-ok 423 - check variant vs casted for '''{a,b,c}''::char(10)[]'   > '''{a,a,c}''::char[]'
-ok 424 - check variant vs casted for '''{a,b,c}''::char(10)[]'   > '''{a,b,c}''::char[]'
-ok 425 - check variant vs casted for '''{a,b,c}''::char(10)[]'   > '''{a,c,c}''::char[]'
-ok 426 - check variant vs casted for '''{a,b,c}''::char(10)[]'   > '''{a,NULL,c}''::char[]'
-ok 427 - check variant vs casted for '''{a,b,c}''::char(10)[]'   > '''{NULL,b,c}''::char[]'
-ok 428 - check variant vs casted for '''{a,b,c}''::char(10)[]'   > 'NULL::char[]'
-ok 429 - check variant vs casted for '''{a,b,c}''::char[]'   > '''{a,a,c}''::char(10)[]'
-ok 430 - check variant vs casted for '''{a,b,c}''::char[]'   > '''{a,b,c}''::char(10)[]'
-ok 431 - check variant vs casted for '''{a,b,c}''::char[]'   > '''{a,c,c}''::char(10)[]'
-ok 432 - check variant vs casted for '''{a,b,c}''::char[]'   > '''{a,NULL,c}''::char(10)[]'
-ok 433 - check variant vs casted for '''{a,b,c}''::char[]'   > '''{NULL,b,c}''::char(10)[]'
-ok 434 - check variant vs casted for '''{a,b,c}''::char[]'   > 'NULL::char(10)[]'
-ok 435 - check variant vs casted for '''{a,b,c}''::char[]'   > '''{a,a,c}''::char[]'
-ok 436 - check variant vs casted for '''{a,b,c}''::char[]'   > '''{a,b,c}''::char[]'
-ok 437 - check variant vs casted for '''{a,b,c}''::char[]'   > '''{a,c,c}''::char[]'
-ok 438 - check variant vs casted for '''{a,b,c}''::char[]'   > '''{a,NULL,c}''::char[]'
-ok 439 - check variant vs casted for '''{a,b,c}''::char[]'   > '''{NULL,b,c}''::char[]'
-ok 440 - check variant vs casted for '''{a,b,c}''::char[]'   > 'NULL::char[]'
-ok 441 - check variant vs casted for '''{a,b,c}''::char(10)[]' !=  '''{a,a,c}''::char(10)[]'
-ok 442 - check variant vs casted for '''{a,b,c}''::char(10)[]' !=  '''{a,b,c}''::char(10)[]'
-ok 443 - check variant vs casted for '''{a,b,c}''::char(10)[]' !=  '''{a,c,c}''::char(10)[]'
-ok 444 - check variant vs casted for '''{a,b,c}''::char(10)[]' !=  '''{a,NULL,c}''::char(10)[]'
-ok 445 - check variant vs casted for '''{a,b,c}''::char(10)[]' !=  '''{NULL,b,c}''::char(10)[]'
-ok 446 - check variant vs casted for '''{a,b,c}''::char(10)[]' !=  'NULL::char(10)[]'
-ok 447 - check variant vs casted for '''{a,b,c}''::char(10)[]' !=  '''{a,a,c}''::char[]'
-ok 448 - check variant vs casted for '''{a,b,c}''::char(10)[]' !=  '''{a,b,c}''::char[]'
-ok 449 - check variant vs casted for '''{a,b,c}''::char(10)[]' !=  '''{a,c,c}''::char[]'
-ok 450 - check variant vs casted for '''{a,b,c}''::char(10)[]' !=  '''{a,NULL,c}''::char[]'
-ok 451 - check variant vs casted for '''{a,b,c}''::char(10)[]' !=  '''{NULL,b,c}''::char[]'
-ok 452 - check variant vs casted for '''{a,b,c}''::char(10)[]' !=  'NULL::char[]'
-ok 453 - check variant vs casted for '''{a,b,c}''::char[]' !=  '''{a,a,c}''::char(10)[]'
-ok 454 - check variant vs casted for '''{a,b,c}''::char[]' !=  '''{a,b,c}''::char(10)[]'
-ok 455 - check variant vs casted for '''{a,b,c}''::char[]' !=  '''{a,c,c}''::char(10)[]'
-ok 456 - check variant vs casted for '''{a,b,c}''::char[]' !=  '''{a,NULL,c}''::char(10)[]'
-ok 457 - check variant vs casted for '''{a,b,c}''::char[]' !=  '''{NULL,b,c}''::char(10)[]'
-ok 458 - check variant vs casted for '''{a,b,c}''::char[]' !=  'NULL::char(10)[]'
-ok 459 - check variant vs casted for '''{a,b,c}''::char[]' !=  '''{a,a,c}''::char[]'
-ok 460 - check variant vs casted for '''{a,b,c}''::char[]' !=  '''{a,b,c}''::char[]'
-ok 461 - check variant vs casted for '''{a,b,c}''::char[]' !=  '''{a,c,c}''::char[]'
-ok 462 - check variant vs casted for '''{a,b,c}''::char[]' !=  '''{a,NULL,c}''::char[]'
-ok 463 - check variant vs casted for '''{a,b,c}''::char[]' !=  '''{NULL,b,c}''::char[]'
-ok 464 - check variant vs casted for '''{a,b,c}''::char[]' !=  'NULL::char[]'
+ok 33 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char(10)[] <   '{"a         ","a         ","c         "}'::char(10)[]
+ok 34 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char(10)[] <   '{"a         ","b         ","c         "}'::char(10)[]
+ok 35 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char(10)[] <   '{"a         ","c         ","c         "}'::char(10)[]
+ok 36 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char(10)[] <   '{"a         ",NULL,"c         "}'::char(10)[]
+ok 37 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char(10)[] <   '{NULL,"b         ","c         "}'::char(10)[]
+ok 38 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char(10)[] <   NULL::char(10)[]
+ok 39 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char(10)[] <   '{"a         ","a         ","c         "}'::char[]
+ok 40 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char(10)[] <   '{"a         ","b         ","c         "}'::char[]
+ok 41 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char(10)[] <   '{"a         ","c         ","c         "}'::char[]
+ok 42 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char(10)[] <   '{"a         ",NULL,"c         "}'::char[]
+ok 43 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char(10)[] <   '{NULL,"b         ","c         "}'::char[]
+ok 44 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char(10)[] <   NULL::char[]
+ok 45 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char[] <   '{"a         ","a         ","c         "}'::char(10)[]
+ok 46 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char[] <   '{"a         ","b         ","c         "}'::char(10)[]
+ok 47 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char[] <   '{"a         ","c         ","c         "}'::char(10)[]
+ok 48 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char[] <   '{"a         ",NULL,"c         "}'::char(10)[]
+ok 49 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char[] <   '{NULL,"b         ","c         "}'::char(10)[]
+ok 50 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char[] <   NULL::char(10)[]
+ok 51 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char[] <   '{"a         ","a         ","c         "}'::char[]
+ok 52 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char[] <   '{"a         ","b         ","c         "}'::char[]
+ok 53 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char[] <   '{"a         ","c         ","c         "}'::char[]
+ok 54 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char[] <   '{"a         ",NULL,"c         "}'::char[]
+ok 55 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char[] <   '{NULL,"b         ","c         "}'::char[]
+ok 56 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char[] <   NULL::char[]
+ok 57 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char(10)[] <=  '{"a         ","a         ","c         "}'::char(10)[]
+ok 58 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char(10)[] <=  '{"a         ","b         ","c         "}'::char(10)[]
+ok 59 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char(10)[] <=  '{"a         ","c         ","c         "}'::char(10)[]
+ok 60 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char(10)[] <=  '{"a         ",NULL,"c         "}'::char(10)[]
+ok 61 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char(10)[] <=  '{NULL,"b         ","c         "}'::char(10)[]
+ok 62 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char(10)[] <=  NULL::char(10)[]
+ok 63 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char(10)[] <=  '{"a         ","a         ","c         "}'::char[]
+ok 64 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char(10)[] <=  '{"a         ","b         ","c         "}'::char[]
+ok 65 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char(10)[] <=  '{"a         ","c         ","c         "}'::char[]
+ok 66 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char(10)[] <=  '{"a         ",NULL,"c         "}'::char[]
+ok 67 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char(10)[] <=  '{NULL,"b         ","c         "}'::char[]
+ok 68 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char(10)[] <=  NULL::char[]
+ok 69 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char[] <=  '{"a         ","a         ","c         "}'::char(10)[]
+ok 70 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char[] <=  '{"a         ","b         ","c         "}'::char(10)[]
+ok 71 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char[] <=  '{"a         ","c         ","c         "}'::char(10)[]
+ok 72 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char[] <=  '{"a         ",NULL,"c         "}'::char(10)[]
+ok 73 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char[] <=  '{NULL,"b         ","c         "}'::char(10)[]
+ok 74 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char[] <=  NULL::char(10)[]
+ok 75 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char[] <=  '{"a         ","a         ","c         "}'::char[]
+ok 76 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char[] <=  '{"a         ","b         ","c         "}'::char[]
+ok 77 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char[] <=  '{"a         ","c         ","c         "}'::char[]
+ok 78 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char[] <=  '{"a         ",NULL,"c         "}'::char[]
+ok 79 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char[] <=  '{NULL,"b         ","c         "}'::char[]
+ok 80 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char[] <=  NULL::char[]
+ok 81 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char(10)[]  =  '{"a         ","a         ","c         "}'::char(10)[]
+ok 82 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char(10)[]  =  '{"a         ","b         ","c         "}'::char(10)[]
+ok 83 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char(10)[]  =  '{"a         ","c         ","c         "}'::char(10)[]
+ok 84 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char(10)[]  =  '{"a         ",NULL,"c         "}'::char(10)[]
+ok 85 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char(10)[]  =  '{NULL,"b         ","c         "}'::char(10)[]
+ok 86 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char(10)[]  =  NULL::char(10)[]
+ok 87 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char(10)[]  =  '{"a         ","a         ","c         "}'::char[]
+ok 88 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char(10)[]  =  '{"a         ","b         ","c         "}'::char[]
+ok 89 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char(10)[]  =  '{"a         ","c         ","c         "}'::char[]
+ok 90 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char(10)[]  =  '{"a         ",NULL,"c         "}'::char[]
+ok 91 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char(10)[]  =  '{NULL,"b         ","c         "}'::char[]
+ok 92 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char(10)[]  =  NULL::char[]
+ok 93 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char[]  =  '{"a         ","a         ","c         "}'::char(10)[]
+ok 94 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char[]  =  '{"a         ","b         ","c         "}'::char(10)[]
+ok 95 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char[]  =  '{"a         ","c         ","c         "}'::char(10)[]
+ok 96 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char[]  =  '{"a         ",NULL,"c         "}'::char(10)[]
+ok 97 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char[]  =  '{NULL,"b         ","c         "}'::char(10)[]
+ok 98 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char[]  =  NULL::char(10)[]
+ok 99 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char[]  =  '{"a         ","a         ","c         "}'::char[]
+ok 100 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char[]  =  '{"a         ","b         ","c         "}'::char[]
+ok 101 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char[]  =  '{"a         ","c         ","c         "}'::char[]
+ok 102 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char[]  =  '{"a         ",NULL,"c         "}'::char[]
+ok 103 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char[]  =  '{NULL,"b         ","c         "}'::char[]
+ok 104 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char[]  =  NULL::char[]
+ok 105 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char(10)[]  >= '{"a         ","a         ","c         "}'::char(10)[]
+ok 106 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char(10)[]  >= '{"a         ","b         ","c         "}'::char(10)[]
+ok 107 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char(10)[]  >= '{"a         ","c         ","c         "}'::char(10)[]
+ok 108 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char(10)[]  >= '{"a         ",NULL,"c         "}'::char(10)[]
+ok 109 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char(10)[]  >= '{NULL,"b         ","c         "}'::char(10)[]
+ok 110 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char(10)[]  >= NULL::char(10)[]
+ok 111 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char(10)[]  >= '{"a         ","a         ","c         "}'::char[]
+ok 112 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char(10)[]  >= '{"a         ","b         ","c         "}'::char[]
+ok 113 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char(10)[]  >= '{"a         ","c         ","c         "}'::char[]
+ok 114 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char(10)[]  >= '{"a         ",NULL,"c         "}'::char[]
+ok 115 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char(10)[]  >= '{NULL,"b         ","c         "}'::char[]
+ok 116 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char(10)[]  >= NULL::char[]
+ok 117 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char[]  >= '{"a         ","a         ","c         "}'::char(10)[]
+ok 118 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char[]  >= '{"a         ","b         ","c         "}'::char(10)[]
+ok 119 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char[]  >= '{"a         ","c         ","c         "}'::char(10)[]
+ok 120 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char[]  >= '{"a         ",NULL,"c         "}'::char(10)[]
+ok 121 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char[]  >= '{NULL,"b         ","c         "}'::char(10)[]
+ok 122 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char[]  >= NULL::char(10)[]
+ok 123 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char[]  >= '{"a         ","a         ","c         "}'::char[]
+ok 124 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char[]  >= '{"a         ","b         ","c         "}'::char[]
+ok 125 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char[]  >= '{"a         ","c         ","c         "}'::char[]
+ok 126 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char[]  >= '{"a         ",NULL,"c         "}'::char[]
+ok 127 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char[]  >= '{NULL,"b         ","c         "}'::char[]
+ok 128 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char[]  >= NULL::char[]
+ok 129 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char(10)[]   > '{"a         ","a         ","c         "}'::char(10)[]
+ok 130 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char(10)[]   > '{"a         ","b         ","c         "}'::char(10)[]
+ok 131 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char(10)[]   > '{"a         ","c         ","c         "}'::char(10)[]
+ok 132 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char(10)[]   > '{"a         ",NULL,"c         "}'::char(10)[]
+ok 133 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char(10)[]   > '{NULL,"b         ","c         "}'::char(10)[]
+ok 134 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char(10)[]   > NULL::char(10)[]
+ok 135 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char(10)[]   > '{"a         ","a         ","c         "}'::char[]
+ok 136 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char(10)[]   > '{"a         ","b         ","c         "}'::char[]
+ok 137 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char(10)[]   > '{"a         ","c         ","c         "}'::char[]
+ok 138 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char(10)[]   > '{"a         ",NULL,"c         "}'::char[]
+ok 139 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char(10)[]   > '{NULL,"b         ","c         "}'::char[]
+ok 140 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char(10)[]   > NULL::char[]
+ok 141 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char[]   > '{"a         ","a         ","c         "}'::char(10)[]
+ok 142 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char[]   > '{"a         ","b         ","c         "}'::char(10)[]
+ok 143 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char[]   > '{"a         ","c         ","c         "}'::char(10)[]
+ok 144 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char[]   > '{"a         ",NULL,"c         "}'::char(10)[]
+ok 145 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char[]   > '{NULL,"b         ","c         "}'::char(10)[]
+ok 146 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char[]   > NULL::char(10)[]
+ok 147 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char[]   > '{"a         ","a         ","c         "}'::char[]
+ok 148 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char[]   > '{"a         ","b         ","c         "}'::char[]
+ok 149 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char[]   > '{"a         ","c         ","c         "}'::char[]
+ok 150 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char[]   > '{"a         ",NULL,"c         "}'::char[]
+ok 151 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char[]   > '{NULL,"b         ","c         "}'::char[]
+ok 152 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char[]   > NULL::char[]
+ok 153 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char(10)[] !=  '{"a         ","a         ","c         "}'::char(10)[]
+ok 154 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char(10)[] !=  '{"a         ","b         ","c         "}'::char(10)[]
+ok 155 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char(10)[] !=  '{"a         ","c         ","c         "}'::char(10)[]
+ok 156 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char(10)[] !=  '{"a         ",NULL,"c         "}'::char(10)[]
+ok 157 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char(10)[] !=  '{NULL,"b         ","c         "}'::char(10)[]
+ok 158 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char(10)[] !=  NULL::char(10)[]
+ok 159 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char(10)[] !=  '{"a         ","a         ","c         "}'::char[]
+ok 160 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char(10)[] !=  '{"a         ","b         ","c         "}'::char[]
+ok 161 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char(10)[] !=  '{"a         ","c         ","c         "}'::char[]
+ok 162 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char(10)[] !=  '{"a         ",NULL,"c         "}'::char[]
+ok 163 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char(10)[] !=  '{NULL,"b         ","c         "}'::char[]
+ok 164 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char(10)[] !=  NULL::char[]
+ok 165 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char[] !=  '{"a         ","a         ","c         "}'::char(10)[]
+ok 166 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char[] !=  '{"a         ","b         ","c         "}'::char(10)[]
+ok 167 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char[] !=  '{"a         ","c         ","c         "}'::char(10)[]
+ok 168 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char[] !=  '{"a         ",NULL,"c         "}'::char(10)[]
+ok 169 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char[] !=  '{NULL,"b         ","c         "}'::char(10)[]
+ok 170 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char[] !=  NULL::char(10)[]
+ok 171 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char[] !=  '{"a         ","a         ","c         "}'::char[]
+ok 172 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char[] !=  '{"a         ","b         ","c         "}'::char[]
+ok 173 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char[] !=  '{"a         ","c         ","c         "}'::char[]
+ok 174 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char[] !=  '{"a         ",NULL,"c         "}'::char[]
+ok 175 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char[] !=  '{NULL,"b         ","c         "}'::char[]
+ok 176 - check casted vs uncasted for '{"a         ","b         ","c         "}'::char[] !=  NULL::char[]
+ok 177 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char(10)[] <   '{"a         ","a         ","c         "}'::char(10)[]
+ok 178 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char(10)[] <   '{"a         ","b         ","c         "}'::char(10)[]
+ok 179 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char(10)[] <   '{"a         ","c         ","c         "}'::char(10)[]
+ok 180 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char(10)[] <   '{"a         ",NULL,"c         "}'::char(10)[]
+ok 181 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char(10)[] <   '{NULL,"b         ","c         "}'::char(10)[]
+ok 182 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char(10)[] <   NULL::char(10)[]
+ok 183 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char(10)[] <   '{"a         ","a         ","c         "}'::char[]
+ok 184 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char(10)[] <   '{"a         ","b         ","c         "}'::char[]
+ok 185 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char(10)[] <   '{"a         ","c         ","c         "}'::char[]
+ok 186 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char(10)[] <   '{"a         ",NULL,"c         "}'::char[]
+ok 187 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char(10)[] <   '{NULL,"b         ","c         "}'::char[]
+ok 188 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char(10)[] <   NULL::char[]
+ok 189 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char[] <   '{"a         ","a         ","c         "}'::char(10)[]
+ok 190 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char[] <   '{"a         ","b         ","c         "}'::char(10)[]
+ok 191 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char[] <   '{"a         ","c         ","c         "}'::char(10)[]
+ok 192 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char[] <   '{"a         ",NULL,"c         "}'::char(10)[]
+ok 193 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char[] <   '{NULL,"b         ","c         "}'::char(10)[]
+ok 194 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char[] <   NULL::char(10)[]
+ok 195 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char[] <   '{"a         ","a         ","c         "}'::char[]
+ok 196 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char[] <   '{"a         ","b         ","c         "}'::char[]
+ok 197 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char[] <   '{"a         ","c         ","c         "}'::char[]
+ok 198 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char[] <   '{"a         ",NULL,"c         "}'::char[]
+ok 199 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char[] <   '{NULL,"b         ","c         "}'::char[]
+ok 200 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char[] <   NULL::char[]
+ok 201 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char(10)[] <=  '{"a         ","a         ","c         "}'::char(10)[]
+ok 202 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char(10)[] <=  '{"a         ","b         ","c         "}'::char(10)[]
+ok 203 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char(10)[] <=  '{"a         ","c         ","c         "}'::char(10)[]
+ok 204 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char(10)[] <=  '{"a         ",NULL,"c         "}'::char(10)[]
+ok 205 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char(10)[] <=  '{NULL,"b         ","c         "}'::char(10)[]
+ok 206 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char(10)[] <=  NULL::char(10)[]
+ok 207 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char(10)[] <=  '{"a         ","a         ","c         "}'::char[]
+ok 208 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char(10)[] <=  '{"a         ","b         ","c         "}'::char[]
+ok 209 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char(10)[] <=  '{"a         ","c         ","c         "}'::char[]
+ok 210 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char(10)[] <=  '{"a         ",NULL,"c         "}'::char[]
+ok 211 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char(10)[] <=  '{NULL,"b         ","c         "}'::char[]
+ok 212 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char(10)[] <=  NULL::char[]
+ok 213 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char[] <=  '{"a         ","a         ","c         "}'::char(10)[]
+ok 214 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char[] <=  '{"a         ","b         ","c         "}'::char(10)[]
+ok 215 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char[] <=  '{"a         ","c         ","c         "}'::char(10)[]
+ok 216 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char[] <=  '{"a         ",NULL,"c         "}'::char(10)[]
+ok 217 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char[] <=  '{NULL,"b         ","c         "}'::char(10)[]
+ok 218 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char[] <=  NULL::char(10)[]
+ok 219 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char[] <=  '{"a         ","a         ","c         "}'::char[]
+ok 220 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char[] <=  '{"a         ","b         ","c         "}'::char[]
+ok 221 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char[] <=  '{"a         ","c         ","c         "}'::char[]
+ok 222 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char[] <=  '{"a         ",NULL,"c         "}'::char[]
+ok 223 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char[] <=  '{NULL,"b         ","c         "}'::char[]
+ok 224 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char[] <=  NULL::char[]
+ok 225 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char(10)[]  =  '{"a         ","a         ","c         "}'::char(10)[]
+ok 226 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char(10)[]  =  '{"a         ","b         ","c         "}'::char(10)[]
+ok 227 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char(10)[]  =  '{"a         ","c         ","c         "}'::char(10)[]
+ok 228 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char(10)[]  =  '{"a         ",NULL,"c         "}'::char(10)[]
+ok 229 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char(10)[]  =  '{NULL,"b         ","c         "}'::char(10)[]
+ok 230 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char(10)[]  =  NULL::char(10)[]
+ok 231 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char(10)[]  =  '{"a         ","a         ","c         "}'::char[]
+ok 232 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char(10)[]  =  '{"a         ","b         ","c         "}'::char[]
+ok 233 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char(10)[]  =  '{"a         ","c         ","c         "}'::char[]
+ok 234 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char(10)[]  =  '{"a         ",NULL,"c         "}'::char[]
+ok 235 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char(10)[]  =  '{NULL,"b         ","c         "}'::char[]
+ok 236 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char(10)[]  =  NULL::char[]
+ok 237 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char[]  =  '{"a         ","a         ","c         "}'::char(10)[]
+ok 238 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char[]  =  '{"a         ","b         ","c         "}'::char(10)[]
+ok 239 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char[]  =  '{"a         ","c         ","c         "}'::char(10)[]
+ok 240 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char[]  =  '{"a         ",NULL,"c         "}'::char(10)[]
+ok 241 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char[]  =  '{NULL,"b         ","c         "}'::char(10)[]
+ok 242 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char[]  =  NULL::char(10)[]
+ok 243 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char[]  =  '{"a         ","a         ","c         "}'::char[]
+ok 244 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char[]  =  '{"a         ","b         ","c         "}'::char[]
+ok 245 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char[]  =  '{"a         ","c         ","c         "}'::char[]
+ok 246 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char[]  =  '{"a         ",NULL,"c         "}'::char[]
+ok 247 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char[]  =  '{NULL,"b         ","c         "}'::char[]
+ok 248 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char[]  =  NULL::char[]
+ok 249 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char(10)[]  >= '{"a         ","a         ","c         "}'::char(10)[]
+ok 250 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char(10)[]  >= '{"a         ","b         ","c         "}'::char(10)[]
+ok 251 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char(10)[]  >= '{"a         ","c         ","c         "}'::char(10)[]
+ok 252 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char(10)[]  >= '{"a         ",NULL,"c         "}'::char(10)[]
+ok 253 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char(10)[]  >= '{NULL,"b         ","c         "}'::char(10)[]
+ok 254 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char(10)[]  >= NULL::char(10)[]
+ok 255 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char(10)[]  >= '{"a         ","a         ","c         "}'::char[]
+ok 256 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char(10)[]  >= '{"a         ","b         ","c         "}'::char[]
+ok 257 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char(10)[]  >= '{"a         ","c         ","c         "}'::char[]
+ok 258 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char(10)[]  >= '{"a         ",NULL,"c         "}'::char[]
+ok 259 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char(10)[]  >= '{NULL,"b         ","c         "}'::char[]
+ok 260 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char(10)[]  >= NULL::char[]
+ok 261 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char[]  >= '{"a         ","a         ","c         "}'::char(10)[]
+ok 262 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char[]  >= '{"a         ","b         ","c         "}'::char(10)[]
+ok 263 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char[]  >= '{"a         ","c         ","c         "}'::char(10)[]
+ok 264 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char[]  >= '{"a         ",NULL,"c         "}'::char(10)[]
+ok 265 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char[]  >= '{NULL,"b         ","c         "}'::char(10)[]
+ok 266 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char[]  >= NULL::char(10)[]
+ok 267 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char[]  >= '{"a         ","a         ","c         "}'::char[]
+ok 268 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char[]  >= '{"a         ","b         ","c         "}'::char[]
+ok 269 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char[]  >= '{"a         ","c         ","c         "}'::char[]
+ok 270 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char[]  >= '{"a         ",NULL,"c         "}'::char[]
+ok 271 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char[]  >= '{NULL,"b         ","c         "}'::char[]
+ok 272 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char[]  >= NULL::char[]
+ok 273 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char(10)[]   > '{"a         ","a         ","c         "}'::char(10)[]
+ok 274 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char(10)[]   > '{"a         ","b         ","c         "}'::char(10)[]
+ok 275 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char(10)[]   > '{"a         ","c         ","c         "}'::char(10)[]
+ok 276 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char(10)[]   > '{"a         ",NULL,"c         "}'::char(10)[]
+ok 277 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char(10)[]   > '{NULL,"b         ","c         "}'::char(10)[]
+ok 278 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char(10)[]   > NULL::char(10)[]
+ok 279 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char(10)[]   > '{"a         ","a         ","c         "}'::char[]
+ok 280 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char(10)[]   > '{"a         ","b         ","c         "}'::char[]
+ok 281 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char(10)[]   > '{"a         ","c         ","c         "}'::char[]
+ok 282 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char(10)[]   > '{"a         ",NULL,"c         "}'::char[]
+ok 283 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char(10)[]   > '{NULL,"b         ","c         "}'::char[]
+ok 284 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char(10)[]   > NULL::char[]
+ok 285 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char[]   > '{"a         ","a         ","c         "}'::char(10)[]
+ok 286 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char[]   > '{"a         ","b         ","c         "}'::char(10)[]
+ok 287 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char[]   > '{"a         ","c         ","c         "}'::char(10)[]
+ok 288 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char[]   > '{"a         ",NULL,"c         "}'::char(10)[]
+ok 289 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char[]   > '{NULL,"b         ","c         "}'::char(10)[]
+ok 290 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char[]   > NULL::char(10)[]
+ok 291 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char[]   > '{"a         ","a         ","c         "}'::char[]
+ok 292 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char[]   > '{"a         ","b         ","c         "}'::char[]
+ok 293 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char[]   > '{"a         ","c         ","c         "}'::char[]
+ok 294 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char[]   > '{"a         ",NULL,"c         "}'::char[]
+ok 295 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char[]   > '{NULL,"b         ","c         "}'::char[]
+ok 296 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char[]   > NULL::char[]
+ok 297 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char(10)[] !=  '{"a         ","a         ","c         "}'::char(10)[]
+ok 298 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char(10)[] !=  '{"a         ","b         ","c         "}'::char(10)[]
+ok 299 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char(10)[] !=  '{"a         ","c         ","c         "}'::char(10)[]
+ok 300 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char(10)[] !=  '{"a         ",NULL,"c         "}'::char(10)[]
+ok 301 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char(10)[] !=  '{NULL,"b         ","c         "}'::char(10)[]
+ok 302 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char(10)[] !=  NULL::char(10)[]
+ok 303 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char(10)[] !=  '{"a         ","a         ","c         "}'::char[]
+ok 304 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char(10)[] !=  '{"a         ","b         ","c         "}'::char[]
+ok 305 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char(10)[] !=  '{"a         ","c         ","c         "}'::char[]
+ok 306 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char(10)[] !=  '{"a         ",NULL,"c         "}'::char[]
+ok 307 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char(10)[] !=  '{NULL,"b         ","c         "}'::char[]
+ok 308 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char(10)[] !=  NULL::char[]
+ok 309 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char[] !=  '{"a         ","a         ","c         "}'::char(10)[]
+ok 310 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char[] !=  '{"a         ","b         ","c         "}'::char(10)[]
+ok 311 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char[] !=  '{"a         ","c         ","c         "}'::char(10)[]
+ok 312 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char[] !=  '{"a         ",NULL,"c         "}'::char(10)[]
+ok 313 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char[] !=  '{NULL,"b         ","c         "}'::char(10)[]
+ok 314 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char[] !=  NULL::char(10)[]
+ok 315 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char[] !=  '{"a         ","a         ","c         "}'::char[]
+ok 316 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char[] !=  '{"a         ","b         ","c         "}'::char[]
+ok 317 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char[] !=  '{"a         ","c         ","c         "}'::char[]
+ok 318 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char[] !=  '{"a         ",NULL,"c         "}'::char[]
+ok 319 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char[] !=  '{NULL,"b         ","c         "}'::char[]
+ok 320 - check variant vs uncasted for '{"a         ","b         ","c         "}'::char[] !=  NULL::char[]
+ok 321 - check variant vs casted for '''{"a         ","b         ","c         "}''::char(10)[]' <   '''{"a         ","a         ","c         "}''::char(10)[]'
+ok 322 - check variant vs casted for '''{"a         ","b         ","c         "}''::char(10)[]' <   '''{"a         ","b         ","c         "}''::char(10)[]'
+ok 323 - check variant vs casted for '''{"a         ","b         ","c         "}''::char(10)[]' <   '''{"a         ","c         ","c         "}''::char(10)[]'
+ok 324 - check variant vs casted for '''{"a         ","b         ","c         "}''::char(10)[]' <   '''{"a         ",NULL,"c         "}''::char(10)[]'
+ok 325 - check variant vs casted for '''{"a         ","b         ","c         "}''::char(10)[]' <   '''{NULL,"b         ","c         "}''::char(10)[]'
+ok 326 - check variant vs casted for '''{"a         ","b         ","c         "}''::char(10)[]' <   'NULL::char(10)[]'
+ok 327 - check variant vs casted for '''{"a         ","b         ","c         "}''::char(10)[]' <   '''{"a         ","a         ","c         "}''::char[]'
+ok 328 - check variant vs casted for '''{"a         ","b         ","c         "}''::char(10)[]' <   '''{"a         ","b         ","c         "}''::char[]'
+ok 329 - check variant vs casted for '''{"a         ","b         ","c         "}''::char(10)[]' <   '''{"a         ","c         ","c         "}''::char[]'
+ok 330 - check variant vs casted for '''{"a         ","b         ","c         "}''::char(10)[]' <   '''{"a         ",NULL,"c         "}''::char[]'
+ok 331 - check variant vs casted for '''{"a         ","b         ","c         "}''::char(10)[]' <   '''{NULL,"b         ","c         "}''::char[]'
+ok 332 - check variant vs casted for '''{"a         ","b         ","c         "}''::char(10)[]' <   'NULL::char[]'
+ok 333 - check variant vs casted for '''{"a         ","b         ","c         "}''::char[]' <   '''{"a         ","a         ","c         "}''::char(10)[]'
+ok 334 - check variant vs casted for '''{"a         ","b         ","c         "}''::char[]' <   '''{"a         ","b         ","c         "}''::char(10)[]'
+ok 335 - check variant vs casted for '''{"a         ","b         ","c         "}''::char[]' <   '''{"a         ","c         ","c         "}''::char(10)[]'
+ok 336 - check variant vs casted for '''{"a         ","b         ","c         "}''::char[]' <   '''{"a         ",NULL,"c         "}''::char(10)[]'
+ok 337 - check variant vs casted for '''{"a         ","b         ","c         "}''::char[]' <   '''{NULL,"b         ","c         "}''::char(10)[]'
+ok 338 - check variant vs casted for '''{"a         ","b         ","c         "}''::char[]' <   'NULL::char(10)[]'
+ok 339 - check variant vs casted for '''{"a         ","b         ","c         "}''::char[]' <   '''{"a         ","a         ","c         "}''::char[]'
+ok 340 - check variant vs casted for '''{"a         ","b         ","c         "}''::char[]' <   '''{"a         ","b         ","c         "}''::char[]'
+ok 341 - check variant vs casted for '''{"a         ","b         ","c         "}''::char[]' <   '''{"a         ","c         ","c         "}''::char[]'
+ok 342 - check variant vs casted for '''{"a         ","b         ","c         "}''::char[]' <   '''{"a         ",NULL,"c         "}''::char[]'
+ok 343 - check variant vs casted for '''{"a         ","b         ","c         "}''::char[]' <   '''{NULL,"b         ","c         "}''::char[]'
+ok 344 - check variant vs casted for '''{"a         ","b         ","c         "}''::char[]' <   'NULL::char[]'
+ok 345 - check variant vs casted for '''{"a         ","b         ","c         "}''::char(10)[]' <=  '''{"a         ","a         ","c         "}''::char(10)[]'
+ok 346 - check variant vs casted for '''{"a         ","b         ","c         "}''::char(10)[]' <=  '''{"a         ","b         ","c         "}''::char(10)[]'
+ok 347 - check variant vs casted for '''{"a         ","b         ","c         "}''::char(10)[]' <=  '''{"a         ","c         ","c         "}''::char(10)[]'
+ok 348 - check variant vs casted for '''{"a         ","b         ","c         "}''::char(10)[]' <=  '''{"a         ",NULL,"c         "}''::char(10)[]'
+ok 349 - check variant vs casted for '''{"a         ","b         ","c         "}''::char(10)[]' <=  '''{NULL,"b         ","c         "}''::char(10)[]'
+ok 350 - check variant vs casted for '''{"a         ","b         ","c         "}''::char(10)[]' <=  'NULL::char(10)[]'
+ok 351 - check variant vs casted for '''{"a         ","b         ","c         "}''::char(10)[]' <=  '''{"a         ","a         ","c         "}''::char[]'
+ok 352 - check variant vs casted for '''{"a         ","b         ","c         "}''::char(10)[]' <=  '''{"a         ","b         ","c         "}''::char[]'
+ok 353 - check variant vs casted for '''{"a         ","b         ","c         "}''::char(10)[]' <=  '''{"a         ","c         ","c         "}''::char[]'
+ok 354 - check variant vs casted for '''{"a         ","b         ","c         "}''::char(10)[]' <=  '''{"a         ",NULL,"c         "}''::char[]'
+ok 355 - check variant vs casted for '''{"a         ","b         ","c         "}''::char(10)[]' <=  '''{NULL,"b         ","c         "}''::char[]'
+ok 356 - check variant vs casted for '''{"a         ","b         ","c         "}''::char(10)[]' <=  'NULL::char[]'
+ok 357 - check variant vs casted for '''{"a         ","b         ","c         "}''::char[]' <=  '''{"a         ","a         ","c         "}''::char(10)[]'
+ok 358 - check variant vs casted for '''{"a         ","b         ","c         "}''::char[]' <=  '''{"a         ","b         ","c         "}''::char(10)[]'
+ok 359 - check variant vs casted for '''{"a         ","b         ","c         "}''::char[]' <=  '''{"a         ","c         ","c         "}''::char(10)[]'
+ok 360 - check variant vs casted for '''{"a         ","b         ","c         "}''::char[]' <=  '''{"a         ",NULL,"c         "}''::char(10)[]'
+ok 361 - check variant vs casted for '''{"a         ","b         ","c         "}''::char[]' <=  '''{NULL,"b         ","c         "}''::char(10)[]'
+ok 362 - check variant vs casted for '''{"a         ","b         ","c         "}''::char[]' <=  'NULL::char(10)[]'
+ok 363 - check variant vs casted for '''{"a         ","b         ","c         "}''::char[]' <=  '''{"a         ","a         ","c         "}''::char[]'
+ok 364 - check variant vs casted for '''{"a         ","b         ","c         "}''::char[]' <=  '''{"a         ","b         ","c         "}''::char[]'
+ok 365 - check variant vs casted for '''{"a         ","b         ","c         "}''::char[]' <=  '''{"a         ","c         ","c         "}''::char[]'
+ok 366 - check variant vs casted for '''{"a         ","b         ","c         "}''::char[]' <=  '''{"a         ",NULL,"c         "}''::char[]'
+ok 367 - check variant vs casted for '''{"a         ","b         ","c         "}''::char[]' <=  '''{NULL,"b         ","c         "}''::char[]'
+ok 368 - check variant vs casted for '''{"a         ","b         ","c         "}''::char[]' <=  'NULL::char[]'
+ok 369 - check variant vs casted for '''{"a         ","b         ","c         "}''::char(10)[]'  =  '''{"a         ","a         ","c         "}''::char(10)[]'
+ok 370 - check variant vs casted for '''{"a         ","b         ","c         "}''::char(10)[]'  =  '''{"a         ","b         ","c         "}''::char(10)[]'
+ok 371 - check variant vs casted for '''{"a         ","b         ","c         "}''::char(10)[]'  =  '''{"a         ","c         ","c         "}''::char(10)[]'
+ok 372 - check variant vs casted for '''{"a         ","b         ","c         "}''::char(10)[]'  =  '''{"a         ",NULL,"c         "}''::char(10)[]'
+ok 373 - check variant vs casted for '''{"a         ","b         ","c         "}''::char(10)[]'  =  '''{NULL,"b         ","c         "}''::char(10)[]'
+ok 374 - check variant vs casted for '''{"a         ","b         ","c         "}''::char(10)[]'  =  'NULL::char(10)[]'
+ok 375 - check variant vs casted for '''{"a         ","b         ","c         "}''::char(10)[]'  =  '''{"a         ","a         ","c         "}''::char[]'
+ok 376 - check variant vs casted for '''{"a         ","b         ","c         "}''::char(10)[]'  =  '''{"a         ","b         ","c         "}''::char[]'
+ok 377 - check variant vs casted for '''{"a         ","b         ","c         "}''::char(10)[]'  =  '''{"a         ","c         ","c         "}''::char[]'
+ok 378 - check variant vs casted for '''{"a         ","b         ","c         "}''::char(10)[]'  =  '''{"a         ",NULL,"c         "}''::char[]'
+ok 379 - check variant vs casted for '''{"a         ","b         ","c         "}''::char(10)[]'  =  '''{NULL,"b         ","c         "}''::char[]'
+ok 380 - check variant vs casted for '''{"a         ","b         ","c         "}''::char(10)[]'  =  'NULL::char[]'
+ok 381 - check variant vs casted for '''{"a         ","b         ","c         "}''::char[]'  =  '''{"a         ","a         ","c         "}''::char(10)[]'
+ok 382 - check variant vs casted for '''{"a         ","b         ","c         "}''::char[]'  =  '''{"a         ","b         ","c         "}''::char(10)[]'
+ok 383 - check variant vs casted for '''{"a         ","b         ","c         "}''::char[]'  =  '''{"a         ","c         ","c         "}''::char(10)[]'
+ok 384 - check variant vs casted for '''{"a         ","b         ","c         "}''::char[]'  =  '''{"a         ",NULL,"c         "}''::char(10)[]'
+ok 385 - check variant vs casted for '''{"a         ","b         ","c         "}''::char[]'  =  '''{NULL,"b         ","c         "}''::char(10)[]'
+ok 386 - check variant vs casted for '''{"a         ","b         ","c         "}''::char[]'  =  'NULL::char(10)[]'
+ok 387 - check variant vs casted for '''{"a         ","b         ","c         "}''::char[]'  =  '''{"a         ","a         ","c         "}''::char[]'
+ok 388 - check variant vs casted for '''{"a         ","b         ","c         "}''::char[]'  =  '''{"a         ","b         ","c         "}''::char[]'
+ok 389 - check variant vs casted for '''{"a         ","b         ","c         "}''::char[]'  =  '''{"a         ","c         ","c         "}''::char[]'
+ok 390 - check variant vs casted for '''{"a         ","b         ","c         "}''::char[]'  =  '''{"a         ",NULL,"c         "}''::char[]'
+ok 391 - check variant vs casted for '''{"a         ","b         ","c         "}''::char[]'  =  '''{NULL,"b         ","c         "}''::char[]'
+ok 392 - check variant vs casted for '''{"a         ","b         ","c         "}''::char[]'  =  'NULL::char[]'
+ok 393 - check variant vs casted for '''{"a         ","b         ","c         "}''::char(10)[]'  >= '''{"a         ","a         ","c         "}''::char(10)[]'
+ok 394 - check variant vs casted for '''{"a         ","b         ","c         "}''::char(10)[]'  >= '''{"a         ","b         ","c         "}''::char(10)[]'
+ok 395 - check variant vs casted for '''{"a         ","b         ","c         "}''::char(10)[]'  >= '''{"a         ","c         ","c         "}''::char(10)[]'
+ok 396 - check variant vs casted for '''{"a         ","b         ","c         "}''::char(10)[]'  >= '''{"a         ",NULL,"c         "}''::char(10)[]'
+ok 397 - check variant vs casted for '''{"a         ","b         ","c         "}''::char(10)[]'  >= '''{NULL,"b         ","c         "}''::char(10)[]'
+ok 398 - check variant vs casted for '''{"a         ","b         ","c         "}''::char(10)[]'  >= 'NULL::char(10)[]'
+ok 399 - check variant vs casted for '''{"a         ","b         ","c         "}''::char(10)[]'  >= '''{"a         ","a         ","c         "}''::char[]'
+ok 400 - check variant vs casted for '''{"a         ","b         ","c         "}''::char(10)[]'  >= '''{"a         ","b         ","c         "}''::char[]'
+ok 401 - check variant vs casted for '''{"a         ","b         ","c         "}''::char(10)[]'  >= '''{"a         ","c         ","c         "}''::char[]'
+ok 402 - check variant vs casted for '''{"a         ","b         ","c         "}''::char(10)[]'  >= '''{"a         ",NULL,"c         "}''::char[]'
+ok 403 - check variant vs casted for '''{"a         ","b         ","c         "}''::char(10)[]'  >= '''{NULL,"b         ","c         "}''::char[]'
+ok 404 - check variant vs casted for '''{"a         ","b         ","c         "}''::char(10)[]'  >= 'NULL::char[]'
+ok 405 - check variant vs casted for '''{"a         ","b         ","c         "}''::char[]'  >= '''{"a         ","a         ","c         "}''::char(10)[]'
+ok 406 - check variant vs casted for '''{"a         ","b         ","c         "}''::char[]'  >= '''{"a         ","b         ","c         "}''::char(10)[]'
+ok 407 - check variant vs casted for '''{"a         ","b         ","c         "}''::char[]'  >= '''{"a         ","c         ","c         "}''::char(10)[]'
+ok 408 - check variant vs casted for '''{"a         ","b         ","c         "}''::char[]'  >= '''{"a         ",NULL,"c         "}''::char(10)[]'
+ok 409 - check variant vs casted for '''{"a         ","b         ","c         "}''::char[]'  >= '''{NULL,"b         ","c         "}''::char(10)[]'
+ok 410 - check variant vs casted for '''{"a         ","b         ","c         "}''::char[]'  >= 'NULL::char(10)[]'
+ok 411 - check variant vs casted for '''{"a         ","b         ","c         "}''::char[]'  >= '''{"a         ","a         ","c         "}''::char[]'
+ok 412 - check variant vs casted for '''{"a         ","b         ","c         "}''::char[]'  >= '''{"a         ","b         ","c         "}''::char[]'
+ok 413 - check variant vs casted for '''{"a         ","b         ","c         "}''::char[]'  >= '''{"a         ","c         ","c         "}''::char[]'
+ok 414 - check variant vs casted for '''{"a         ","b         ","c         "}''::char[]'  >= '''{"a         ",NULL,"c         "}''::char[]'
+ok 415 - check variant vs casted for '''{"a         ","b         ","c         "}''::char[]'  >= '''{NULL,"b         ","c         "}''::char[]'
+ok 416 - check variant vs casted for '''{"a         ","b         ","c         "}''::char[]'  >= 'NULL::char[]'
+ok 417 - check variant vs casted for '''{"a         ","b         ","c         "}''::char(10)[]'   > '''{"a         ","a         ","c         "}''::char(10)[]'
+ok 418 - check variant vs casted for '''{"a         ","b         ","c         "}''::char(10)[]'   > '''{"a         ","b         ","c         "}''::char(10)[]'
+ok 419 - check variant vs casted for '''{"a         ","b         ","c         "}''::char(10)[]'   > '''{"a         ","c         ","c         "}''::char(10)[]'
+ok 420 - check variant vs casted for '''{"a         ","b         ","c         "}''::char(10)[]'   > '''{"a         ",NULL,"c         "}''::char(10)[]'
+ok 421 - check variant vs casted for '''{"a         ","b         ","c         "}''::char(10)[]'   > '''{NULL,"b         ","c         "}''::char(10)[]'
+ok 422 - check variant vs casted for '''{"a         ","b         ","c         "}''::char(10)[]'   > 'NULL::char(10)[]'
+ok 423 - check variant vs casted for '''{"a         ","b         ","c         "}''::char(10)[]'   > '''{"a         ","a         ","c         "}''::char[]'
+ok 424 - check variant vs casted for '''{"a         ","b         ","c         "}''::char(10)[]'   > '''{"a         ","b         ","c         "}''::char[]'
+ok 425 - check variant vs casted for '''{"a         ","b         ","c         "}''::char(10)[]'   > '''{"a         ","c         ","c         "}''::char[]'
+ok 426 - check variant vs casted for '''{"a         ","b         ","c         "}''::char(10)[]'   > '''{"a         ",NULL,"c         "}''::char[]'
+ok 427 - check variant vs casted for '''{"a         ","b         ","c         "}''::char(10)[]'   > '''{NULL,"b         ","c         "}''::char[]'
+ok 428 - check variant vs casted for '''{"a         ","b         ","c         "}''::char(10)[]'   > 'NULL::char[]'
+ok 429 - check variant vs casted for '''{"a         ","b         ","c         "}''::char[]'   > '''{"a         ","a         ","c         "}''::char(10)[]'
+ok 430 - check variant vs casted for '''{"a         ","b         ","c         "}''::char[]'   > '''{"a         ","b         ","c         "}''::char(10)[]'
+ok 431 - check variant vs casted for '''{"a         ","b         ","c         "}''::char[]'   > '''{"a         ","c         ","c         "}''::char(10)[]'
+ok 432 - check variant vs casted for '''{"a         ","b         ","c         "}''::char[]'   > '''{"a         ",NULL,"c         "}''::char(10)[]'
+ok 433 - check variant vs casted for '''{"a         ","b         ","c         "}''::char[]'   > '''{NULL,"b         ","c         "}''::char(10)[]'
+ok 434 - check variant vs casted for '''{"a         ","b         ","c         "}''::char[]'   > 'NULL::char(10)[]'
+ok 435 - check variant vs casted for '''{"a         ","b         ","c         "}''::char[]'   > '''{"a         ","a         ","c         "}''::char[]'
+ok 436 - check variant vs casted for '''{"a         ","b         ","c         "}''::char[]'   > '''{"a         ","b         ","c         "}''::char[]'
+ok 437 - check variant vs casted for '''{"a         ","b         ","c         "}''::char[]'   > '''{"a         ","c         ","c         "}''::char[]'
+ok 438 - check variant vs casted for '''{"a         ","b         ","c         "}''::char[]'   > '''{"a         ",NULL,"c         "}''::char[]'
+ok 439 - check variant vs casted for '''{"a         ","b         ","c         "}''::char[]'   > '''{NULL,"b         ","c         "}''::char[]'
+ok 440 - check variant vs casted for '''{"a         ","b         ","c         "}''::char[]'   > 'NULL::char[]'
+ok 441 - check variant vs casted for '''{"a         ","b         ","c         "}''::char(10)[]' !=  '''{"a         ","a         ","c         "}''::char(10)[]'
+ok 442 - check variant vs casted for '''{"a         ","b         ","c         "}''::char(10)[]' !=  '''{"a         ","b         ","c         "}''::char(10)[]'
+ok 443 - check variant vs casted for '''{"a         ","b         ","c         "}''::char(10)[]' !=  '''{"a         ","c         ","c         "}''::char(10)[]'
+ok 444 - check variant vs casted for '''{"a         ","b         ","c         "}''::char(10)[]' !=  '''{"a         ",NULL,"c         "}''::char(10)[]'
+ok 445 - check variant vs casted for '''{"a         ","b         ","c         "}''::char(10)[]' !=  '''{NULL,"b         ","c         "}''::char(10)[]'
+ok 446 - check variant vs casted for '''{"a         ","b         ","c         "}''::char(10)[]' !=  'NULL::char(10)[]'
+ok 447 - check variant vs casted for '''{"a         ","b         ","c         "}''::char(10)[]' !=  '''{"a         ","a         ","c         "}''::char[]'
+ok 448 - check variant vs casted for '''{"a         ","b         ","c         "}''::char(10)[]' !=  '''{"a         ","b         ","c         "}''::char[]'
+ok 449 - check variant vs casted for '''{"a         ","b         ","c         "}''::char(10)[]' !=  '''{"a         ","c         ","c         "}''::char[]'
+ok 450 - check variant vs casted for '''{"a         ","b         ","c         "}''::char(10)[]' !=  '''{"a         ",NULL,"c         "}''::char[]'
+ok 451 - check variant vs casted for '''{"a         ","b         ","c         "}''::char(10)[]' !=  '''{NULL,"b         ","c         "}''::char[]'
+ok 452 - check variant vs casted for '''{"a         ","b         ","c         "}''::char(10)[]' !=  'NULL::char[]'
+ok 453 - check variant vs casted for '''{"a         ","b         ","c         "}''::char[]' !=  '''{"a         ","a         ","c         "}''::char(10)[]'
+ok 454 - check variant vs casted for '''{"a         ","b         ","c         "}''::char[]' !=  '''{"a         ","b         ","c         "}''::char(10)[]'
+ok 455 - check variant vs casted for '''{"a         ","b         ","c         "}''::char[]' !=  '''{"a         ","c         ","c         "}''::char(10)[]'
+ok 456 - check variant vs casted for '''{"a         ","b         ","c         "}''::char[]' !=  '''{"a         ",NULL,"c         "}''::char(10)[]'
+ok 457 - check variant vs casted for '''{"a         ","b         ","c         "}''::char[]' !=  '''{NULL,"b         ","c         "}''::char(10)[]'
+ok 458 - check variant vs casted for '''{"a         ","b         ","c         "}''::char[]' !=  'NULL::char(10)[]'
+ok 459 - check variant vs casted for '''{"a         ","b         ","c         "}''::char[]' !=  '''{"a         ","a         ","c         "}''::char[]'
+ok 460 - check variant vs casted for '''{"a         ","b         ","c         "}''::char[]' !=  '''{"a         ","b         ","c         "}''::char[]'
+ok 461 - check variant vs casted for '''{"a         ","b         ","c         "}''::char[]' !=  '''{"a         ","c         ","c         "}''::char[]'
+ok 462 - check variant vs casted for '''{"a         ","b         ","c         "}''::char[]' !=  '''{"a         ",NULL,"c         "}''::char[]'
+ok 463 - check variant vs casted for '''{"a         ","b         ","c         "}''::char[]' !=  '''{NULL,"b         ","c         "}''::char[]'
+ok 464 - check variant vs casted for '''{"a         ","b         ","c         "}''::char[]' !=  'NULL::char[]'
