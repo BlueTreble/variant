@@ -12,6 +12,7 @@ SELECT plan( (
 	+3 -- register
 	+6 -- register__get*
 	+4 -- NULL
+	+1 -- Type storage options
 )::int );
 
 SELECT is(
@@ -106,6 +107,18 @@ SELECT is( 1::int::variant.variant("test variant")::int = NULL, false, '(int,1):
 SET transform_null_equals = off;
 SELECT is( NULL::int::variant.variant("test variant")::int = NULL, NULL, '(int,)::int = NULL is NULL' );
 SELECT is( 1::int::variant.variant("test variant")::int = NULL, NULL, '(int,1)::int != NULL is NULL' );
+
+/*
+ * This is just meant as a rough sanity-check that we are testing all expected
+ * type storage methods. Note that we're only concerned about different
+ * positive-size typlens due to alignment reasons, so we ignore ones that align
+* to int.
+ */
+SELECT bag_eq(
+	$$SELECT DISTINCT typbyval, typlen FROM pg_type WHERE typname = ANY( string_to_array( 'int2 int4 int8 float real numeric text macaddr char', ' ' ) )$$
+	, $$SELECT DISTINCT typbyval, typlen FROM pg_type WHERE (typlen <= 8 OR typlen % 4 != 0) AND typname NOT IN( 'cstring', 'unknown' )$$
+	, 'Verify we are testing all storage options'
+);
 
 SELECT finish();
 ROLLBACK;

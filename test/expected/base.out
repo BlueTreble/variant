@@ -1,7 +1,7 @@
 \set ECHO 0
 
 
-1..19
+1..20
 ok 1 - cast to text
 ok 2 - Check equality
 ok 3 - Check NULL
@@ -21,3 +21,4 @@ ok 16 - (int,)::int = NULL
 ok 17 - (int,1)::int != NULL
 ok 18 - (int,)::int = NULL is NULL
 ok 19 - (int,1)::int != NULL is NULL
+ok 20 - Verify we are testing all storage options
