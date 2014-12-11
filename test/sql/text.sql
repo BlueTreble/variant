@@ -1,10 +1,15 @@
 \set ECHO 0
 \set QUIET 1
 
+/*
+ * We intentionally test "char" as well, because it's typlen is 1 and it's
+ * easier to include it here than to test boolean (the other typlen 1 type).
+ */
+
 
 \set baseline_type text
 -- Space separated string
-\set test_types 'char char(10) varchar varchar(10) text'
+\set test_types '"char" char char(10) varchar varchar(10) text'
 -- Used in array[ :base_values ]
 \set base_values '$$a$$, $$b$$, $$c$$, NULL'
 \set compare_value b
