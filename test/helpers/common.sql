@@ -22,7 +22,7 @@ RETURNS SETOF text LANGUAGE sql AS $$
 	SELECT * FROM pg_temp.exec_text($1, NULL::text)
 $$;
 
-CREATE TEMP VIEW operator AS SELECT * FROM unnest( string_to_array( '<  ,<= , = , >=,  >,!= ', ',' ) ) AS op;
+CREATE TEMP TABLE operator AS SELECT * FROM unnest( string_to_array( '<  ,<= , = , >=,  >,!= ', ',' ) ) AS op;
 CREATE TEMP VIEW ops AS SELECT * FROM operator; -- Eventually going away
 
 CREATE TEMP TABLE plan(

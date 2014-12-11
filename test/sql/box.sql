@@ -24,6 +24,8 @@
  */
 \set op_test_order_by 'ORDER BY compare_type, base_type, compare_value::text, base_value::text'
 
+-- Box also doesn't have a != operator
+DELETE FROM operator WHERE op ~ '!=';
 
 SELECT plan(sum(test_count)::int) FROM plan;
 
