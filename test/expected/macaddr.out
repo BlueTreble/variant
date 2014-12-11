@@ -1,0 +1,92 @@
+\set ECHO 0
+
+
+
+
+1..86
+ok 1 - No NULL variants
+ok 2 - Verify result of cast '08:00:2b:01:02:03'::macaddr
+ok 3 - Verify result of cast '08:10:2b:01:02:03'::macaddr
+ok 4 - Verify result of cast '08:20:2b:01:02:03'::macaddr
+ok 5 - Verify result of cast NULL::macaddr
+ok 6 - SET base_variant_b
+ok 7 - Verify text_in(text_out()) works for (macaddr,08:00:2b:01:02:03)
+ok 8 - Verify text_in(text_out()) works for (macaddr,08:10:2b:01:02:03)
+ok 9 - Verify text_in(text_out()) works for (macaddr,08:20:2b:01:02:03)
+ok 10 - Verify text_in(text_out()) works for (macaddr,)
+ok 11 - No NULL variants
+ok 12 - Verify result of cast '08:10:2b:01:02:03'::macaddr
+ok 13 - SET compare_variant_b
+ok 14 - Verify text_in(text_out()) works for (macaddr,08:10:2b:01:02:03)
+ok 15 - check casted vs uncasted for '08:10:2b:01:02:03'::macaddr <   '08:00:2b:01:02:03'::macaddr
+ok 16 - check casted vs uncasted for '08:10:2b:01:02:03'::macaddr <   '08:10:2b:01:02:03'::macaddr
+ok 17 - check casted vs uncasted for '08:10:2b:01:02:03'::macaddr <   '08:20:2b:01:02:03'::macaddr
+ok 18 - check casted vs uncasted for '08:10:2b:01:02:03'::macaddr <   NULL::macaddr
+ok 19 - check casted vs uncasted for '08:10:2b:01:02:03'::macaddr <=  '08:00:2b:01:02:03'::macaddr
+ok 20 - check casted vs uncasted for '08:10:2b:01:02:03'::macaddr <=  '08:10:2b:01:02:03'::macaddr
+ok 21 - check casted vs uncasted for '08:10:2b:01:02:03'::macaddr <=  '08:20:2b:01:02:03'::macaddr
+ok 22 - check casted vs uncasted for '08:10:2b:01:02:03'::macaddr <=  NULL::macaddr
+ok 23 - check casted vs uncasted for '08:10:2b:01:02:03'::macaddr  =  '08:00:2b:01:02:03'::macaddr
+ok 24 - check casted vs uncasted for '08:10:2b:01:02:03'::macaddr  =  '08:10:2b:01:02:03'::macaddr
+ok 25 - check casted vs uncasted for '08:10:2b:01:02:03'::macaddr  =  '08:20:2b:01:02:03'::macaddr
+ok 26 - check casted vs uncasted for '08:10:2b:01:02:03'::macaddr  =  NULL::macaddr
+ok 27 - check casted vs uncasted for '08:10:2b:01:02:03'::macaddr  >= '08:00:2b:01:02:03'::macaddr
+ok 28 - check casted vs uncasted for '08:10:2b:01:02:03'::macaddr  >= '08:10:2b:01:02:03'::macaddr
+ok 29 - check casted vs uncasted for '08:10:2b:01:02:03'::macaddr  >= '08:20:2b:01:02:03'::macaddr
+ok 30 - check casted vs uncasted for '08:10:2b:01:02:03'::macaddr  >= NULL::macaddr
+ok 31 - check casted vs uncasted for '08:10:2b:01:02:03'::macaddr   > '08:00:2b:01:02:03'::macaddr
+ok 32 - check casted vs uncasted for '08:10:2b:01:02:03'::macaddr   > '08:10:2b:01:02:03'::macaddr
+ok 33 - check casted vs uncasted for '08:10:2b:01:02:03'::macaddr   > '08:20:2b:01:02:03'::macaddr
+ok 34 - check casted vs uncasted for '08:10:2b:01:02:03'::macaddr   > NULL::macaddr
+ok 35 - check casted vs uncasted for '08:10:2b:01:02:03'::macaddr !=  '08:00:2b:01:02:03'::macaddr
+ok 36 - check casted vs uncasted for '08:10:2b:01:02:03'::macaddr !=  '08:10:2b:01:02:03'::macaddr
+ok 37 - check casted vs uncasted for '08:10:2b:01:02:03'::macaddr !=  '08:20:2b:01:02:03'::macaddr
+ok 38 - check casted vs uncasted for '08:10:2b:01:02:03'::macaddr !=  NULL::macaddr
+ok 39 - check variant vs uncasted for '08:10:2b:01:02:03'::macaddr <   '08:00:2b:01:02:03'::macaddr
+ok 40 - check variant vs uncasted for '08:10:2b:01:02:03'::macaddr <   '08:10:2b:01:02:03'::macaddr
+ok 41 - check variant vs uncasted for '08:10:2b:01:02:03'::macaddr <   '08:20:2b:01:02:03'::macaddr
+ok 42 - check variant vs uncasted for '08:10:2b:01:02:03'::macaddr <   NULL::macaddr
+ok 43 - check variant vs uncasted for '08:10:2b:01:02:03'::macaddr <=  '08:00:2b:01:02:03'::macaddr
+ok 44 - check variant vs uncasted for '08:10:2b:01:02:03'::macaddr <=  '08:10:2b:01:02:03'::macaddr
+ok 45 - check variant vs uncasted for '08:10:2b:01:02:03'::macaddr <=  '08:20:2b:01:02:03'::macaddr
+ok 46 - check variant vs uncasted for '08:10:2b:01:02:03'::macaddr <=  NULL::macaddr
+ok 47 - check variant vs uncasted for '08:10:2b:01:02:03'::macaddr  =  '08:00:2b:01:02:03'::macaddr
+ok 48 - check variant vs uncasted for '08:10:2b:01:02:03'::macaddr  =  '08:10:2b:01:02:03'::macaddr
+ok 49 - check variant vs uncasted for '08:10:2b:01:02:03'::macaddr  =  '08:20:2b:01:02:03'::macaddr
+ok 50 - check variant vs uncasted for '08:10:2b:01:02:03'::macaddr  =  NULL::macaddr
+ok 51 - check variant vs uncasted for '08:10:2b:01:02:03'::macaddr  >= '08:00:2b:01:02:03'::macaddr
+ok 52 - check variant vs uncasted for '08:10:2b:01:02:03'::macaddr  >= '08:10:2b:01:02:03'::macaddr
+ok 53 - check variant vs uncasted for '08:10:2b:01:02:03'::macaddr  >= '08:20:2b:01:02:03'::macaddr
+ok 54 - check variant vs uncasted for '08:10:2b:01:02:03'::macaddr  >= NULL::macaddr
+ok 55 - check variant vs uncasted for '08:10:2b:01:02:03'::macaddr   > '08:00:2b:01:02:03'::macaddr
+ok 56 - check variant vs uncasted for '08:10:2b:01:02:03'::macaddr   > '08:10:2b:01:02:03'::macaddr
+ok 57 - check variant vs uncasted for '08:10:2b:01:02:03'::macaddr   > '08:20:2b:01:02:03'::macaddr
+ok 58 - check variant vs uncasted for '08:10:2b:01:02:03'::macaddr   > NULL::macaddr
+ok 59 - check variant vs uncasted for '08:10:2b:01:02:03'::macaddr !=  '08:00:2b:01:02:03'::macaddr
+ok 60 - check variant vs uncasted for '08:10:2b:01:02:03'::macaddr !=  '08:10:2b:01:02:03'::macaddr
+ok 61 - check variant vs uncasted for '08:10:2b:01:02:03'::macaddr !=  '08:20:2b:01:02:03'::macaddr
+ok 62 - check variant vs uncasted for '08:10:2b:01:02:03'::macaddr !=  NULL::macaddr
+ok 63 - check variant vs casted for '''08:10:2b:01:02:03''::macaddr' <   '''08:00:2b:01:02:03''::macaddr'
+ok 64 - check variant vs casted for '''08:10:2b:01:02:03''::macaddr' <   '''08:10:2b:01:02:03''::macaddr'
+ok 65 - check variant vs casted for '''08:10:2b:01:02:03''::macaddr' <   '''08:20:2b:01:02:03''::macaddr'
+ok 66 - check variant vs casted for '''08:10:2b:01:02:03''::macaddr' <   'NULL::macaddr'
+ok 67 - check variant vs casted for '''08:10:2b:01:02:03''::macaddr' <=  '''08:00:2b:01:02:03''::macaddr'
+ok 68 - check variant vs casted for '''08:10:2b:01:02:03''::macaddr' <=  '''08:10:2b:01:02:03''::macaddr'
+ok 69 - check variant vs casted for '''08:10:2b:01:02:03''::macaddr' <=  '''08:20:2b:01:02:03''::macaddr'
+ok 70 - check variant vs casted for '''08:10:2b:01:02:03''::macaddr' <=  'NULL::macaddr'
+ok 71 - check variant vs casted for '''08:10:2b:01:02:03''::macaddr'  =  '''08:00:2b:01:02:03''::macaddr'
+ok 72 - check variant vs casted for '''08:10:2b:01:02:03''::macaddr'  =  '''08:10:2b:01:02:03''::macaddr'
+ok 73 - check variant vs casted for '''08:10:2b:01:02:03''::macaddr'  =  '''08:20:2b:01:02:03''::macaddr'
+ok 74 - check variant vs casted for '''08:10:2b:01:02:03''::macaddr'  =  'NULL::macaddr'
+ok 75 - check variant vs casted for '''08:10:2b:01:02:03''::macaddr'  >= '''08:00:2b:01:02:03''::macaddr'
+ok 76 - check variant vs casted for '''08:10:2b:01:02:03''::macaddr'  >= '''08:10:2b:01:02:03''::macaddr'
+ok 77 - check variant vs casted for '''08:10:2b:01:02:03''::macaddr'  >= '''08:20:2b:01:02:03''::macaddr'
+ok 78 - check variant vs casted for '''08:10:2b:01:02:03''::macaddr'  >= 'NULL::macaddr'
+ok 79 - check variant vs casted for '''08:10:2b:01:02:03''::macaddr'   > '''08:00:2b:01:02:03''::macaddr'
+ok 80 - check variant vs casted for '''08:10:2b:01:02:03''::macaddr'   > '''08:10:2b:01:02:03''::macaddr'
+ok 81 - check variant vs casted for '''08:10:2b:01:02:03''::macaddr'   > '''08:20:2b:01:02:03''::macaddr'
+ok 82 - check variant vs casted for '''08:10:2b:01:02:03''::macaddr'   > 'NULL::macaddr'
+ok 83 - check variant vs casted for '''08:10:2b:01:02:03''::macaddr' !=  '''08:00:2b:01:02:03''::macaddr'
+ok 84 - check variant vs casted for '''08:10:2b:01:02:03''::macaddr' !=  '''08:10:2b:01:02:03''::macaddr'
+ok 85 - check variant vs casted for '''08:10:2b:01:02:03''::macaddr' !=  '''08:20:2b:01:02:03''::macaddr'
+ok 86 - check variant vs casted for '''08:10:2b:01:02:03''::macaddr' !=  'NULL::macaddr'
