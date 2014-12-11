@@ -111,8 +111,7 @@ $$SELECT is(
       , %s
     )
   FROM (
-    SELECT * FROM op_test_data
-      ORDER BY compare_type, base_type, compare_value, base_value
+    SELECT * FROM op_test_data $$ || :'op_test_order_by' || $$
   ) ordered -- Need to order first otherwise our test numbers get re-arranged, which is confusing
 $$::text AS is_format;
 

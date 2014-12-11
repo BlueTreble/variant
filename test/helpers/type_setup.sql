@@ -5,6 +5,15 @@
  * base_value is a table of the values to test, represented in the "big" type format
  */
 
+/*
+ * Some types don't have sort operators defined. For those cases you'll need to
+ * over-ride this variable with something else. It's still a good idea to have
+ * a unique sort ordering, to prevent false test failures.
+ *
+ * Note that this is used as a string value!
+ */
+\set op_test_order_by 'ORDER BY compare_type, base_type, compare_value, base_value'
+
 BEGIN;
 \i test/helpers/tap_setup.sql
 \i test/helpers/common.sql
