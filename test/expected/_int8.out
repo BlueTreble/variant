@@ -5,168 +5,168 @@
 
 1..166
 ok 1 - No NULL variants
-ok 2 - Verify result of cast '{-1,-1,1}'::numeric[]
-ok 3 - Verify result of cast '{-1,0,1}'::numeric[]
-ok 4 - Verify result of cast '{-1,1,1}'::numeric[]
-ok 5 - Verify result of cast '{NULL,-1,1}'::numeric[]
-ok 6 - Verify result of cast '{NULL,0,1}'::numeric[]
-ok 7 - Verify result of cast '{NULL,1,1}'::numeric[]
-ok 8 - Verify result of cast '{-1,NULL,1}'::numeric[]
-ok 9 - Verify result of cast NULL::numeric[]
+ok 2 - Verify result of cast '{-1,-1,1}'::int8[]
+ok 3 - Verify result of cast '{-1,0,1}'::int8[]
+ok 4 - Verify result of cast '{-1,1,1}'::int8[]
+ok 5 - Verify result of cast '{NULL,-1,1}'::int8[]
+ok 6 - Verify result of cast '{NULL,0,1}'::int8[]
+ok 7 - Verify result of cast '{NULL,1,1}'::int8[]
+ok 8 - Verify result of cast '{-1,NULL,1}'::int8[]
+ok 9 - Verify result of cast NULL::int8[]
 ok 10 - SET base_variant_b
-ok 11 - Verify text_in(text_out()) works for (numeric[],"{-1,-1,1}")
-ok 12 - Verify text_in(text_out()) works for (numeric[],"{-1,0,1}")
-ok 13 - Verify text_in(text_out()) works for (numeric[],"{-1,1,1}")
-ok 14 - Verify text_in(text_out()) works for (numeric[],"{NULL,-1,1}")
-ok 15 - Verify text_in(text_out()) works for (numeric[],"{NULL,0,1}")
-ok 16 - Verify text_in(text_out()) works for (numeric[],"{NULL,1,1}")
-ok 17 - Verify text_in(text_out()) works for (numeric[],"{-1,NULL,1}")
-ok 18 - Verify text_in(text_out()) works for (numeric[],)
+ok 11 - Verify text_in(text_out()) works for (bigint[],"{-1,-1,1}")
+ok 12 - Verify text_in(text_out()) works for (bigint[],"{-1,0,1}")
+ok 13 - Verify text_in(text_out()) works for (bigint[],"{-1,1,1}")
+ok 14 - Verify text_in(text_out()) works for (bigint[],"{NULL,-1,1}")
+ok 15 - Verify text_in(text_out()) works for (bigint[],"{NULL,0,1}")
+ok 16 - Verify text_in(text_out()) works for (bigint[],"{NULL,1,1}")
+ok 17 - Verify text_in(text_out()) works for (bigint[],"{-1,NULL,1}")
+ok 18 - Verify text_in(text_out()) works for (bigint[],)
 ok 19 - No NULL variants
-ok 20 - Verify result of cast '{-1,0,1}'::numeric[]
+ok 20 - Verify result of cast '{-1,0,1}'::int8[]
 ok 21 - SET compare_variant_b
-ok 22 - Verify text_in(text_out()) works for (numeric[],"{-1,0,1}")
-ok 23 - check casted vs uncasted for '{-1,0,1}'::numeric[] <   '{-1,-1,1}'::numeric[]
-ok 24 - check casted vs uncasted for '{-1,0,1}'::numeric[] <   '{-1,0,1}'::numeric[]
-ok 25 - check casted vs uncasted for '{-1,0,1}'::numeric[] <   '{-1,1,1}'::numeric[]
-ok 26 - check casted vs uncasted for '{-1,0,1}'::numeric[] <   '{-1,NULL,1}'::numeric[]
-ok 27 - check casted vs uncasted for '{-1,0,1}'::numeric[] <   '{NULL,-1,1}'::numeric[]
-ok 28 - check casted vs uncasted for '{-1,0,1}'::numeric[] <   '{NULL,0,1}'::numeric[]
-ok 29 - check casted vs uncasted for '{-1,0,1}'::numeric[] <   '{NULL,1,1}'::numeric[]
-ok 30 - check casted vs uncasted for '{-1,0,1}'::numeric[] <   NULL::numeric[]
-ok 31 - check casted vs uncasted for '{-1,0,1}'::numeric[] <=  '{-1,-1,1}'::numeric[]
-ok 32 - check casted vs uncasted for '{-1,0,1}'::numeric[] <=  '{-1,0,1}'::numeric[]
-ok 33 - check casted vs uncasted for '{-1,0,1}'::numeric[] <=  '{-1,1,1}'::numeric[]
-ok 34 - check casted vs uncasted for '{-1,0,1}'::numeric[] <=  '{-1,NULL,1}'::numeric[]
-ok 35 - check casted vs uncasted for '{-1,0,1}'::numeric[] <=  '{NULL,-1,1}'::numeric[]
-ok 36 - check casted vs uncasted for '{-1,0,1}'::numeric[] <=  '{NULL,0,1}'::numeric[]
-ok 37 - check casted vs uncasted for '{-1,0,1}'::numeric[] <=  '{NULL,1,1}'::numeric[]
-ok 38 - check casted vs uncasted for '{-1,0,1}'::numeric[] <=  NULL::numeric[]
-ok 39 - check casted vs uncasted for '{-1,0,1}'::numeric[]  =  '{-1,-1,1}'::numeric[]
-ok 40 - check casted vs uncasted for '{-1,0,1}'::numeric[]  =  '{-1,0,1}'::numeric[]
-ok 41 - check casted vs uncasted for '{-1,0,1}'::numeric[]  =  '{-1,1,1}'::numeric[]
-ok 42 - check casted vs uncasted for '{-1,0,1}'::numeric[]  =  '{-1,NULL,1}'::numeric[]
-ok 43 - check casted vs uncasted for '{-1,0,1}'::numeric[]  =  '{NULL,-1,1}'::numeric[]
-ok 44 - check casted vs uncasted for '{-1,0,1}'::numeric[]  =  '{NULL,0,1}'::numeric[]
-ok 45 - check casted vs uncasted for '{-1,0,1}'::numeric[]  =  '{NULL,1,1}'::numeric[]
-ok 46 - check casted vs uncasted for '{-1,0,1}'::numeric[]  =  NULL::numeric[]
-ok 47 - check casted vs uncasted for '{-1,0,1}'::numeric[]  >= '{-1,-1,1}'::numeric[]
-ok 48 - check casted vs uncasted for '{-1,0,1}'::numeric[]  >= '{-1,0,1}'::numeric[]
-ok 49 - check casted vs uncasted for '{-1,0,1}'::numeric[]  >= '{-1,1,1}'::numeric[]
-ok 50 - check casted vs uncasted for '{-1,0,1}'::numeric[]  >= '{-1,NULL,1}'::numeric[]
-ok 51 - check casted vs uncasted for '{-1,0,1}'::numeric[]  >= '{NULL,-1,1}'::numeric[]
-ok 52 - check casted vs uncasted for '{-1,0,1}'::numeric[]  >= '{NULL,0,1}'::numeric[]
-ok 53 - check casted vs uncasted for '{-1,0,1}'::numeric[]  >= '{NULL,1,1}'::numeric[]
-ok 54 - check casted vs uncasted for '{-1,0,1}'::numeric[]  >= NULL::numeric[]
-ok 55 - check casted vs uncasted for '{-1,0,1}'::numeric[]   > '{-1,-1,1}'::numeric[]
-ok 56 - check casted vs uncasted for '{-1,0,1}'::numeric[]   > '{-1,0,1}'::numeric[]
-ok 57 - check casted vs uncasted for '{-1,0,1}'::numeric[]   > '{-1,1,1}'::numeric[]
-ok 58 - check casted vs uncasted for '{-1,0,1}'::numeric[]   > '{-1,NULL,1}'::numeric[]
-ok 59 - check casted vs uncasted for '{-1,0,1}'::numeric[]   > '{NULL,-1,1}'::numeric[]
-ok 60 - check casted vs uncasted for '{-1,0,1}'::numeric[]   > '{NULL,0,1}'::numeric[]
-ok 61 - check casted vs uncasted for '{-1,0,1}'::numeric[]   > '{NULL,1,1}'::numeric[]
-ok 62 - check casted vs uncasted for '{-1,0,1}'::numeric[]   > NULL::numeric[]
-ok 63 - check casted vs uncasted for '{-1,0,1}'::numeric[] !=  '{-1,-1,1}'::numeric[]
-ok 64 - check casted vs uncasted for '{-1,0,1}'::numeric[] !=  '{-1,0,1}'::numeric[]
-ok 65 - check casted vs uncasted for '{-1,0,1}'::numeric[] !=  '{-1,1,1}'::numeric[]
-ok 66 - check casted vs uncasted for '{-1,0,1}'::numeric[] !=  '{-1,NULL,1}'::numeric[]
-ok 67 - check casted vs uncasted for '{-1,0,1}'::numeric[] !=  '{NULL,-1,1}'::numeric[]
-ok 68 - check casted vs uncasted for '{-1,0,1}'::numeric[] !=  '{NULL,0,1}'::numeric[]
-ok 69 - check casted vs uncasted for '{-1,0,1}'::numeric[] !=  '{NULL,1,1}'::numeric[]
-ok 70 - check casted vs uncasted for '{-1,0,1}'::numeric[] !=  NULL::numeric[]
-ok 71 - check variant vs uncasted for '{-1,0,1}'::numeric[] <   '{-1,-1,1}'::numeric[]
-ok 72 - check variant vs uncasted for '{-1,0,1}'::numeric[] <   '{-1,0,1}'::numeric[]
-ok 73 - check variant vs uncasted for '{-1,0,1}'::numeric[] <   '{-1,1,1}'::numeric[]
-ok 74 - check variant vs uncasted for '{-1,0,1}'::numeric[] <   '{-1,NULL,1}'::numeric[]
-ok 75 - check variant vs uncasted for '{-1,0,1}'::numeric[] <   '{NULL,-1,1}'::numeric[]
-ok 76 - check variant vs uncasted for '{-1,0,1}'::numeric[] <   '{NULL,0,1}'::numeric[]
-ok 77 - check variant vs uncasted for '{-1,0,1}'::numeric[] <   '{NULL,1,1}'::numeric[]
-ok 78 - check variant vs uncasted for '{-1,0,1}'::numeric[] <   NULL::numeric[]
-ok 79 - check variant vs uncasted for '{-1,0,1}'::numeric[] <=  '{-1,-1,1}'::numeric[]
-ok 80 - check variant vs uncasted for '{-1,0,1}'::numeric[] <=  '{-1,0,1}'::numeric[]
-ok 81 - check variant vs uncasted for '{-1,0,1}'::numeric[] <=  '{-1,1,1}'::numeric[]
-ok 82 - check variant vs uncasted for '{-1,0,1}'::numeric[] <=  '{-1,NULL,1}'::numeric[]
-ok 83 - check variant vs uncasted for '{-1,0,1}'::numeric[] <=  '{NULL,-1,1}'::numeric[]
-ok 84 - check variant vs uncasted for '{-1,0,1}'::numeric[] <=  '{NULL,0,1}'::numeric[]
-ok 85 - check variant vs uncasted for '{-1,0,1}'::numeric[] <=  '{NULL,1,1}'::numeric[]
-ok 86 - check variant vs uncasted for '{-1,0,1}'::numeric[] <=  NULL::numeric[]
-ok 87 - check variant vs uncasted for '{-1,0,1}'::numeric[]  =  '{-1,-1,1}'::numeric[]
-ok 88 - check variant vs uncasted for '{-1,0,1}'::numeric[]  =  '{-1,0,1}'::numeric[]
-ok 89 - check variant vs uncasted for '{-1,0,1}'::numeric[]  =  '{-1,1,1}'::numeric[]
-ok 90 - check variant vs uncasted for '{-1,0,1}'::numeric[]  =  '{-1,NULL,1}'::numeric[]
-ok 91 - check variant vs uncasted for '{-1,0,1}'::numeric[]  =  '{NULL,-1,1}'::numeric[]
-ok 92 - check variant vs uncasted for '{-1,0,1}'::numeric[]  =  '{NULL,0,1}'::numeric[]
-ok 93 - check variant vs uncasted for '{-1,0,1}'::numeric[]  =  '{NULL,1,1}'::numeric[]
-ok 94 - check variant vs uncasted for '{-1,0,1}'::numeric[]  =  NULL::numeric[]
-ok 95 - check variant vs uncasted for '{-1,0,1}'::numeric[]  >= '{-1,-1,1}'::numeric[]
-ok 96 - check variant vs uncasted for '{-1,0,1}'::numeric[]  >= '{-1,0,1}'::numeric[]
-ok 97 - check variant vs uncasted for '{-1,0,1}'::numeric[]  >= '{-1,1,1}'::numeric[]
-ok 98 - check variant vs uncasted for '{-1,0,1}'::numeric[]  >= '{-1,NULL,1}'::numeric[]
-ok 99 - check variant vs uncasted for '{-1,0,1}'::numeric[]  >= '{NULL,-1,1}'::numeric[]
-ok 100 - check variant vs uncasted for '{-1,0,1}'::numeric[]  >= '{NULL,0,1}'::numeric[]
-ok 101 - check variant vs uncasted for '{-1,0,1}'::numeric[]  >= '{NULL,1,1}'::numeric[]
-ok 102 - check variant vs uncasted for '{-1,0,1}'::numeric[]  >= NULL::numeric[]
-ok 103 - check variant vs uncasted for '{-1,0,1}'::numeric[]   > '{-1,-1,1}'::numeric[]
-ok 104 - check variant vs uncasted for '{-1,0,1}'::numeric[]   > '{-1,0,1}'::numeric[]
-ok 105 - check variant vs uncasted for '{-1,0,1}'::numeric[]   > '{-1,1,1}'::numeric[]
-ok 106 - check variant vs uncasted for '{-1,0,1}'::numeric[]   > '{-1,NULL,1}'::numeric[]
-ok 107 - check variant vs uncasted for '{-1,0,1}'::numeric[]   > '{NULL,-1,1}'::numeric[]
-ok 108 - check variant vs uncasted for '{-1,0,1}'::numeric[]   > '{NULL,0,1}'::numeric[]
-ok 109 - check variant vs uncasted for '{-1,0,1}'::numeric[]   > '{NULL,1,1}'::numeric[]
-ok 110 - check variant vs uncasted for '{-1,0,1}'::numeric[]   > NULL::numeric[]
-ok 111 - check variant vs uncasted for '{-1,0,1}'::numeric[] !=  '{-1,-1,1}'::numeric[]
-ok 112 - check variant vs uncasted for '{-1,0,1}'::numeric[] !=  '{-1,0,1}'::numeric[]
-ok 113 - check variant vs uncasted for '{-1,0,1}'::numeric[] !=  '{-1,1,1}'::numeric[]
-ok 114 - check variant vs uncasted for '{-1,0,1}'::numeric[] !=  '{-1,NULL,1}'::numeric[]
-ok 115 - check variant vs uncasted for '{-1,0,1}'::numeric[] !=  '{NULL,-1,1}'::numeric[]
-ok 116 - check variant vs uncasted for '{-1,0,1}'::numeric[] !=  '{NULL,0,1}'::numeric[]
-ok 117 - check variant vs uncasted for '{-1,0,1}'::numeric[] !=  '{NULL,1,1}'::numeric[]
-ok 118 - check variant vs uncasted for '{-1,0,1}'::numeric[] !=  NULL::numeric[]
-ok 119 - check variant vs casted for '''{-1,0,1}''::numeric[]' <   '''{-1,-1,1}''::numeric[]'
-ok 120 - check variant vs casted for '''{-1,0,1}''::numeric[]' <   '''{-1,0,1}''::numeric[]'
-ok 121 - check variant vs casted for '''{-1,0,1}''::numeric[]' <   '''{-1,1,1}''::numeric[]'
-ok 122 - check variant vs casted for '''{-1,0,1}''::numeric[]' <   '''{-1,NULL,1}''::numeric[]'
-ok 123 - check variant vs casted for '''{-1,0,1}''::numeric[]' <   '''{NULL,-1,1}''::numeric[]'
-ok 124 - check variant vs casted for '''{-1,0,1}''::numeric[]' <   '''{NULL,0,1}''::numeric[]'
-ok 125 - check variant vs casted for '''{-1,0,1}''::numeric[]' <   '''{NULL,1,1}''::numeric[]'
-ok 126 - check variant vs casted for '''{-1,0,1}''::numeric[]' <   'NULL::numeric[]'
-ok 127 - check variant vs casted for '''{-1,0,1}''::numeric[]' <=  '''{-1,-1,1}''::numeric[]'
-ok 128 - check variant vs casted for '''{-1,0,1}''::numeric[]' <=  '''{-1,0,1}''::numeric[]'
-ok 129 - check variant vs casted for '''{-1,0,1}''::numeric[]' <=  '''{-1,1,1}''::numeric[]'
-ok 130 - check variant vs casted for '''{-1,0,1}''::numeric[]' <=  '''{-1,NULL,1}''::numeric[]'
-ok 131 - check variant vs casted for '''{-1,0,1}''::numeric[]' <=  '''{NULL,-1,1}''::numeric[]'
-ok 132 - check variant vs casted for '''{-1,0,1}''::numeric[]' <=  '''{NULL,0,1}''::numeric[]'
-ok 133 - check variant vs casted for '''{-1,0,1}''::numeric[]' <=  '''{NULL,1,1}''::numeric[]'
-ok 134 - check variant vs casted for '''{-1,0,1}''::numeric[]' <=  'NULL::numeric[]'
-ok 135 - check variant vs casted for '''{-1,0,1}''::numeric[]'  =  '''{-1,-1,1}''::numeric[]'
-ok 136 - check variant vs casted for '''{-1,0,1}''::numeric[]'  =  '''{-1,0,1}''::numeric[]'
-ok 137 - check variant vs casted for '''{-1,0,1}''::numeric[]'  =  '''{-1,1,1}''::numeric[]'
-ok 138 - check variant vs casted for '''{-1,0,1}''::numeric[]'  =  '''{-1,NULL,1}''::numeric[]'
-ok 139 - check variant vs casted for '''{-1,0,1}''::numeric[]'  =  '''{NULL,-1,1}''::numeric[]'
-ok 140 - check variant vs casted for '''{-1,0,1}''::numeric[]'  =  '''{NULL,0,1}''::numeric[]'
-ok 141 - check variant vs casted for '''{-1,0,1}''::numeric[]'  =  '''{NULL,1,1}''::numeric[]'
-ok 142 - check variant vs casted for '''{-1,0,1}''::numeric[]'  =  'NULL::numeric[]'
-ok 143 - check variant vs casted for '''{-1,0,1}''::numeric[]'  >= '''{-1,-1,1}''::numeric[]'
-ok 144 - check variant vs casted for '''{-1,0,1}''::numeric[]'  >= '''{-1,0,1}''::numeric[]'
-ok 145 - check variant vs casted for '''{-1,0,1}''::numeric[]'  >= '''{-1,1,1}''::numeric[]'
-ok 146 - check variant vs casted for '''{-1,0,1}''::numeric[]'  >= '''{-1,NULL,1}''::numeric[]'
-ok 147 - check variant vs casted for '''{-1,0,1}''::numeric[]'  >= '''{NULL,-1,1}''::numeric[]'
-ok 148 - check variant vs casted for '''{-1,0,1}''::numeric[]'  >= '''{NULL,0,1}''::numeric[]'
-ok 149 - check variant vs casted for '''{-1,0,1}''::numeric[]'  >= '''{NULL,1,1}''::numeric[]'
-ok 150 - check variant vs casted for '''{-1,0,1}''::numeric[]'  >= 'NULL::numeric[]'
-ok 151 - check variant vs casted for '''{-1,0,1}''::numeric[]'   > '''{-1,-1,1}''::numeric[]'
-ok 152 - check variant vs casted for '''{-1,0,1}''::numeric[]'   > '''{-1,0,1}''::numeric[]'
-ok 153 - check variant vs casted for '''{-1,0,1}''::numeric[]'   > '''{-1,1,1}''::numeric[]'
-ok 154 - check variant vs casted for '''{-1,0,1}''::numeric[]'   > '''{-1,NULL,1}''::numeric[]'
-ok 155 - check variant vs casted for '''{-1,0,1}''::numeric[]'   > '''{NULL,-1,1}''::numeric[]'
-ok 156 - check variant vs casted for '''{-1,0,1}''::numeric[]'   > '''{NULL,0,1}''::numeric[]'
-ok 157 - check variant vs casted for '''{-1,0,1}''::numeric[]'   > '''{NULL,1,1}''::numeric[]'
-ok 158 - check variant vs casted for '''{-1,0,1}''::numeric[]'   > 'NULL::numeric[]'
-ok 159 - check variant vs casted for '''{-1,0,1}''::numeric[]' !=  '''{-1,-1,1}''::numeric[]'
-ok 160 - check variant vs casted for '''{-1,0,1}''::numeric[]' !=  '''{-1,0,1}''::numeric[]'
-ok 161 - check variant vs casted for '''{-1,0,1}''::numeric[]' !=  '''{-1,1,1}''::numeric[]'
-ok 162 - check variant vs casted for '''{-1,0,1}''::numeric[]' !=  '''{-1,NULL,1}''::numeric[]'
-ok 163 - check variant vs casted for '''{-1,0,1}''::numeric[]' !=  '''{NULL,-1,1}''::numeric[]'
-ok 164 - check variant vs casted for '''{-1,0,1}''::numeric[]' !=  '''{NULL,0,1}''::numeric[]'
-ok 165 - check variant vs casted for '''{-1,0,1}''::numeric[]' !=  '''{NULL,1,1}''::numeric[]'
-ok 166 - check variant vs casted for '''{-1,0,1}''::numeric[]' !=  'NULL::numeric[]'
+ok 22 - Verify text_in(text_out()) works for (bigint[],"{-1,0,1}")
+ok 23 - check casted vs uncasted for '{-1,0,1}'::int8[] <   '{-1,-1,1}'::int8[]
+ok 24 - check casted vs uncasted for '{-1,0,1}'::int8[] <   '{-1,0,1}'::int8[]
+ok 25 - check casted vs uncasted for '{-1,0,1}'::int8[] <   '{-1,1,1}'::int8[]
+ok 26 - check casted vs uncasted for '{-1,0,1}'::int8[] <   '{-1,NULL,1}'::int8[]
+ok 27 - check casted vs uncasted for '{-1,0,1}'::int8[] <   '{NULL,-1,1}'::int8[]
+ok 28 - check casted vs uncasted for '{-1,0,1}'::int8[] <   '{NULL,0,1}'::int8[]
+ok 29 - check casted vs uncasted for '{-1,0,1}'::int8[] <   '{NULL,1,1}'::int8[]
+ok 30 - check casted vs uncasted for '{-1,0,1}'::int8[] <   NULL::int8[]
+ok 31 - check casted vs uncasted for '{-1,0,1}'::int8[] <=  '{-1,-1,1}'::int8[]
+ok 32 - check casted vs uncasted for '{-1,0,1}'::int8[] <=  '{-1,0,1}'::int8[]
+ok 33 - check casted vs uncasted for '{-1,0,1}'::int8[] <=  '{-1,1,1}'::int8[]
+ok 34 - check casted vs uncasted for '{-1,0,1}'::int8[] <=  '{-1,NULL,1}'::int8[]
+ok 35 - check casted vs uncasted for '{-1,0,1}'::int8[] <=  '{NULL,-1,1}'::int8[]
+ok 36 - check casted vs uncasted for '{-1,0,1}'::int8[] <=  '{NULL,0,1}'::int8[]
+ok 37 - check casted vs uncasted for '{-1,0,1}'::int8[] <=  '{NULL,1,1}'::int8[]
+ok 38 - check casted vs uncasted for '{-1,0,1}'::int8[] <=  NULL::int8[]
+ok 39 - check casted vs uncasted for '{-1,0,1}'::int8[]  =  '{-1,-1,1}'::int8[]
+ok 40 - check casted vs uncasted for '{-1,0,1}'::int8[]  =  '{-1,0,1}'::int8[]
+ok 41 - check casted vs uncasted for '{-1,0,1}'::int8[]  =  '{-1,1,1}'::int8[]
+ok 42 - check casted vs uncasted for '{-1,0,1}'::int8[]  =  '{-1,NULL,1}'::int8[]
+ok 43 - check casted vs uncasted for '{-1,0,1}'::int8[]  =  '{NULL,-1,1}'::int8[]
+ok 44 - check casted vs uncasted for '{-1,0,1}'::int8[]  =  '{NULL,0,1}'::int8[]
+ok 45 - check casted vs uncasted for '{-1,0,1}'::int8[]  =  '{NULL,1,1}'::int8[]
+ok 46 - check casted vs uncasted for '{-1,0,1}'::int8[]  =  NULL::int8[]
+ok 47 - check casted vs uncasted for '{-1,0,1}'::int8[]  >= '{-1,-1,1}'::int8[]
+ok 48 - check casted vs uncasted for '{-1,0,1}'::int8[]  >= '{-1,0,1}'::int8[]
+ok 49 - check casted vs uncasted for '{-1,0,1}'::int8[]  >= '{-1,1,1}'::int8[]
+ok 50 - check casted vs uncasted for '{-1,0,1}'::int8[]  >= '{-1,NULL,1}'::int8[]
+ok 51 - check casted vs uncasted for '{-1,0,1}'::int8[]  >= '{NULL,-1,1}'::int8[]
+ok 52 - check casted vs uncasted for '{-1,0,1}'::int8[]  >= '{NULL,0,1}'::int8[]
+ok 53 - check casted vs uncasted for '{-1,0,1}'::int8[]  >= '{NULL,1,1}'::int8[]
+ok 54 - check casted vs uncasted for '{-1,0,1}'::int8[]  >= NULL::int8[]
+ok 55 - check casted vs uncasted for '{-1,0,1}'::int8[]   > '{-1,-1,1}'::int8[]
+ok 56 - check casted vs uncasted for '{-1,0,1}'::int8[]   > '{-1,0,1}'::int8[]
+ok 57 - check casted vs uncasted for '{-1,0,1}'::int8[]   > '{-1,1,1}'::int8[]
+ok 58 - check casted vs uncasted for '{-1,0,1}'::int8[]   > '{-1,NULL,1}'::int8[]
+ok 59 - check casted vs uncasted for '{-1,0,1}'::int8[]   > '{NULL,-1,1}'::int8[]
+ok 60 - check casted vs uncasted for '{-1,0,1}'::int8[]   > '{NULL,0,1}'::int8[]
+ok 61 - check casted vs uncasted for '{-1,0,1}'::int8[]   > '{NULL,1,1}'::int8[]
+ok 62 - check casted vs uncasted for '{-1,0,1}'::int8[]   > NULL::int8[]
+ok 63 - check casted vs uncasted for '{-1,0,1}'::int8[] !=  '{-1,-1,1}'::int8[]
+ok 64 - check casted vs uncasted for '{-1,0,1}'::int8[] !=  '{-1,0,1}'::int8[]
+ok 65 - check casted vs uncasted for '{-1,0,1}'::int8[] !=  '{-1,1,1}'::int8[]
+ok 66 - check casted vs uncasted for '{-1,0,1}'::int8[] !=  '{-1,NULL,1}'::int8[]
+ok 67 - check casted vs uncasted for '{-1,0,1}'::int8[] !=  '{NULL,-1,1}'::int8[]
+ok 68 - check casted vs uncasted for '{-1,0,1}'::int8[] !=  '{NULL,0,1}'::int8[]
+ok 69 - check casted vs uncasted for '{-1,0,1}'::int8[] !=  '{NULL,1,1}'::int8[]
+ok 70 - check casted vs uncasted for '{-1,0,1}'::int8[] !=  NULL::int8[]
+ok 71 - check variant vs uncasted for '{-1,0,1}'::int8[] <   '{-1,-1,1}'::int8[]
+ok 72 - check variant vs uncasted for '{-1,0,1}'::int8[] <   '{-1,0,1}'::int8[]
+ok 73 - check variant vs uncasted for '{-1,0,1}'::int8[] <   '{-1,1,1}'::int8[]
+ok 74 - check variant vs uncasted for '{-1,0,1}'::int8[] <   '{-1,NULL,1}'::int8[]
+ok 75 - check variant vs uncasted for '{-1,0,1}'::int8[] <   '{NULL,-1,1}'::int8[]
+ok 76 - check variant vs uncasted for '{-1,0,1}'::int8[] <   '{NULL,0,1}'::int8[]
+ok 77 - check variant vs uncasted for '{-1,0,1}'::int8[] <   '{NULL,1,1}'::int8[]
+ok 78 - check variant vs uncasted for '{-1,0,1}'::int8[] <   NULL::int8[]
+ok 79 - check variant vs uncasted for '{-1,0,1}'::int8[] <=  '{-1,-1,1}'::int8[]
+ok 80 - check variant vs uncasted for '{-1,0,1}'::int8[] <=  '{-1,0,1}'::int8[]
+ok 81 - check variant vs uncasted for '{-1,0,1}'::int8[] <=  '{-1,1,1}'::int8[]
+ok 82 - check variant vs uncasted for '{-1,0,1}'::int8[] <=  '{-1,NULL,1}'::int8[]
+ok 83 - check variant vs uncasted for '{-1,0,1}'::int8[] <=  '{NULL,-1,1}'::int8[]
+ok 84 - check variant vs uncasted for '{-1,0,1}'::int8[] <=  '{NULL,0,1}'::int8[]
+ok 85 - check variant vs uncasted for '{-1,0,1}'::int8[] <=  '{NULL,1,1}'::int8[]
+ok 86 - check variant vs uncasted for '{-1,0,1}'::int8[] <=  NULL::int8[]
+ok 87 - check variant vs uncasted for '{-1,0,1}'::int8[]  =  '{-1,-1,1}'::int8[]
+ok 88 - check variant vs uncasted for '{-1,0,1}'::int8[]  =  '{-1,0,1}'::int8[]
+ok 89 - check variant vs uncasted for '{-1,0,1}'::int8[]  =  '{-1,1,1}'::int8[]
+ok 90 - check variant vs uncasted for '{-1,0,1}'::int8[]  =  '{-1,NULL,1}'::int8[]
+ok 91 - check variant vs uncasted for '{-1,0,1}'::int8[]  =  '{NULL,-1,1}'::int8[]
+ok 92 - check variant vs uncasted for '{-1,0,1}'::int8[]  =  '{NULL,0,1}'::int8[]
+ok 93 - check variant vs uncasted for '{-1,0,1}'::int8[]  =  '{NULL,1,1}'::int8[]
+ok 94 - check variant vs uncasted for '{-1,0,1}'::int8[]  =  NULL::int8[]
+ok 95 - check variant vs uncasted for '{-1,0,1}'::int8[]  >= '{-1,-1,1}'::int8[]
+ok 96 - check variant vs uncasted for '{-1,0,1}'::int8[]  >= '{-1,0,1}'::int8[]
+ok 97 - check variant vs uncasted for '{-1,0,1}'::int8[]  >= '{-1,1,1}'::int8[]
+ok 98 - check variant vs uncasted for '{-1,0,1}'::int8[]  >= '{-1,NULL,1}'::int8[]
+ok 99 - check variant vs uncasted for '{-1,0,1}'::int8[]  >= '{NULL,-1,1}'::int8[]
+ok 100 - check variant vs uncasted for '{-1,0,1}'::int8[]  >= '{NULL,0,1}'::int8[]
+ok 101 - check variant vs uncasted for '{-1,0,1}'::int8[]  >= '{NULL,1,1}'::int8[]
+ok 102 - check variant vs uncasted for '{-1,0,1}'::int8[]  >= NULL::int8[]
+ok 103 - check variant vs uncasted for '{-1,0,1}'::int8[]   > '{-1,-1,1}'::int8[]
+ok 104 - check variant vs uncasted for '{-1,0,1}'::int8[]   > '{-1,0,1}'::int8[]
+ok 105 - check variant vs uncasted for '{-1,0,1}'::int8[]   > '{-1,1,1}'::int8[]
+ok 106 - check variant vs uncasted for '{-1,0,1}'::int8[]   > '{-1,NULL,1}'::int8[]
+ok 107 - check variant vs uncasted for '{-1,0,1}'::int8[]   > '{NULL,-1,1}'::int8[]
+ok 108 - check variant vs uncasted for '{-1,0,1}'::int8[]   > '{NULL,0,1}'::int8[]
+ok 109 - check variant vs uncasted for '{-1,0,1}'::int8[]   > '{NULL,1,1}'::int8[]
+ok 110 - check variant vs uncasted for '{-1,0,1}'::int8[]   > NULL::int8[]
+ok 111 - check variant vs uncasted for '{-1,0,1}'::int8[] !=  '{-1,-1,1}'::int8[]
+ok 112 - check variant vs uncasted for '{-1,0,1}'::int8[] !=  '{-1,0,1}'::int8[]
+ok 113 - check variant vs uncasted for '{-1,0,1}'::int8[] !=  '{-1,1,1}'::int8[]
+ok 114 - check variant vs uncasted for '{-1,0,1}'::int8[] !=  '{-1,NULL,1}'::int8[]
+ok 115 - check variant vs uncasted for '{-1,0,1}'::int8[] !=  '{NULL,-1,1}'::int8[]
+ok 116 - check variant vs uncasted for '{-1,0,1}'::int8[] !=  '{NULL,0,1}'::int8[]
+ok 117 - check variant vs uncasted for '{-1,0,1}'::int8[] !=  '{NULL,1,1}'::int8[]
+ok 118 - check variant vs uncasted for '{-1,0,1}'::int8[] !=  NULL::int8[]
+ok 119 - check variant vs casted for '''{-1,0,1}''::int8[]' <   '''{-1,-1,1}''::int8[]'
+ok 120 - check variant vs casted for '''{-1,0,1}''::int8[]' <   '''{-1,0,1}''::int8[]'
+ok 121 - check variant vs casted for '''{-1,0,1}''::int8[]' <   '''{-1,1,1}''::int8[]'
+ok 122 - check variant vs casted for '''{-1,0,1}''::int8[]' <   '''{-1,NULL,1}''::int8[]'
+ok 123 - check variant vs casted for '''{-1,0,1}''::int8[]' <   '''{NULL,-1,1}''::int8[]'
+ok 124 - check variant vs casted for '''{-1,0,1}''::int8[]' <   '''{NULL,0,1}''::int8[]'
+ok 125 - check variant vs casted for '''{-1,0,1}''::int8[]' <   '''{NULL,1,1}''::int8[]'
+ok 126 - check variant vs casted for '''{-1,0,1}''::int8[]' <   'NULL::int8[]'
+ok 127 - check variant vs casted for '''{-1,0,1}''::int8[]' <=  '''{-1,-1,1}''::int8[]'
+ok 128 - check variant vs casted for '''{-1,0,1}''::int8[]' <=  '''{-1,0,1}''::int8[]'
+ok 129 - check variant vs casted for '''{-1,0,1}''::int8[]' <=  '''{-1,1,1}''::int8[]'
+ok 130 - check variant vs casted for '''{-1,0,1}''::int8[]' <=  '''{-1,NULL,1}''::int8[]'
+ok 131 - check variant vs casted for '''{-1,0,1}''::int8[]' <=  '''{NULL,-1,1}''::int8[]'
+ok 132 - check variant vs casted for '''{-1,0,1}''::int8[]' <=  '''{NULL,0,1}''::int8[]'
+ok 133 - check variant vs casted for '''{-1,0,1}''::int8[]' <=  '''{NULL,1,1}''::int8[]'
+ok 134 - check variant vs casted for '''{-1,0,1}''::int8[]' <=  'NULL::int8[]'
+ok 135 - check variant vs casted for '''{-1,0,1}''::int8[]'  =  '''{-1,-1,1}''::int8[]'
+ok 136 - check variant vs casted for '''{-1,0,1}''::int8[]'  =  '''{-1,0,1}''::int8[]'
+ok 137 - check variant vs casted for '''{-1,0,1}''::int8[]'  =  '''{-1,1,1}''::int8[]'
+ok 138 - check variant vs casted for '''{-1,0,1}''::int8[]'  =  '''{-1,NULL,1}''::int8[]'
+ok 139 - check variant vs casted for '''{-1,0,1}''::int8[]'  =  '''{NULL,-1,1}''::int8[]'
+ok 140 - check variant vs casted for '''{-1,0,1}''::int8[]'  =  '''{NULL,0,1}''::int8[]'
+ok 141 - check variant vs casted for '''{-1,0,1}''::int8[]'  =  '''{NULL,1,1}''::int8[]'
+ok 142 - check variant vs casted for '''{-1,0,1}''::int8[]'  =  'NULL::int8[]'
+ok 143 - check variant vs casted for '''{-1,0,1}''::int8[]'  >= '''{-1,-1,1}''::int8[]'
+ok 144 - check variant vs casted for '''{-1,0,1}''::int8[]'  >= '''{-1,0,1}''::int8[]'
+ok 145 - check variant vs casted for '''{-1,0,1}''::int8[]'  >= '''{-1,1,1}''::int8[]'
+ok 146 - check variant vs casted for '''{-1,0,1}''::int8[]'  >= '''{-1,NULL,1}''::int8[]'
+ok 147 - check variant vs casted for '''{-1,0,1}''::int8[]'  >= '''{NULL,-1,1}''::int8[]'
+ok 148 - check variant vs casted for '''{-1,0,1}''::int8[]'  >= '''{NULL,0,1}''::int8[]'
+ok 149 - check variant vs casted for '''{-1,0,1}''::int8[]'  >= '''{NULL,1,1}''::int8[]'
+ok 150 - check variant vs casted for '''{-1,0,1}''::int8[]'  >= 'NULL::int8[]'
+ok 151 - check variant vs casted for '''{-1,0,1}''::int8[]'   > '''{-1,-1,1}''::int8[]'
+ok 152 - check variant vs casted for '''{-1,0,1}''::int8[]'   > '''{-1,0,1}''::int8[]'
+ok 153 - check variant vs casted for '''{-1,0,1}''::int8[]'   > '''{-1,1,1}''::int8[]'
+ok 154 - check variant vs casted for '''{-1,0,1}''::int8[]'   > '''{-1,NULL,1}''::int8[]'
+ok 155 - check variant vs casted for '''{-1,0,1}''::int8[]'   > '''{NULL,-1,1}''::int8[]'
+ok 156 - check variant vs casted for '''{-1,0,1}''::int8[]'   > '''{NULL,0,1}''::int8[]'
+ok 157 - check variant vs casted for '''{-1,0,1}''::int8[]'   > '''{NULL,1,1}''::int8[]'
+ok 158 - check variant vs casted for '''{-1,0,1}''::int8[]'   > 'NULL::int8[]'
+ok 159 - check variant vs casted for '''{-1,0,1}''::int8[]' !=  '''{-1,-1,1}''::int8[]'
+ok 160 - check variant vs casted for '''{-1,0,1}''::int8[]' !=  '''{-1,0,1}''::int8[]'
+ok 161 - check variant vs casted for '''{-1,0,1}''::int8[]' !=  '''{-1,1,1}''::int8[]'
+ok 162 - check variant vs casted for '''{-1,0,1}''::int8[]' !=  '''{-1,NULL,1}''::int8[]'
+ok 163 - check variant vs casted for '''{-1,0,1}''::int8[]' !=  '''{NULL,-1,1}''::int8[]'
+ok 164 - check variant vs casted for '''{-1,0,1}''::int8[]' !=  '''{NULL,0,1}''::int8[]'
+ok 165 - check variant vs casted for '''{-1,0,1}''::int8[]' !=  '''{NULL,1,1}''::int8[]'
+ok 166 - check variant vs casted for '''{-1,0,1}''::int8[]' !=  'NULL::int8[]'
