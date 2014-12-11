@@ -7,7 +7,7 @@
  * KEEP ALL THREE FILES IN SYNC!
  */
 
-\set test_types text[]
+\set test_types 'text[]'
 \set baseline_type text[]
 
 \i test/helpers/_string_setup.sql
