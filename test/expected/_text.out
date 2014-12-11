@@ -1,0 +1,132 @@
+\set ECHO 0
+
+
+
+
+1..126
+ok 1 - No NULL variants
+ok 2 - Verify result of cast '{a,a,c}'::text[]
+ok 3 - Verify result of cast '{a,b,c}'::text[]
+ok 4 - Verify result of cast '{a,c,c}'::text[]
+ok 5 - Verify result of cast '{a,NULL,c}'::text[]
+ok 6 - Verify result of cast '{NULL,b,c}'::text[]
+ok 7 - Verify result of cast NULL::text[]
+ok 8 - SET base_variant_b
+ok 9 - Verify text_in(text_out()) works for (text[],"{a,a,c}")
+ok 10 - Verify text_in(text_out()) works for (text[],"{a,b,c}")
+ok 11 - Verify text_in(text_out()) works for (text[],"{a,c,c}")
+ok 12 - Verify text_in(text_out()) works for (text[],"{a,NULL,c}")
+ok 13 - Verify text_in(text_out()) works for (text[],"{NULL,b,c}")
+ok 14 - Verify text_in(text_out()) works for (text[],)
+ok 15 - No NULL variants
+ok 16 - Verify result of cast '{a,b,c}'::text[]
+ok 17 - SET compare_variant_b
+ok 18 - Verify text_in(text_out()) works for (text[],"{a,b,c}")
+ok 19 - check casted vs uncasted for '{a,b,c}'::text[] <   '{a,a,c}'::text[]
+ok 20 - check casted vs uncasted for '{a,b,c}'::text[] <   '{a,b,c}'::text[]
+ok 21 - check casted vs uncasted for '{a,b,c}'::text[] <   '{a,c,c}'::text[]
+ok 22 - check casted vs uncasted for '{a,b,c}'::text[] <   '{a,NULL,c}'::text[]
+ok 23 - check casted vs uncasted for '{a,b,c}'::text[] <   '{NULL,b,c}'::text[]
+ok 24 - check casted vs uncasted for '{a,b,c}'::text[] <   NULL::text[]
+ok 25 - check casted vs uncasted for '{a,b,c}'::text[] <=  '{a,a,c}'::text[]
+ok 26 - check casted vs uncasted for '{a,b,c}'::text[] <=  '{a,b,c}'::text[]
+ok 27 - check casted vs uncasted for '{a,b,c}'::text[] <=  '{a,c,c}'::text[]
+ok 28 - check casted vs uncasted for '{a,b,c}'::text[] <=  '{a,NULL,c}'::text[]
+ok 29 - check casted vs uncasted for '{a,b,c}'::text[] <=  '{NULL,b,c}'::text[]
+ok 30 - check casted vs uncasted for '{a,b,c}'::text[] <=  NULL::text[]
+ok 31 - check casted vs uncasted for '{a,b,c}'::text[]  =  '{a,a,c}'::text[]
+ok 32 - check casted vs uncasted for '{a,b,c}'::text[]  =  '{a,b,c}'::text[]
+ok 33 - check casted vs uncasted for '{a,b,c}'::text[]  =  '{a,c,c}'::text[]
+ok 34 - check casted vs uncasted for '{a,b,c}'::text[]  =  '{a,NULL,c}'::text[]
+ok 35 - check casted vs uncasted for '{a,b,c}'::text[]  =  '{NULL,b,c}'::text[]
+ok 36 - check casted vs uncasted for '{a,b,c}'::text[]  =  NULL::text[]
+ok 37 - check casted vs uncasted for '{a,b,c}'::text[]  >= '{a,a,c}'::text[]
+ok 38 - check casted vs uncasted for '{a,b,c}'::text[]  >= '{a,b,c}'::text[]
+ok 39 - check casted vs uncasted for '{a,b,c}'::text[]  >= '{a,c,c}'::text[]
+ok 40 - check casted vs uncasted for '{a,b,c}'::text[]  >= '{a,NULL,c}'::text[]
+ok 41 - check casted vs uncasted for '{a,b,c}'::text[]  >= '{NULL,b,c}'::text[]
+ok 42 - check casted vs uncasted for '{a,b,c}'::text[]  >= NULL::text[]
+ok 43 - check casted vs uncasted for '{a,b,c}'::text[]   > '{a,a,c}'::text[]
+ok 44 - check casted vs uncasted for '{a,b,c}'::text[]   > '{a,b,c}'::text[]
+ok 45 - check casted vs uncasted for '{a,b,c}'::text[]   > '{a,c,c}'::text[]
+ok 46 - check casted vs uncasted for '{a,b,c}'::text[]   > '{a,NULL,c}'::text[]
+ok 47 - check casted vs uncasted for '{a,b,c}'::text[]   > '{NULL,b,c}'::text[]
+ok 48 - check casted vs uncasted for '{a,b,c}'::text[]   > NULL::text[]
+ok 49 - check casted vs uncasted for '{a,b,c}'::text[] !=  '{a,a,c}'::text[]
+ok 50 - check casted vs uncasted for '{a,b,c}'::text[] !=  '{a,b,c}'::text[]
+ok 51 - check casted vs uncasted for '{a,b,c}'::text[] !=  '{a,c,c}'::text[]
+ok 52 - check casted vs uncasted for '{a,b,c}'::text[] !=  '{a,NULL,c}'::text[]
+ok 53 - check casted vs uncasted for '{a,b,c}'::text[] !=  '{NULL,b,c}'::text[]
+ok 54 - check casted vs uncasted for '{a,b,c}'::text[] !=  NULL::text[]
+ok 55 - check variant vs uncasted for '{a,b,c}'::text[] <   '{a,a,c}'::text[]
+ok 56 - check variant vs uncasted for '{a,b,c}'::text[] <   '{a,b,c}'::text[]
+ok 57 - check variant vs uncasted for '{a,b,c}'::text[] <   '{a,c,c}'::text[]
+ok 58 - check variant vs uncasted for '{a,b,c}'::text[] <   '{a,NULL,c}'::text[]
+ok 59 - check variant vs uncasted for '{a,b,c}'::text[] <   '{NULL,b,c}'::text[]
+ok 60 - check variant vs uncasted for '{a,b,c}'::text[] <   NULL::text[]
+ok 61 - check variant vs uncasted for '{a,b,c}'::text[] <=  '{a,a,c}'::text[]
+ok 62 - check variant vs uncasted for '{a,b,c}'::text[] <=  '{a,b,c}'::text[]
+ok 63 - check variant vs uncasted for '{a,b,c}'::text[] <=  '{a,c,c}'::text[]
+ok 64 - check variant vs uncasted for '{a,b,c}'::text[] <=  '{a,NULL,c}'::text[]
+ok 65 - check variant vs uncasted for '{a,b,c}'::text[] <=  '{NULL,b,c}'::text[]
+ok 66 - check variant vs uncasted for '{a,b,c}'::text[] <=  NULL::text[]
+ok 67 - check variant vs uncasted for '{a,b,c}'::text[]  =  '{a,a,c}'::text[]
+ok 68 - check variant vs uncasted for '{a,b,c}'::text[]  =  '{a,b,c}'::text[]
+ok 69 - check variant vs uncasted for '{a,b,c}'::text[]  =  '{a,c,c}'::text[]
+ok 70 - check variant vs uncasted for '{a,b,c}'::text[]  =  '{a,NULL,c}'::text[]
+ok 71 - check variant vs uncasted for '{a,b,c}'::text[]  =  '{NULL,b,c}'::text[]
+ok 72 - check variant vs uncasted for '{a,b,c}'::text[]  =  NULL::text[]
+ok 73 - check variant vs uncasted for '{a,b,c}'::text[]  >= '{a,a,c}'::text[]
+ok 74 - check variant vs uncasted for '{a,b,c}'::text[]  >= '{a,b,c}'::text[]
+ok 75 - check variant vs uncasted for '{a,b,c}'::text[]  >= '{a,c,c}'::text[]
+ok 76 - check variant vs uncasted for '{a,b,c}'::text[]  >= '{a,NULL,c}'::text[]
+ok 77 - check variant vs uncasted for '{a,b,c}'::text[]  >= '{NULL,b,c}'::text[]
+ok 78 - check variant vs uncasted for '{a,b,c}'::text[]  >= NULL::text[]
+ok 79 - check variant vs uncasted for '{a,b,c}'::text[]   > '{a,a,c}'::text[]
+ok 80 - check variant vs uncasted for '{a,b,c}'::text[]   > '{a,b,c}'::text[]
+ok 81 - check variant vs uncasted for '{a,b,c}'::text[]   > '{a,c,c}'::text[]
+ok 82 - check variant vs uncasted for '{a,b,c}'::text[]   > '{a,NULL,c}'::text[]
+ok 83 - check variant vs uncasted for '{a,b,c}'::text[]   > '{NULL,b,c}'::text[]
+ok 84 - check variant vs uncasted for '{a,b,c}'::text[]   > NULL::text[]
+ok 85 - check variant vs uncasted for '{a,b,c}'::text[] !=  '{a,a,c}'::text[]
+ok 86 - check variant vs uncasted for '{a,b,c}'::text[] !=  '{a,b,c}'::text[]
+ok 87 - check variant vs uncasted for '{a,b,c}'::text[] !=  '{a,c,c}'::text[]
+ok 88 - check variant vs uncasted for '{a,b,c}'::text[] !=  '{a,NULL,c}'::text[]
+ok 89 - check variant vs uncasted for '{a,b,c}'::text[] !=  '{NULL,b,c}'::text[]
+ok 90 - check variant vs uncasted for '{a,b,c}'::text[] !=  NULL::text[]
+ok 91 - check variant vs casted for '''{a,b,c}''::text[]' <   '''{a,a,c}''::text[]'
+ok 92 - check variant vs casted for '''{a,b,c}''::text[]' <   '''{a,b,c}''::text[]'
+ok 93 - check variant vs casted for '''{a,b,c}''::text[]' <   '''{a,c,c}''::text[]'
+ok 94 - check variant vs casted for '''{a,b,c}''::text[]' <   '''{a,NULL,c}''::text[]'
+ok 95 - check variant vs casted for '''{a,b,c}''::text[]' <   '''{NULL,b,c}''::text[]'
+ok 96 - check variant vs casted for '''{a,b,c}''::text[]' <   'NULL::text[]'
+ok 97 - check variant vs casted for '''{a,b,c}''::text[]' <=  '''{a,a,c}''::text[]'
+ok 98 - check variant vs casted for '''{a,b,c}''::text[]' <=  '''{a,b,c}''::text[]'
+ok 99 - check variant vs casted for '''{a,b,c}''::text[]' <=  '''{a,c,c}''::text[]'
+ok 100 - check variant vs casted for '''{a,b,c}''::text[]' <=  '''{a,NULL,c}''::text[]'
+ok 101 - check variant vs casted for '''{a,b,c}''::text[]' <=  '''{NULL,b,c}''::text[]'
+ok 102 - check variant vs casted for '''{a,b,c}''::text[]' <=  'NULL::text[]'
+ok 103 - check variant vs casted for '''{a,b,c}''::text[]'  =  '''{a,a,c}''::text[]'
+ok 104 - check variant vs casted for '''{a,b,c}''::text[]'  =  '''{a,b,c}''::text[]'
+ok 105 - check variant vs casted for '''{a,b,c}''::text[]'  =  '''{a,c,c}''::text[]'
+ok 106 - check variant vs casted for '''{a,b,c}''::text[]'  =  '''{a,NULL,c}''::text[]'
+ok 107 - check variant vs casted for '''{a,b,c}''::text[]'  =  '''{NULL,b,c}''::text[]'
+ok 108 - check variant vs casted for '''{a,b,c}''::text[]'  =  'NULL::text[]'
+ok 109 - check variant vs casted for '''{a,b,c}''::text[]'  >= '''{a,a,c}''::text[]'
+ok 110 - check variant vs casted for '''{a,b,c}''::text[]'  >= '''{a,b,c}''::text[]'
+ok 111 - check variant vs casted for '''{a,b,c}''::text[]'  >= '''{a,c,c}''::text[]'
+ok 112 - check variant vs casted for '''{a,b,c}''::text[]'  >= '''{a,NULL,c}''::text[]'
+ok 113 - check variant vs casted for '''{a,b,c}''::text[]'  >= '''{NULL,b,c}''::text[]'
+ok 114 - check variant vs casted for '''{a,b,c}''::text[]'  >= 'NULL::text[]'
+ok 115 - check variant vs casted for '''{a,b,c}''::text[]'   > '''{a,a,c}''::text[]'
+ok 116 - check variant vs casted for '''{a,b,c}''::text[]'   > '''{a,b,c}''::text[]'
+ok 117 - check variant vs casted for '''{a,b,c}''::text[]'   > '''{a,c,c}''::text[]'
+ok 118 - check variant vs casted for '''{a,b,c}''::text[]'   > '''{a,NULL,c}''::text[]'
+ok 119 - check variant vs casted for '''{a,b,c}''::text[]'   > '''{NULL,b,c}''::text[]'
+ok 120 - check variant vs casted for '''{a,b,c}''::text[]'   > 'NULL::text[]'
+ok 121 - check variant vs casted for '''{a,b,c}''::text[]' !=  '''{a,a,c}''::text[]'
+ok 122 - check variant vs casted for '''{a,b,c}''::text[]' !=  '''{a,b,c}''::text[]'
+ok 123 - check variant vs casted for '''{a,b,c}''::text[]' !=  '''{a,c,c}''::text[]'
+ok 124 - check variant vs casted for '''{a,b,c}''::text[]' !=  '''{a,NULL,c}''::text[]'
+ok 125 - check variant vs casted for '''{a,b,c}''::text[]' !=  '''{NULL,b,c}''::text[]'
+ok 126 - check variant vs casted for '''{a,b,c}''::text[]' !=  'NULL::text[]'
