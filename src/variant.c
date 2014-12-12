@@ -167,7 +167,7 @@ variant_cast_out(PG_FUNCTION_ARGS)
 		bool						isnull;
 		MemoryContext		cctx = CurrentMemoryContext;
 		HeapTuple				tup;
-		StringInfoData	cmdd;
+		StringInfo			cmdd;
 		StringInfo			cmd = &cmdd;
 		char						*nulls = " ";
 
@@ -273,11 +273,18 @@ PG_FUNCTION_INFO_V1(variant_typmod_out);
 Datum
 variant_typmod_out(PG_FUNCTION_ARGS)
 {
+	StringInfoData	strd;
+	StringInfo			str = &strd;
+
 	Assert(fcinfo->flinfo->fn_strict); /* Must be strict */
 
 	/* TODO: cache this stuff */
+	initStringInfo(str);
+	appendStringInfoChar(str, '(');
+	appendStringInfoString(str, variant_get_variant_name(PG_GETARG_INT32(0)));
+	appendStringInfoChar(str, ')');
 
-	PG_RETURN_CSTRING(variant_get_variant_name(PG_GETARG_INT32(0)));
+	PG_RETURN_CSTRING(str->data);
 }
 
 
