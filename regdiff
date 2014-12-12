@@ -1,0 +1,1 @@
+egrep -v '^([ !] (ok |1\.\.)| *$)' regression.diffs
