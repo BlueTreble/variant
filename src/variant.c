@@ -273,18 +273,48 @@ PG_FUNCTION_INFO_V1(variant_typmod_out);
 Datum
 variant_typmod_out(PG_FUNCTION_ARGS)
 {
-	StringInfoData	strd;
-	StringInfo			str = &strd;
+	StringInfoData	outd;
+	StringInfo			out = &outd;
+	char						*variant_name;
+	bool						need_quote;
+	char						*tmp;
 
 	Assert(fcinfo->flinfo->fn_strict); /* Must be strict */
+	variant_name = variant_get_variant_name(PG_GETARG_INT32(0));
 
 	/* TODO: cache this stuff */
-	initStringInfo(str);
-	appendStringInfoChar(str, '(');
-	appendStringInfoString(str, variant_get_variant_name(PG_GETARG_INT32(0)));
-	appendStringInfoChar(str, ')');
+	initStringInfo(out);
+	appendStringInfoChar(out, '(');
+	need_quote = false;
+	for (tmp = variant_name; *tmp; tmp++)
+	{
+		char		ch = *tmp;
 
-	PG_RETURN_CSTRING(str->data);
+		if (ch == '"' || ch == '(' || ch == ')' || ch == ',' ||
+			isspace((unsigned char) ch))
+		{
+			need_quote = true;
+			break;
+		}
+	}
+	if(!need_quote)
+		appendStringInfoString(out, variant_name);
+	else
+	{
+		appendStringInfoChar(out, '"');
+		for (tmp = variant_name; *tmp; tmp++)
+		{
+			char		ch = *tmp;
+
+			if (ch == '"')
+				appendStringInfoCharMacro(out, ch);
+			appendStringInfoCharMacro(out, ch);
+		}
+		appendStringInfoChar(out, '"');
+	}
+	appendStringInfoChar(out, ')');
+
+	PG_RETURN_CSTRING(out->data);
 }
 
 

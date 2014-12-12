@@ -1,7 +1,7 @@
 \set ECHO 0
 
 
-1..20
+1..27
 ok 1 - cast to text
 ok 2 - Check equality
 ok 3 - Check NULL
@@ -11,14 +11,21 @@ ok 6 - variant.text_out()
 ok 7 - valid variant(DEFAULT)
 ok 8 - Register variant
 ok 9 - registration test variant correctly added
-ok 10 - _variant.registered( text )
-ok 11 - _variant.registered( int )
-ok 12 - threw 22023: Invalid variant type bullshit registered test variant that should never actually exist
-ok 13 - threw 22023: Invalid variant type <>
-ok 14 - threw 22023: Invalid typmod -2
-ok 15 - threw 22023: Invalid typmod <>
-ok 16 - (int,)::int = NULL
-ok 17 - (int,1)::int != NULL
-ok 18 - (int,)::int = NULL is NULL
-ok 19 - (int,1)::int != NULL is NULL
-ok 20 - Verify we are testing all storage options
+ok 10 - Check format_type() output
+ok 11 - _variant.registered( text )
+ok 12 - _variant.registered( int )
+ok 13 - threw 22023: Invalid variant type bullshit registered test variant that should never actually exist
+ok 14 - threw 22023: Invalid variant type <>
+ok 15 - threw 22023: Invalid typmod -2
+ok 16 - threw 22023: Invalid typmod <>
+ok 17 - test valid variant names
+ok 18 - threw 42601
+ok 19 - test variant name (
+ok 20 - test variant name )
+ok 21 - test variant name "
+ok 22 - test variant name 99999
+ok 23 - (int,)::int = NULL
+ok 24 - (int,1)::int != NULL
+ok 25 - (int,)::int = NULL is NULL
+ok 26 - (int,1)::int != NULL is NULL
+ok 27 - Verify we are testing all storage options

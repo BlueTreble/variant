@@ -291,10 +291,15 @@ CREATE OR REPLACE FUNCTION variant.register(
 ) RETURNS _variant._registered.variant_typmod%TYPE
 LANGUAGE plpgsql AS $func$
 DECLARE
+  c_test_table CONSTANT text := 'test_ability_to_create_table_with_just_registered_variant';
+  v_formatted_type text;
   ret _variant._registered.variant_typmod%TYPE;
 BEGIN
   IF p_variant_name IS NULL THEN
     RAISE EXCEPTION 'variant_name may not be NULL';
+  END IF;
+  IF p_variant_name = '' THEN
+    RAISE EXCEPTION 'variant_name may not be an empty string';
   END IF;
 
   INSERT INTO _variant._registered( variant_name )
@@ -302,6 +307,27 @@ BEGIN
     RETURNING variant_typmod
     INTO ret
   ;
+  v_formatted_type := pg_catalog.format_type( 'variant.variant'::regtype, ret );
+
+  -- This ensures that the user can actually use the variant that they're registering
+  BEGIN
+    PERFORM _variant.exec(format(
+        $$CREATE TEMP TABLE %I(v %s)$$
+        , c_test_table
+        , v_formatted_type
+    ));
+  EXCEPTION
+    WHEN syntax_error THEN
+      RAISE EXCEPTION '% is not a valid name for a variant', p_variant_name
+        USING ERRCODE = 'syntax_error'
+          , HINT = 'variant names must be valid type modifiers: string literals or numbers'
+          , DETAIL = 'formatted type output: ' || coalesce(v_formatted_type, '<>')
+      ;
+  END;
+  PERFORM _variant.exec(format(
+      $$DROP TABLE %I$$
+      , c_test_table
+  ));
 
   RETURN ret;
 END
