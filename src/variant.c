@@ -167,7 +167,7 @@ variant_cast_out(PG_FUNCTION_ARGS)
 		bool						isnull;
 		MemoryContext		cctx = CurrentMemoryContext;
 		HeapTuple				tup;
-		StringInfo			cmdd;
+		StringInfoData	cmdd;
 		StringInfo			cmd = &cmdd;
 		char						*nulls = " ";
 
@@ -504,7 +504,8 @@ variant_out_int(FunctionCallInfo fcinfo, Variant input)
 	bool					need_quote;
 	char					*tmp;
 	char					*org_cstring;
-	StringInfoData	out;
+	StringInfoData	outd;
+	StringInfo		out = &outd;
 	VariantInt		vi;
 
 	Assert(fcinfo->flinfo->fn_strict); /* Must be strict */
@@ -514,7 +515,9 @@ variant_out_int(FunctionCallInfo fcinfo, Variant input)
 	Assert(cache->formatted_name);
 
 	/* Start building string */
-	initStringInfo(&out);
+	initStringInfo(out);
+	appendStringInfoChar(out, '(');
+
 	need_quote = false;
 	for (tmp = cache->formatted_name; *tmp; tmp++)
 	{
@@ -529,22 +532,21 @@ variant_out_int(FunctionCallInfo fcinfo, Variant input)
 		}
 	}
 	if(!need_quote)
-		appendStringInfo(&out, "(%s", cache->formatted_name);
+		appendStringInfoString(out, cache->formatted_name);
 	else
 	{
-		appendStringInfoChar(&out, '(');
-		appendStringInfoChar(&out, '"');
+		appendStringInfoChar(out, '"');
 		for (tmp = cache->formatted_name; *tmp; tmp++)
 		{
 			char		ch = *tmp;
 
 			if (ch == '"' || ch == '\\')
-				appendStringInfoCharMacro(&out, ch);
-			appendStringInfoCharMacro(&out, ch);
+				appendStringInfoCharMacro(out, ch);
+			appendStringInfoCharMacro(out, ch);
 		}
-		appendStringInfoChar(&out, '"');
+		appendStringInfoChar(out, '"');
 	}
-	appendStringInfoChar(&out, ',');
+	appendStringInfoChar(out, ',');
 
 	if(!vi->isnull)
 	{
@@ -573,25 +575,25 @@ variant_out_int(FunctionCallInfo fcinfo, Variant input)
 		}
 
 		if (!need_quote)
-			appendStringInfoString(&out, org_cstring);
+			appendStringInfoString(out, org_cstring);
 		else
 		{
-			appendStringInfoChar(&out, '"');
+			appendStringInfoChar(out, '"');
 			for (tmp = org_cstring; *tmp; tmp++)
 			{
 				char		ch = *tmp;
 
 				if (ch == '"' || ch == '\\')
-					appendStringInfoCharMacro(&out, ch);
-				appendStringInfoCharMacro(&out, ch);
+					appendStringInfoCharMacro(out, ch);
+				appendStringInfoCharMacro(out, ch);
 			}
-			appendStringInfoChar(&out, '"');
+			appendStringInfoChar(out, '"');
 		}
 	}
 
-	appendStringInfoChar(&out, ')');
+	appendStringInfoChar(out, ')');
 
-	return out.data;
+	return out->data;
 }
 
 /*
@@ -819,7 +821,7 @@ make_variant_int(Variant v, FunctionCallInfo fcinfo, IOFuncSelector func)
 	{
 		if(vi->isnull)
 		{
-			vi->data = NULL;
+			vi->data = (Datum) 0;
 			return vi;
 		}
 
