@@ -4,13 +4,13 @@ variant
 variant is a Postgres datatype that can hold data from any other type, as well
 as remembering what the original type was. For example:
 
-    SELECT '(text,some text)'::variant.variant;
+    SELECT 'some text'::text::variant.variant;
           variant       
     --------------------
      (text,"some text")
     (1 row)
 
-    SELECT '(int,42)'::variant.variant;
+    SELECT 42::int::variant.variant;
        variant    
     --------------
      (integer,42)
@@ -25,40 +25,6 @@ and then in your database:
     CREATE EXTENSION variant;
 
 See "Building" below for more details or if you run into a problem.
-
-Usage
-=====
-
-Currently, what you can do is extremely limited; you can only store and retrieve data.
-
-The input format for a variant is similar to that of a composite type of the form
-
-    ( original_type regtype, data text )
-
-where original_type is the type that the data was originally in, and data is the data itself, in it's own output format. For certain values (ie: an empty string), you must wrap the data portion in double-quotes, ie:
-
-    CAST( '(text,"")' AS variant.variant )
-
-NULLs
-=====
-
-variant has special handling for NULLs in that you can store a NULL value that is associated with a data type:
-
-    '(timestamp with time zone,)'
-
-This is *not* the same as a variant that is itself NULL.
-
-TODO
-====
-
-The next step is to handle casting to and from variant and other data types. This will make it easy to store data as a variant by simply casting to variant.
-
-Add the ability to remember exactly what types a particular variant has stored. I plan on doing this by allowing you to uniquely identify a variant when you create it, ie:
-
-    CREATE TABLE v( v variant('integer variant');
-    SELECT variant.register( 'integer variant', array[ 'smallint', 'int', 'bigint' ] );
-
-variant doesn't currently store the type modifier (ie: the 42 in varchar(42)).
 
 Building
 ========
