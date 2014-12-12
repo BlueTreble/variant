@@ -7,8 +7,8 @@
  * KEEP ALL THREE FILES IN SYNC!
  */
 
-\set test_types 'char[] char(10)[]'
-\set baseline_type char(10)[]
+\set test_types 'character[] character(10)[]'
+\set baseline_type character(10)[]
 
 \i test/helpers/_string_setup.sql
 

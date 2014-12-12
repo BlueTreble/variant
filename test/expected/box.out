@@ -3,7 +3,7 @@
 
 
 
-1..74
+1..78
 ok 1 - No NULL variants
 ok 2 - Verify result of cast '(0.5,0.5),(0,0)'::box
 ok 3 - Verify result of cast '(1,1),(0,0)'::box
@@ -14,67 +14,71 @@ ok 7 - Verify text_in(text_out()) works for (box,"(0.5,0.5),(0,0)")
 ok 8 - Verify text_in(text_out()) works for (box,"(1,1),(0,0)")
 ok 9 - Verify text_in(text_out()) works for (box,"(1,1),(-1,-1)")
 ok 10 - Verify text_in(text_out()) works for (box,)
-ok 11 - No NULL variants
-ok 12 - Verify result of cast '(1,1),(0,0)'::box
-ok 13 - SET compare_variant_b
-ok 14 - Verify text_in(text_out()) works for (box,"(1,1),(0,0)")
-ok 15 - check casted vs uncasted for '(1,1),(0,0)'::box <   '(0.5,0.5),(0,0)'::box
-ok 16 - check casted vs uncasted for '(1,1),(0,0)'::box <   '(1,1),(-1,-1)'::box
-ok 17 - check casted vs uncasted for '(1,1),(0,0)'::box <   '(1,1),(0,0)'::box
-ok 18 - check casted vs uncasted for '(1,1),(0,0)'::box <   NULL::box
-ok 19 - check casted vs uncasted for '(1,1),(0,0)'::box <=  '(0.5,0.5),(0,0)'::box
-ok 20 - check casted vs uncasted for '(1,1),(0,0)'::box <=  '(1,1),(-1,-1)'::box
-ok 21 - check casted vs uncasted for '(1,1),(0,0)'::box <=  '(1,1),(0,0)'::box
-ok 22 - check casted vs uncasted for '(1,1),(0,0)'::box <=  NULL::box
-ok 23 - check casted vs uncasted for '(1,1),(0,0)'::box  =  '(0.5,0.5),(0,0)'::box
-ok 24 - check casted vs uncasted for '(1,1),(0,0)'::box  =  '(1,1),(-1,-1)'::box
-ok 25 - check casted vs uncasted for '(1,1),(0,0)'::box  =  '(1,1),(0,0)'::box
-ok 26 - check casted vs uncasted for '(1,1),(0,0)'::box  =  NULL::box
-ok 27 - check casted vs uncasted for '(1,1),(0,0)'::box  >= '(0.5,0.5),(0,0)'::box
-ok 28 - check casted vs uncasted for '(1,1),(0,0)'::box  >= '(1,1),(-1,-1)'::box
-ok 29 - check casted vs uncasted for '(1,1),(0,0)'::box  >= '(1,1),(0,0)'::box
-ok 30 - check casted vs uncasted for '(1,1),(0,0)'::box  >= NULL::box
-ok 31 - check casted vs uncasted for '(1,1),(0,0)'::box   > '(0.5,0.5),(0,0)'::box
-ok 32 - check casted vs uncasted for '(1,1),(0,0)'::box   > '(1,1),(-1,-1)'::box
-ok 33 - check casted vs uncasted for '(1,1),(0,0)'::box   > '(1,1),(0,0)'::box
-ok 34 - check casted vs uncasted for '(1,1),(0,0)'::box   > NULL::box
-ok 35 - check variant vs uncasted for '(1,1),(0,0)'::box <   '(0.5,0.5),(0,0)'::box
-ok 36 - check variant vs uncasted for '(1,1),(0,0)'::box <   '(1,1),(-1,-1)'::box
-ok 37 - check variant vs uncasted for '(1,1),(0,0)'::box <   '(1,1),(0,0)'::box
-ok 38 - check variant vs uncasted for '(1,1),(0,0)'::box <   NULL::box
-ok 39 - check variant vs uncasted for '(1,1),(0,0)'::box <=  '(0.5,0.5),(0,0)'::box
-ok 40 - check variant vs uncasted for '(1,1),(0,0)'::box <=  '(1,1),(-1,-1)'::box
-ok 41 - check variant vs uncasted for '(1,1),(0,0)'::box <=  '(1,1),(0,0)'::box
-ok 42 - check variant vs uncasted for '(1,1),(0,0)'::box <=  NULL::box
-ok 43 - check variant vs uncasted for '(1,1),(0,0)'::box  =  '(0.5,0.5),(0,0)'::box
-ok 44 - check variant vs uncasted for '(1,1),(0,0)'::box  =  '(1,1),(-1,-1)'::box
-ok 45 - check variant vs uncasted for '(1,1),(0,0)'::box  =  '(1,1),(0,0)'::box
-ok 46 - check variant vs uncasted for '(1,1),(0,0)'::box  =  NULL::box
-ok 47 - check variant vs uncasted for '(1,1),(0,0)'::box  >= '(0.5,0.5),(0,0)'::box
-ok 48 - check variant vs uncasted for '(1,1),(0,0)'::box  >= '(1,1),(-1,-1)'::box
-ok 49 - check variant vs uncasted for '(1,1),(0,0)'::box  >= '(1,1),(0,0)'::box
-ok 50 - check variant vs uncasted for '(1,1),(0,0)'::box  >= NULL::box
-ok 51 - check variant vs uncasted for '(1,1),(0,0)'::box   > '(0.5,0.5),(0,0)'::box
-ok 52 - check variant vs uncasted for '(1,1),(0,0)'::box   > '(1,1),(-1,-1)'::box
-ok 53 - check variant vs uncasted for '(1,1),(0,0)'::box   > '(1,1),(0,0)'::box
-ok 54 - check variant vs uncasted for '(1,1),(0,0)'::box   > NULL::box
-ok 55 - check variant vs casted for '''(1,1),(0,0)''::box' <   '''(0.5,0.5),(0,0)''::box'
-ok 56 - check variant vs casted for '''(1,1),(0,0)''::box' <   '''(1,1),(-1,-1)''::box'
-ok 57 - check variant vs casted for '''(1,1),(0,0)''::box' <   '''(1,1),(0,0)''::box'
-ok 58 - check variant vs casted for '''(1,1),(0,0)''::box' <   'NULL::box'
-ok 59 - check variant vs casted for '''(1,1),(0,0)''::box' <=  '''(0.5,0.5),(0,0)''::box'
-ok 60 - check variant vs casted for '''(1,1),(0,0)''::box' <=  '''(1,1),(-1,-1)''::box'
-ok 61 - check variant vs casted for '''(1,1),(0,0)''::box' <=  '''(1,1),(0,0)''::box'
-ok 62 - check variant vs casted for '''(1,1),(0,0)''::box' <=  'NULL::box'
-ok 63 - check variant vs casted for '''(1,1),(0,0)''::box'  =  '''(0.5,0.5),(0,0)''::box'
-ok 64 - check variant vs casted for '''(1,1),(0,0)''::box'  =  '''(1,1),(-1,-1)''::box'
-ok 65 - check variant vs casted for '''(1,1),(0,0)''::box'  =  '''(1,1),(0,0)''::box'
-ok 66 - check variant vs casted for '''(1,1),(0,0)''::box'  =  'NULL::box'
-ok 67 - check variant vs casted for '''(1,1),(0,0)''::box'  >= '''(0.5,0.5),(0,0)''::box'
-ok 68 - check variant vs casted for '''(1,1),(0,0)''::box'  >= '''(1,1),(-1,-1)''::box'
-ok 69 - check variant vs casted for '''(1,1),(0,0)''::box'  >= '''(1,1),(0,0)''::box'
-ok 70 - check variant vs casted for '''(1,1),(0,0)''::box'  >= 'NULL::box'
-ok 71 - check variant vs casted for '''(1,1),(0,0)''::box'   > '''(0.5,0.5),(0,0)''::box'
-ok 72 - check variant vs casted for '''(1,1),(0,0)''::box'   > '''(1,1),(-1,-1)''::box'
-ok 73 - check variant vs casted for '''(1,1),(0,0)''::box'   > '''(1,1),(0,0)''::box'
-ok 74 - check variant vs casted for '''(1,1),(0,0)''::box'   > 'NULL::box'
+ok 11
+ok 12
+ok 13
+ok 14
+ok 15 - No NULL variants
+ok 16 - Verify result of cast '(1,1),(0,0)'::box
+ok 17 - SET compare_variant_b
+ok 18 - Verify text_in(text_out()) works for (box,"(1,1),(0,0)")
+ok 19 - check casted vs uncasted for '(1,1),(0,0)'::box <   '(0.5,0.5),(0,0)'::box
+ok 20 - check casted vs uncasted for '(1,1),(0,0)'::box <   '(1,1),(-1,-1)'::box
+ok 21 - check casted vs uncasted for '(1,1),(0,0)'::box <   '(1,1),(0,0)'::box
+ok 22 - check casted vs uncasted for '(1,1),(0,0)'::box <   NULL::box
+ok 23 - check casted vs uncasted for '(1,1),(0,0)'::box <=  '(0.5,0.5),(0,0)'::box
+ok 24 - check casted vs uncasted for '(1,1),(0,0)'::box <=  '(1,1),(-1,-1)'::box
+ok 25 - check casted vs uncasted for '(1,1),(0,0)'::box <=  '(1,1),(0,0)'::box
+ok 26 - check casted vs uncasted for '(1,1),(0,0)'::box <=  NULL::box
+ok 27 - check casted vs uncasted for '(1,1),(0,0)'::box  =  '(0.5,0.5),(0,0)'::box
+ok 28 - check casted vs uncasted for '(1,1),(0,0)'::box  =  '(1,1),(-1,-1)'::box
+ok 29 - check casted vs uncasted for '(1,1),(0,0)'::box  =  '(1,1),(0,0)'::box
+ok 30 - check casted vs uncasted for '(1,1),(0,0)'::box  =  NULL::box
+ok 31 - check casted vs uncasted for '(1,1),(0,0)'::box  >= '(0.5,0.5),(0,0)'::box
+ok 32 - check casted vs uncasted for '(1,1),(0,0)'::box  >= '(1,1),(-1,-1)'::box
+ok 33 - check casted vs uncasted for '(1,1),(0,0)'::box  >= '(1,1),(0,0)'::box
+ok 34 - check casted vs uncasted for '(1,1),(0,0)'::box  >= NULL::box
+ok 35 - check casted vs uncasted for '(1,1),(0,0)'::box   > '(0.5,0.5),(0,0)'::box
+ok 36 - check casted vs uncasted for '(1,1),(0,0)'::box   > '(1,1),(-1,-1)'::box
+ok 37 - check casted vs uncasted for '(1,1),(0,0)'::box   > '(1,1),(0,0)'::box
+ok 38 - check casted vs uncasted for '(1,1),(0,0)'::box   > NULL::box
+ok 39 - check variant vs uncasted for '(1,1),(0,0)'::box <   '(0.5,0.5),(0,0)'::box
+ok 40 - check variant vs uncasted for '(1,1),(0,0)'::box <   '(1,1),(-1,-1)'::box
+ok 41 - check variant vs uncasted for '(1,1),(0,0)'::box <   '(1,1),(0,0)'::box
+ok 42 - check variant vs uncasted for '(1,1),(0,0)'::box <   NULL::box
+ok 43 - check variant vs uncasted for '(1,1),(0,0)'::box <=  '(0.5,0.5),(0,0)'::box
+ok 44 - check variant vs uncasted for '(1,1),(0,0)'::box <=  '(1,1),(-1,-1)'::box
+ok 45 - check variant vs uncasted for '(1,1),(0,0)'::box <=  '(1,1),(0,0)'::box
+ok 46 - check variant vs uncasted for '(1,1),(0,0)'::box <=  NULL::box
+ok 47 - check variant vs uncasted for '(1,1),(0,0)'::box  =  '(0.5,0.5),(0,0)'::box
+ok 48 - check variant vs uncasted for '(1,1),(0,0)'::box  =  '(1,1),(-1,-1)'::box
+ok 49 - check variant vs uncasted for '(1,1),(0,0)'::box  =  '(1,1),(0,0)'::box
+ok 50 - check variant vs uncasted for '(1,1),(0,0)'::box  =  NULL::box
+ok 51 - check variant vs uncasted for '(1,1),(0,0)'::box  >= '(0.5,0.5),(0,0)'::box
+ok 52 - check variant vs uncasted for '(1,1),(0,0)'::box  >= '(1,1),(-1,-1)'::box
+ok 53 - check variant vs uncasted for '(1,1),(0,0)'::box  >= '(1,1),(0,0)'::box
+ok 54 - check variant vs uncasted for '(1,1),(0,0)'::box  >= NULL::box
+ok 55 - check variant vs uncasted for '(1,1),(0,0)'::box   > '(0.5,0.5),(0,0)'::box
+ok 56 - check variant vs uncasted for '(1,1),(0,0)'::box   > '(1,1),(-1,-1)'::box
+ok 57 - check variant vs uncasted for '(1,1),(0,0)'::box   > '(1,1),(0,0)'::box
+ok 58 - check variant vs uncasted for '(1,1),(0,0)'::box   > NULL::box
+ok 59 - check variant vs casted for '''(1,1),(0,0)''::box' <   '''(0.5,0.5),(0,0)''::box'
+ok 60 - check variant vs casted for '''(1,1),(0,0)''::box' <   '''(1,1),(-1,-1)''::box'
+ok 61 - check variant vs casted for '''(1,1),(0,0)''::box' <   '''(1,1),(0,0)''::box'
+ok 62 - check variant vs casted for '''(1,1),(0,0)''::box' <   'NULL::box'
+ok 63 - check variant vs casted for '''(1,1),(0,0)''::box' <=  '''(0.5,0.5),(0,0)''::box'
+ok 64 - check variant vs casted for '''(1,1),(0,0)''::box' <=  '''(1,1),(-1,-1)''::box'
+ok 65 - check variant vs casted for '''(1,1),(0,0)''::box' <=  '''(1,1),(0,0)''::box'
+ok 66 - check variant vs casted for '''(1,1),(0,0)''::box' <=  'NULL::box'
+ok 67 - check variant vs casted for '''(1,1),(0,0)''::box'  =  '''(0.5,0.5),(0,0)''::box'
+ok 68 - check variant vs casted for '''(1,1),(0,0)''::box'  =  '''(1,1),(-1,-1)''::box'
+ok 69 - check variant vs casted for '''(1,1),(0,0)''::box'  =  '''(1,1),(0,0)''::box'
+ok 70 - check variant vs casted for '''(1,1),(0,0)''::box'  =  'NULL::box'
+ok 71 - check variant vs casted for '''(1,1),(0,0)''::box'  >= '''(0.5,0.5),(0,0)''::box'
+ok 72 - check variant vs casted for '''(1,1),(0,0)''::box'  >= '''(1,1),(-1,-1)''::box'
+ok 73 - check variant vs casted for '''(1,1),(0,0)''::box'  >= '''(1,1),(0,0)''::box'
+ok 74 - check variant vs casted for '''(1,1),(0,0)''::box'  >= 'NULL::box'
+ok 75 - check variant vs casted for '''(1,1),(0,0)''::box'   > '''(0.5,0.5),(0,0)''::box'
+ok 76 - check variant vs casted for '''(1,1),(0,0)''::box'   > '''(1,1),(-1,-1)''::box'
+ok 77 - check variant vs casted for '''(1,1),(0,0)''::box'   > '''(1,1),(0,0)''::box'
+ok 78 - check variant vs casted for '''(1,1),(0,0)''::box'   > 'NULL::box'

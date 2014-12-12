@@ -67,13 +67,9 @@ RETURNS variant.variant LANGUAGE sql IMMUTABLE STRICT AS $f$
 SELECT variant.text_in( $1, -1 )
 $f$;
 
-CREATE OR REPLACE FUNCTION variant.type_text(variant.variant)
+CREATE OR REPLACE FUNCTION variant.original_type(variant.variant)
 RETURNS text LANGUAGE c IMMUTABLE STRICT
 AS '$libdir/variant', 'variant_type_out';
-CREATE OR REPLACE FUNCTION variant.type_type(variant.variant)
-RETURNS regtype LANGUAGE sql IMMUTABLE STRICT AS $f$
-SELECT variant.type_text($1)::regtype
-$f$;
 
 SELECT NULL = count(*) FROM ( -- Supress tons of blank lines
 SELECT _variant.exec( format($$

@@ -53,6 +53,7 @@ ALTER TABLE base_data
   , ADD COLUMN base__casted        :baseline_type
   , ADD COLUMN base_variant        variant.variant('test variant')
   , ADD COLUMN base_variant_b      variant.variant('test variant')
+  , ADD COLUMN formatted_type     text
 ;
 
 /*
@@ -65,7 +66,7 @@ SELECT NULL = count(*) FROM ( -- Supress tons of blank lines
 SELECT _variant.exec( format(
 -- start format string
 $fmt$INSERT INTO base_data
-  VALUES( %L, %L, %L, %s, %s, %s, NULL )$fmt$
+  VALUES( %L, %L, %L, %s, %s, %s, NULL, %L )$fmt$
 -- end format string
       , base_type
       , base_value
@@ -74,14 +75,22 @@ $fmt$INSERT INTO base_data
       , base_cast_string  -- base__casted
       , base_cast_string  -- base_variant
       -- base_variant_b set to NULL in VALUES
+      , base_type         -- formatted_type
     ) )
   FROM base_casted
 ) a;
+
+-- Be careful of the order these are in!
+UPDATE base_data SET formatted_type = replace( base_type, 'character', 'character(1)' ) WHERE base_type LIKE 'character%' AND base_type NOT LIKE '%(%)%';
+UPDATE base_data SET formatted_type = replace( base_type, 'varchar', 'character varying' ) WHERE base_type LIKE 'varchar%';
+UPDATE base_data SET formatted_type = replace( base_type, 'float', 'double precision' ) WHERE base_type LIKE 'float%';
+--SELECT base_type, formatted_type FROM base_data WHERE base_type <> formatted_type;
 
 INSERT INTO plan SELECT 1,        'Verify no records where base_variant is NULL';
 INSERT INTO plan SELECT count(*), 'Verify base data casted correctly' FROM base_data;
 INSERT INTO plan SELECT 1,        'UPDATE base_variant_b';
 INSERT INTO plan SELECT count(*), 'Verify text_in(text_out())' FROM base_data;
+INSERT INTO plan SELECT count(*), 'Verify variant.original_type())' FROM base_data;
 
 /*
  * Same as above, but for compare values

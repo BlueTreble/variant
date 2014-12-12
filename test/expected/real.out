@@ -3,7 +3,7 @@
 
 
 
-1..86
+1..90
 ok 1 - No NULL variants
 ok 2 - Verify result of cast '-1.1'::real
 ok 3 - Verify result of cast '0.1'::real
@@ -14,79 +14,83 @@ ok 7 - Verify text_in(text_out()) works for (real,-1.1)
 ok 8 - Verify text_in(text_out()) works for (real,0.1)
 ok 9 - Verify text_in(text_out()) works for (real,1.1)
 ok 10 - Verify text_in(text_out()) works for (real,)
-ok 11 - No NULL variants
-ok 12 - Verify result of cast '0.1'::real
-ok 13 - SET compare_variant_b
-ok 14 - Verify text_in(text_out()) works for (real,0.1)
-ok 15 - check casted vs uncasted for '0.1'::real <   '-1.1'::real
-ok 16 - check casted vs uncasted for '0.1'::real <   '0.1'::real
-ok 17 - check casted vs uncasted for '0.1'::real <   '1.1'::real
-ok 18 - check casted vs uncasted for '0.1'::real <   NULL::real
-ok 19 - check casted vs uncasted for '0.1'::real <=  '-1.1'::real
-ok 20 - check casted vs uncasted for '0.1'::real <=  '0.1'::real
-ok 21 - check casted vs uncasted for '0.1'::real <=  '1.1'::real
-ok 22 - check casted vs uncasted for '0.1'::real <=  NULL::real
-ok 23 - check casted vs uncasted for '0.1'::real  =  '-1.1'::real
-ok 24 - check casted vs uncasted for '0.1'::real  =  '0.1'::real
-ok 25 - check casted vs uncasted for '0.1'::real  =  '1.1'::real
-ok 26 - check casted vs uncasted for '0.1'::real  =  NULL::real
-ok 27 - check casted vs uncasted for '0.1'::real  >= '-1.1'::real
-ok 28 - check casted vs uncasted for '0.1'::real  >= '0.1'::real
-ok 29 - check casted vs uncasted for '0.1'::real  >= '1.1'::real
-ok 30 - check casted vs uncasted for '0.1'::real  >= NULL::real
-ok 31 - check casted vs uncasted for '0.1'::real   > '-1.1'::real
-ok 32 - check casted vs uncasted for '0.1'::real   > '0.1'::real
-ok 33 - check casted vs uncasted for '0.1'::real   > '1.1'::real
-ok 34 - check casted vs uncasted for '0.1'::real   > NULL::real
-ok 35 - check casted vs uncasted for '0.1'::real !=  '-1.1'::real
-ok 36 - check casted vs uncasted for '0.1'::real !=  '0.1'::real
-ok 37 - check casted vs uncasted for '0.1'::real !=  '1.1'::real
-ok 38 - check casted vs uncasted for '0.1'::real !=  NULL::real
-ok 39 - check variant vs uncasted for '0.1'::real <   '-1.1'::real
-ok 40 - check variant vs uncasted for '0.1'::real <   '0.1'::real
-ok 41 - check variant vs uncasted for '0.1'::real <   '1.1'::real
-ok 42 - check variant vs uncasted for '0.1'::real <   NULL::real
-ok 43 - check variant vs uncasted for '0.1'::real <=  '-1.1'::real
-ok 44 - check variant vs uncasted for '0.1'::real <=  '0.1'::real
-ok 45 - check variant vs uncasted for '0.1'::real <=  '1.1'::real
-ok 46 - check variant vs uncasted for '0.1'::real <=  NULL::real
-ok 47 - check variant vs uncasted for '0.1'::real  =  '-1.1'::real
-ok 48 - check variant vs uncasted for '0.1'::real  =  '0.1'::real
-ok 49 - check variant vs uncasted for '0.1'::real  =  '1.1'::real
-ok 50 - check variant vs uncasted for '0.1'::real  =  NULL::real
-ok 51 - check variant vs uncasted for '0.1'::real  >= '-1.1'::real
-ok 52 - check variant vs uncasted for '0.1'::real  >= '0.1'::real
-ok 53 - check variant vs uncasted for '0.1'::real  >= '1.1'::real
-ok 54 - check variant vs uncasted for '0.1'::real  >= NULL::real
-ok 55 - check variant vs uncasted for '0.1'::real   > '-1.1'::real
-ok 56 - check variant vs uncasted for '0.1'::real   > '0.1'::real
-ok 57 - check variant vs uncasted for '0.1'::real   > '1.1'::real
-ok 58 - check variant vs uncasted for '0.1'::real   > NULL::real
-ok 59 - check variant vs uncasted for '0.1'::real !=  '-1.1'::real
-ok 60 - check variant vs uncasted for '0.1'::real !=  '0.1'::real
-ok 61 - check variant vs uncasted for '0.1'::real !=  '1.1'::real
-ok 62 - check variant vs uncasted for '0.1'::real !=  NULL::real
-ok 63 - check variant vs casted for '''0.1''::real' <   '''-1.1''::real'
-ok 64 - check variant vs casted for '''0.1''::real' <   '''0.1''::real'
-ok 65 - check variant vs casted for '''0.1''::real' <   '''1.1''::real'
-ok 66 - check variant vs casted for '''0.1''::real' <   'NULL::real'
-ok 67 - check variant vs casted for '''0.1''::real' <=  '''-1.1''::real'
-ok 68 - check variant vs casted for '''0.1''::real' <=  '''0.1''::real'
-ok 69 - check variant vs casted for '''0.1''::real' <=  '''1.1''::real'
-ok 70 - check variant vs casted for '''0.1''::real' <=  'NULL::real'
-ok 71 - check variant vs casted for '''0.1''::real'  =  '''-1.1''::real'
-ok 72 - check variant vs casted for '''0.1''::real'  =  '''0.1''::real'
-ok 73 - check variant vs casted for '''0.1''::real'  =  '''1.1''::real'
-ok 74 - check variant vs casted for '''0.1''::real'  =  'NULL::real'
-ok 75 - check variant vs casted for '''0.1''::real'  >= '''-1.1''::real'
-ok 76 - check variant vs casted for '''0.1''::real'  >= '''0.1''::real'
-ok 77 - check variant vs casted for '''0.1''::real'  >= '''1.1''::real'
-ok 78 - check variant vs casted for '''0.1''::real'  >= 'NULL::real'
-ok 79 - check variant vs casted for '''0.1''::real'   > '''-1.1''::real'
-ok 80 - check variant vs casted for '''0.1''::real'   > '''0.1''::real'
-ok 81 - check variant vs casted for '''0.1''::real'   > '''1.1''::real'
-ok 82 - check variant vs casted for '''0.1''::real'   > 'NULL::real'
-ok 83 - check variant vs casted for '''0.1''::real' !=  '''-1.1''::real'
-ok 84 - check variant vs casted for '''0.1''::real' !=  '''0.1''::real'
-ok 85 - check variant vs casted for '''0.1''::real' !=  '''1.1''::real'
-ok 86 - check variant vs casted for '''0.1''::real' !=  'NULL::real'
+ok 11
+ok 12
+ok 13
+ok 14
+ok 15 - No NULL variants
+ok 16 - Verify result of cast '0.1'::real
+ok 17 - SET compare_variant_b
+ok 18 - Verify text_in(text_out()) works for (real,0.1)
+ok 19 - check casted vs uncasted for '0.1'::real <   '-1.1'::real
+ok 20 - check casted vs uncasted for '0.1'::real <   '0.1'::real
+ok 21 - check casted vs uncasted for '0.1'::real <   '1.1'::real
+ok 22 - check casted vs uncasted for '0.1'::real <   NULL::real
+ok 23 - check casted vs uncasted for '0.1'::real <=  '-1.1'::real
+ok 24 - check casted vs uncasted for '0.1'::real <=  '0.1'::real
+ok 25 - check casted vs uncasted for '0.1'::real <=  '1.1'::real
+ok 26 - check casted vs uncasted for '0.1'::real <=  NULL::real
+ok 27 - check casted vs uncasted for '0.1'::real  =  '-1.1'::real
+ok 28 - check casted vs uncasted for '0.1'::real  =  '0.1'::real
+ok 29 - check casted vs uncasted for '0.1'::real  =  '1.1'::real
+ok 30 - check casted vs uncasted for '0.1'::real  =  NULL::real
+ok 31 - check casted vs uncasted for '0.1'::real  >= '-1.1'::real
+ok 32 - check casted vs uncasted for '0.1'::real  >= '0.1'::real
+ok 33 - check casted vs uncasted for '0.1'::real  >= '1.1'::real
+ok 34 - check casted vs uncasted for '0.1'::real  >= NULL::real
+ok 35 - check casted vs uncasted for '0.1'::real   > '-1.1'::real
+ok 36 - check casted vs uncasted for '0.1'::real   > '0.1'::real
+ok 37 - check casted vs uncasted for '0.1'::real   > '1.1'::real
+ok 38 - check casted vs uncasted for '0.1'::real   > NULL::real
+ok 39 - check casted vs uncasted for '0.1'::real !=  '-1.1'::real
+ok 40 - check casted vs uncasted for '0.1'::real !=  '0.1'::real
+ok 41 - check casted vs uncasted for '0.1'::real !=  '1.1'::real
+ok 42 - check casted vs uncasted for '0.1'::real !=  NULL::real
+ok 43 - check variant vs uncasted for '0.1'::real <   '-1.1'::real
+ok 44 - check variant vs uncasted for '0.1'::real <   '0.1'::real
+ok 45 - check variant vs uncasted for '0.1'::real <   '1.1'::real
+ok 46 - check variant vs uncasted for '0.1'::real <   NULL::real
+ok 47 - check variant vs uncasted for '0.1'::real <=  '-1.1'::real
+ok 48 - check variant vs uncasted for '0.1'::real <=  '0.1'::real
+ok 49 - check variant vs uncasted for '0.1'::real <=  '1.1'::real
+ok 50 - check variant vs uncasted for '0.1'::real <=  NULL::real
+ok 51 - check variant vs uncasted for '0.1'::real  =  '-1.1'::real
+ok 52 - check variant vs uncasted for '0.1'::real  =  '0.1'::real
+ok 53 - check variant vs uncasted for '0.1'::real  =  '1.1'::real
+ok 54 - check variant vs uncasted for '0.1'::real  =  NULL::real
+ok 55 - check variant vs uncasted for '0.1'::real  >= '-1.1'::real
+ok 56 - check variant vs uncasted for '0.1'::real  >= '0.1'::real
+ok 57 - check variant vs uncasted for '0.1'::real  >= '1.1'::real
+ok 58 - check variant vs uncasted for '0.1'::real  >= NULL::real
+ok 59 - check variant vs uncasted for '0.1'::real   > '-1.1'::real
+ok 60 - check variant vs uncasted for '0.1'::real   > '0.1'::real
+ok 61 - check variant vs uncasted for '0.1'::real   > '1.1'::real
+ok 62 - check variant vs uncasted for '0.1'::real   > NULL::real
+ok 63 - check variant vs uncasted for '0.1'::real !=  '-1.1'::real
+ok 64 - check variant vs uncasted for '0.1'::real !=  '0.1'::real
+ok 65 - check variant vs uncasted for '0.1'::real !=  '1.1'::real
+ok 66 - check variant vs uncasted for '0.1'::real !=  NULL::real
+ok 67 - check variant vs casted for '''0.1''::real' <   '''-1.1''::real'
+ok 68 - check variant vs casted for '''0.1''::real' <   '''0.1''::real'
+ok 69 - check variant vs casted for '''0.1''::real' <   '''1.1''::real'
+ok 70 - check variant vs casted for '''0.1''::real' <   'NULL::real'
+ok 71 - check variant vs casted for '''0.1''::real' <=  '''-1.1''::real'
+ok 72 - check variant vs casted for '''0.1''::real' <=  '''0.1''::real'
+ok 73 - check variant vs casted for '''0.1''::real' <=  '''1.1''::real'
+ok 74 - check variant vs casted for '''0.1''::real' <=  'NULL::real'
+ok 75 - check variant vs casted for '''0.1''::real'  =  '''-1.1''::real'
+ok 76 - check variant vs casted for '''0.1''::real'  =  '''0.1''::real'
+ok 77 - check variant vs casted for '''0.1''::real'  =  '''1.1''::real'
+ok 78 - check variant vs casted for '''0.1''::real'  =  'NULL::real'
+ok 79 - check variant vs casted for '''0.1''::real'  >= '''-1.1''::real'
+ok 80 - check variant vs casted for '''0.1''::real'  >= '''0.1''::real'
+ok 81 - check variant vs casted for '''0.1''::real'  >= '''1.1''::real'
+ok 82 - check variant vs casted for '''0.1''::real'  >= 'NULL::real'
+ok 83 - check variant vs casted for '''0.1''::real'   > '''-1.1''::real'
+ok 84 - check variant vs casted for '''0.1''::real'   > '''0.1''::real'
+ok 85 - check variant vs casted for '''0.1''::real'   > '''1.1''::real'
+ok 86 - check variant vs casted for '''0.1''::real'   > 'NULL::real'
+ok 87 - check variant vs casted for '''0.1''::real' !=  '''-1.1''::real'
+ok 88 - check variant vs casted for '''0.1''::real' !=  '''0.1''::real'
+ok 89 - check variant vs casted for '''0.1''::real' !=  '''1.1''::real'
+ok 90 - check variant vs casted for '''0.1''::real' !=  'NULL::real'

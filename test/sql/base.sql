@@ -154,6 +154,7 @@ SELECT is( 1::int::variant.variant("test variant")::int = NULL, NULL, '(int,1)::
 * to int.
  */
 SELECT bag_eq(
+	-- Don't use type aliases here!
 	$$SELECT DISTINCT typbyval, typlen FROM pg_type WHERE typname = ANY( string_to_array( 'int2 int4 int8 float real numeric text macaddr char', ' ' ) )$$
 	, $$SELECT DISTINCT typbyval, typlen FROM pg_type WHERE (typlen <= 8 OR typlen % 4 != 0) AND typname NOT IN( 'cstring', 'unknown' )$$
 	, 'Verify we are testing all storage options'

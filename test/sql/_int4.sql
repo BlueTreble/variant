@@ -7,8 +7,8 @@
 
 \set baseline_type numeric[]
 -- Space separated string
-\set test_types 'int2[] int4[] int8[] float[] real[] numeric[]'
-\set test_types 'int4[]'
+\set test_types 'smallint[] integer[] bigint[] float[] real[] numeric[]'
+\set test_types 'integer[]'
 -- Used in array[ :base_values ]
 \set base_values '$${-1,-1,1}$$, $${-1,0,1}$$, $${-1,1,1}$$, $${NULL,-1,1}$$, $${NULL,0,1}$$, $${NULL,1,1}$$, $${-1,NULL,1}$$, NULL'
 \set compare_value '{-1,0,1}'

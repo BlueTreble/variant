@@ -9,7 +9,7 @@
 
 \set baseline_type text
 -- Space separated string
-\set test_types '"char" char char(10) varchar varchar(10) text'
+\set test_types '"char" character character(10) varchar varchar(10) text'
 -- Used in array[ :base_values ]
 \set base_values '$$a$$, $$b$$, $$c$$, NULL'
 \set compare_value b

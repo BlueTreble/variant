@@ -22,6 +22,7 @@ Overall plan:
 
 6: Verify variant_b = variant_a
 
+7: Verify variant.type works
 */
 
 -- By this point, steps 1, 2 and 4 are done.
@@ -39,6 +40,14 @@ SELECT lives_ok(
 
 -- Step 6
 SELECT is( base_variant_b, base_variant, 'Verify text_in(text_out()) works for ' || variant.text_out(base_variant) ) FROM base_data;
+
+-- Step 7
+SELECT is(
+    variant.original_type(base_variant)
+    , formatted_type
+  )
+  FROM base_data
+;
 
 
 /*
