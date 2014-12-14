@@ -275,6 +275,7 @@ CREATE TABLE _variant._registered(
       CONSTRAINT variant_typemod_minimum_value CHECK( variant_typmod >= -1 )
   , variant_name    varchar(100)  NOT NULL
   , variant_enabled boolean       NOT NULL DEFAULT true
+  , allowed_types   regtype[]
 );
 CREATE UNIQUE INDEX _registered_u_lcase_variant_name ON _variant._registered( lower( variant_name ) );
 
@@ -284,6 +285,7 @@ CREATE VIEW variant.registered AS SELECT * FROM _variant._registered;
 
 CREATE OR REPLACE FUNCTION variant.register(
   p_variant_name _variant._registered.variant_name%TYPE
+  , p_allowed_types _variant._registered.allowed_types%TYPE DEFAULT NULL
 ) RETURNS _variant._registered.variant_typmod%TYPE
 LANGUAGE plpgsql AS $func$
 DECLARE
@@ -298,8 +300,8 @@ BEGIN
     RAISE EXCEPTION 'variant_name may not be an empty string';
   END IF;
 
-  INSERT INTO _variant._registered( variant_name )
-    VALUES( p_variant_name )
+  INSERT INTO _variant._registered( variant_name, allowed_types )
+    VALUES( p_variant_name, p_allowed_types )
     RETURNING variant_typmod
     INTO ret
   ;
@@ -357,16 +359,26 @@ CREATE OR REPLACE FUNCTION _variant.registered__get__variant_name__enabled(
 SELECT variant_name, variant_enabled FROM _variant.registered__get( $1 )
 $f$;
 
+-- TODO: Might want a non-locking version of this that we can mark stable
 CREATE OR REPLACE FUNCTION _variant.registered__get(
   p_variant_name _variant._registered.variant_name%TYPE
-) RETURNS _variant._registered LANGUAGE plpgsql STABLE AS $f$
+  , p_lock boolean DEFAULT false
+) RETURNS _variant._registered LANGUAGE plpgsql AS $f$
 DECLARE
   r_variant _variant._registered%ROWTYPE;
 BEGIN
-  SELECT * INTO STRICT r_variant
-      FROM _variant._registered
-      WHERE lower( variant_name ) = lower( p_variant_name )
-  ;
+  IF p_lock THEN
+    SELECT * INTO STRICT r_variant
+        FROM _variant._registered
+        WHERE lower( variant_name ) = lower( p_variant_name )
+        FOR UPDATE
+    ;
+  ELSE
+    SELECT * INTO STRICT r_variant
+        FROM _variant._registered
+        WHERE lower( variant_name ) = lower( p_variant_name )
+    ;
+  END IF;
   RETURN r_variant;
 
   EXCEPTION
@@ -376,6 +388,7 @@ BEGIN
       ;
 END
 $f$;
+
 CREATE OR REPLACE FUNCTION _variant.registered__get__typmod(
   _variant._registered.variant_name%TYPE
 ) RETURNS _variant._registered.variant_typmod%TYPE LANGUAGE sql STABLE AS $f$
@@ -385,6 +398,49 @@ $f$;
 CREATE OR REPLACE FUNCTION variant.text_in(text, text)
 RETURNS variant.variant LANGUAGE sql IMMUTABLE STRICT AS $f$
 SELECT variant.text_in( $1, _variant.registered__get__typmod($2) )
+$f$;
+
+CREATE OR REPLACE FUNCTION variant.allowed_types(
+  p_variant_name _variant._registered.variant_name%TYPE
+) RETURNS TABLE(allowed_type regtype) LANGUAGE sql STABLE AS $f$
+  SELECT *
+    FROM unnest(
+        ( SELECT allowed_types FROM _variant.registered__get( p_variant_name ) )
+      ) t(t)
+    ORDER BY t::text
+  ;
+$f$;
+
+CREATE OR REPLACE FUNCTION variant.add_types(
+  p_variant_name _variant._registered.variant_name%TYPE
+  , p_allowed_types _variant._registered.allowed_types%TYPE
+) RETURNS TABLE(allowed_type regtype)
+LANGUAGE plpgsql AS $f$
+DECLARE
+  v_new_allowed _variant._registered.allowed_types%TYPE;
+  v_current record;
+BEGIN
+  -- Lock this record when we get it
+  v_current := _variant.registered__get( p_variant_name, true );
+
+  UPDATE _variant._registered
+    -- It seems worthwhile to keep stuff unique
+    SET allowed_types = array(
+        SELECT * FROM unnest( v_current.allowed_types )
+        UNION ALL
+        SELECT * FROM unnest( p_allowed_types )
+      )
+    WHERE variant_typmod = v_current.variant_typmod
+    RETURNING allowed_types INTO v_new_allowed
+  ;
+  RETURN QUERY SELECT t FROM unnest(v_new_allowed) t(t) ORDER BY t::text;
+END
+$f$;
+CREATE OR REPLACE FUNCTION variant.add_type(
+  p_variant_name _variant._registered.variant_name%TYPE
+  , p_type text
+) RETURNS TABLE(allowed_type regtype) LANGUAGE sql AS $f$
+  SELECT * FROM variant.add_types($1,array[ $2::regtype ])
 $f$;
 
 -- vi: expandtab sw=2 ts=2

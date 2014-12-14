@@ -13,6 +13,7 @@ SELECT plan( (
 	+2 -- text in/out
 	+4 -- register
 	+6 -- register__get*
+	+4 -- allowed types
 	+2 -- typmod tests
 	+ (SELECT count(*) FROM typmod_chars)
 	+4 -- NULL
@@ -56,13 +57,16 @@ SELECT is(
  */
 SELECT row_eq(
 	'SELECT * FROM variant.registered WHERE variant_typmod = -1'
-	, ROW( -1, 'DEFAULT', false )::variant.registered
+	, ROW( -1, 'DEFAULT', false, NULL::regtype[] )::variant.registered
 	, 'valid variant(DEFAULT)'
 );
+
+-- type_name is intentionally text because we want our output ordered by text, not OID
+CREATE TEMP TABLE atypes AS SELECT t::text AS type_name FROM unnest( '{int4,int2}'::regtype[] ) t;
 SELECT lives_ok(
 	$test$CREATE TEMP TABLE test_typmod AS
-				SELECT *, ' registration "TEST" (,/) variant '::text AS variant_name, true AS variant_enabled
-					FROM variant.register( ' registration "TEST" (,/) variant ' ) AS r(variant_typmod)
+				SELECT *, ' registration "TEST" (,/) variant '::text AS variant_name, true AS variant_enabled, '{int4,int2}'::regtype[]
+					FROM variant.register( ' registration "TEST" (,/) variant ', array(SELECT type_name::regtype FROM atypes) ) AS r(variant_typmod)
 	$test$
 	, 'Register variant'
 );
@@ -79,7 +83,6 @@ SELECT is(
 		)
 	FROM test_typmod
 ;
-
 
 /*
  * _variant.registered__get
@@ -113,6 +116,34 @@ SELECT throws_ok(
 	$$SELECT * FROM _variant.registered__get( NULL::int )$$
 	, '22023'
 	, 'Invalid typmod <>'
+);
+
+/*
+ * Allowed types
+ *
+ * Note: if you move this before the _variant.registered__get testing you'll break that stuff
+ */
+SELECT results_eq(
+	$$SELECT * FROM variant.allowed_types((SELECT variant_name FROM test_typmod))$$
+	, $$SELECT * FROM atypes ORDER BY 1$$
+	, 'Verify current allowed types'
+);
+INSERT INTO atypes VALUES('box');
+SELECT results_eq(
+	$$SELECT * FROM variant.add_type( (SELECT variant_name FROM test_typmod), 'box' )$$
+	, $$SELECT * FROM atypes ORDER BY 1$$
+	, 'test variant.add_type'
+);
+INSERT INTO atypes VALUES ('boolean'), ('point');
+SELECT results_eq(
+	$$SELECT * FROM variant.add_types( (SELECT variant_name FROM test_typmod), '{point,boolean}' )$$
+	, $$SELECT * FROM atypes ORDER BY 1$$
+	, 'test variant.add_types'
+);
+SELECT results_eq(
+	$$SELECT * FROM variant.allowed_types( (SELECT variant_name FROM test_typmod) )$$
+	, $$SELECT * FROM atypes ORDER BY 1$$
+	, 'Verify newly added types'
 );
 
 /*
@@ -155,7 +186,11 @@ SELECT is( 1::int::variant.variant("test variant")::int = NULL, NULL, '(int,1)::
  */
 SELECT bag_eq(
 	-- Don't use type aliases here!
-	$$SELECT DISTINCT typbyval, typlen FROM pg_type WHERE typname = ANY( string_to_array( 'int2 int4 int8 float real numeric text macaddr char', ' ' ) )$$
+	$$SELECT DISTINCT typbyval, typlen
+		FROM pg_type
+		WHERE (typlen <= 8 OR typlen % 4 != 0)
+			AND oid = ANY( array( SELECT * FROM variant.allowed_types('test variant') ) )
+	$$
 	, $$SELECT DISTINCT typbyval, typlen FROM pg_type WHERE (typlen <= 8 OR typlen % 4 != 0) AND typname NOT IN( 'cstring', 'unknown' )$$
 	, 'Verify we are testing all storage options'
 );

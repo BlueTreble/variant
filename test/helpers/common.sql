@@ -1,6 +1,19 @@
 \i sql/variant.sql
 
-CREATE TEMP TABLE test_variant_typmod AS SELECT * FROM variant.register( 'test variant' ) AS r(variant_typmod);
+CREATE TEMP TABLE test_variant_typmod AS
+    SELECT *
+        FROM variant.register( 'test variant', '{int2,int4,int8,real,float,numeric,char,"\"char\"",varchar,text,box,macaddr}' ) AS r(variant_typmod)
+;
+-- Add array variations on all the types we added
+-- Be easier to use lives_ok, but we need this stuff in place before we call plan()
+SELECT CASE WHEN count(*) > 1 THEN 'ok 1..0' ELSE 'FAIL' END
+    FROM variant.add_types( 'test variant'
+        , array( SELECT (type_name || '[]')::regtype
+                    FROM variant.allowed_types( 'test variant' ) AS t(type_name)
+                    WHERE type_name != ALL( '{box,macaddr}'::regtype[] )
+                )
+    )
+;
 
 CREATE OR REPLACE FUNCTION pg_temp.exec_text(
 	sql text
