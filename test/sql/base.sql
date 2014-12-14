@@ -57,7 +57,7 @@ SELECT is(
  */
 SELECT row_eq(
 	'SELECT * FROM variant.registered WHERE variant_typmod = -1'
-	, ROW( -1, 'DEFAULT', false, NULL::regtype[] )::variant.registered
+	, ROW( -1, 'DEFAULT', false, '{}'::regtype[] )::variant.registered
 	, 'valid variant(DEFAULT)'
 );
 
@@ -150,7 +150,7 @@ SELECT results_eq(
  * typmod testing
  */
 SELECT lives_ok(
-	$$SELECT variant.register(ch) FROM typmod_chars$$
+	$$SELECT variant.register(ch, '{int}') FROM typmod_chars$$
 	, 'test valid variant names'
 );
 SELECT throws_ok(

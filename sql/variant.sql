@@ -275,17 +275,17 @@ CREATE TABLE _variant._registered(
       CONSTRAINT variant_typemod_minimum_value CHECK( variant_typmod >= -1 )
   , variant_name    varchar(100)  NOT NULL
   , variant_enabled boolean       NOT NULL DEFAULT true
-  , allowed_types   regtype[]
+  , allowed_types   regtype[]     NOT NULL
 );
 CREATE UNIQUE INDEX _registered_u_lcase_variant_name ON _variant._registered( lower( variant_name ) );
 
-INSERT INTO _variant._registered VALUES( -1, 'DEFAULT', false );
+INSERT INTO _variant._registered VALUES( -1, 'DEFAULT', false, '{}' );
 
 CREATE VIEW variant.registered AS SELECT * FROM _variant._registered;
 
 CREATE OR REPLACE FUNCTION variant.register(
   p_variant_name _variant._registered.variant_name%TYPE
-  , p_allowed_types _variant._registered.allowed_types%TYPE DEFAULT NULL
+  , p_allowed_types _variant._registered.allowed_types%TYPE
 ) RETURNS _variant._registered.variant_typmod%TYPE
 LANGUAGE plpgsql AS $func$
 DECLARE
