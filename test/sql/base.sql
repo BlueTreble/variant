@@ -14,6 +14,7 @@ SELECT plan( (
 	+4 -- register
 	+6 -- register__get*
 	+4 -- allowed types
+	+3 -- disallowed types
 	+2 -- typmod tests
 	+ (SELECT count(*) FROM typmod_chars)
 	+4 -- NULL
@@ -144,6 +145,24 @@ SELECT results_eq(
 	$$SELECT * FROM variant.allowed_types( (SELECT variant_name FROM test_typmod) )$$
 	, $$SELECT * FROM atypes ORDER BY 1$$
 	, 'Verify newly added types'
+);
+
+/*
+ * Disallowed types
+ */
+SELECT lives_ok(
+	$$SELECT variant.register('test allowed types', '{}')$$
+	, 'Register allowed types variant'
+);
+SELECT lives_ok(
+	$$CREATE TEMP TABLE test_allowed(v variant.variant("test allowed types"))$$
+	, $$Create table for testing allowed types$$
+);
+-- The allowed case is exercised by all other tests
+SELECT throws_ok(
+	$$INSERT INTO test_allowed VALUES( 1::int )$$
+	, '22023'
+	, 'type integer is not allowed in variant.variant(test allowed types)'
 );
 
 /*

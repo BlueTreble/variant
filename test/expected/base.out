@@ -2,7 +2,7 @@
 
 
 ok 1..0
-1..31
+1..34
 ok 1 - cast to text
 ok 2 - Check equality
 ok 3 - Check NULL
@@ -23,14 +23,17 @@ ok 17 - Verify current allowed types
 ok 18 - test variant.add_type
 ok 19 - test variant.add_types
 ok 20 - Verify newly added types
-ok 21 - test valid variant names
-ok 22 - threw 42601
-ok 23 - test variant name (
-ok 24 - test variant name )
-ok 25 - test variant name "
-ok 26 - test variant name 99999
-ok 27 - (int,)::int = NULL
-ok 28 - (int,1)::int != NULL
-ok 29 - (int,)::int = NULL is NULL
-ok 30 - (int,1)::int != NULL is NULL
-ok 31 - Verify we are testing all storage options
+ok 21 - Register allowed types variant
+ok 22 - Create table for testing allowed types
+ok 23 - threw 22023: type integer is not allowed in variant.variant(test allowed types)
+ok 24 - test valid variant names
+ok 25 - threw 42601
+ok 26 - test variant name (
+ok 27 - test variant name )
+ok 28 - test variant name "
+ok 29 - test variant name 99999
+ok 30 - (int,)::int = NULL
+ok 31 - (int,1)::int != NULL
+ok 32 - (int,)::int = NULL is NULL
+ok 33 - (int,1)::int != NULL is NULL
+ok 34 - Verify we are testing all storage options

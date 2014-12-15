@@ -48,7 +48,7 @@ typedef struct VariantCache
 static Variant variant_in_int(FunctionCallInfo fcinfo, char *input, int variant_typmod);
 static char * variant_out_int(FunctionCallInfo fcinfo, Variant input);
 static int variant_cmp_int(FunctionCallInfo fcinfo);
-static char * variant_get_variant_name(int typmod);
+static char * variant_get_variant_name(int typmod, Oid org_typid);
 static VariantInt make_variant_int(Variant v, FunctionCallInfo fcinfo, IOFuncSelector func);
 static Variant make_variant(VariantInt vi, FunctionCallInfo fcinfo, IOFuncSelector func);
 static VariantCache * get_cache(FunctionCallInfo fcinfo, VariantInt vi, IOFuncSelector func);
@@ -115,7 +115,7 @@ variant_cast_in(PG_FUNCTION_ARGS)
 	/* Validate that we're casting to a registered variant */
 	if( PG_ARGISNULL(1) )
 		elog( ERROR, "Target typemod must not be NULL" );
-	variant_get_variant_name(PG_GETARG_INT32(1));
+	variant_get_variant_name(PG_GETARG_INT32(1), vi->typid);
 
 	if( !vi->isnull )
 		vi->data = PG_GETARG_DATUM(0);
@@ -280,7 +280,7 @@ variant_typmod_out(PG_FUNCTION_ARGS)
 	char						*tmp;
 
 	Assert(fcinfo->flinfo->fn_strict); /* Must be strict */
-	variant_name = variant_get_variant_name(PG_GETARG_INT32(0));
+	variant_name = variant_get_variant_name(PG_GETARG_INT32(0), InvalidOid);
 
 	/* TODO: cache this stuff */
 	initStringInfo(out);
@@ -513,10 +513,8 @@ variant_in_int(FunctionCallInfo fcinfo, char *input, int variant_typmod)
 
 	/*
 	 * Verify we've been handed a valid typmod
-	 *
-	 * TODO: validate that vi->typid is allowed to be used with this type of variant
 	 */
-	variant_get_variant_name(variant_typmod);
+	variant_get_variant_name(variant_typmod, vi->typid);
 
 	cache = get_cache(fcinfo, vi, IOFunc_input);
 
@@ -630,30 +628,46 @@ variant_out_int(FunctionCallInfo fcinfo, Variant input)
  * variant_get_variant_name: Return the name of a named variant
  */
 char *
-variant_get_variant_name(int typmod)
+variant_get_variant_name(int typmod, Oid org_typid)
 {
-	Datum						typmod_datum = Int32GetDatum(typmod);
+	Datum						values[2];
 	MemoryContext		cctx = CurrentMemoryContext;
 	bool						do_pop = _SPI_conn();
 	bool						isnull;
-	Oid							type = INT4OID;
-	char						*cmd = "SELECT variant_name, variant_enabled FROM _variant._registered WHERE variant_typmod = $1";
+	Oid							types[2] = {INT4OID, REGTYPEOID};
+	char						*cmd_wo_type = "SELECT variant_name, variant_enabled FROM _variant._registered WHERE variant_typmod = $1";
+	char						*cmd_w_type = "SELECT variant_name, variant_enabled, allowed_types @> array[ $2 ] FROM _variant._registered WHERE variant_typmod = $1";
+	char						*cmd;
+	int							nargs;
 	int							ret;
 	Datum						result;
 	char						*out;
 
+	values[0] = Int32GetDatum(typmod);
+
+	if(org_typid == InvalidOid)
+	{
+		cmd = cmd_wo_type;
+		nargs = 1;
+	}
+	else
+	{
+		cmd = cmd_w_type;
+		nargs = 2;
+		values[1] = ObjectIdGetDatum(org_typid);
+	}
+
 	/* command, nargs, Oid *argument_types, *values, *nulls, read_only, count */
-	if( !(ret =SPI_execute_with_args( cmd, 1, &type, &typmod_datum, " ", true, 0 )) )
+	if( !(ret =SPI_execute_with_args( cmd, nargs, types, values, "  ", true, 0 )) )
 		elog( ERROR, "SPI_execute_with_args(%s) returned %s", cmd, SPI_result_code_string(ret));
 	Assert( SPI_tuptable );
+
 	if ( SPI_processed > 1 )
 		ereport(ERROR,
 			( errmsg( "Got %u records for variant typmod %i", SPI_processed, typmod ),
 				errhint( "This means _variant._registered is corrupted" )
 			)
 		);
-
-
 	if ( SPI_processed < 1 )
 		elog( ERROR, "invalid typmod %i", typmod );
 
@@ -678,6 +692,18 @@ variant_get_variant_name(int typmod)
 					errmsg( "variant.variant(%s) is disabled", out )
 				)
 			);
+
+	if(org_typid != InvalidOid)
+	{
+		result = heap_getattr( SPI_tuptable->vals[0], 3, SPI_tuptable->tupdesc, &isnull );
+		if( !DatumGetBool(result) )
+			ereport( ERROR,
+					( errcode(ERRCODE_INVALID_PARAMETER_VALUE),
+						errmsg( "type %s is not allowed in variant.variant(%s)", format_type_be(org_typid), out ),
+						errhint( "you can permanently allow a type to be used by calling variant.allow_type()" )
+					)
+				);
+	}
 
 	_SPI_disc(do_pop); /* pfree's all SPI stuff */
 
