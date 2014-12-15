@@ -226,6 +226,7 @@ variant_typmod_in(PG_FUNCTION_ARGS)
 		bool						isnull;
 		int							ret;
 		Oid							type = TEXTOID;
+		/* This should arguably be FOR KEY SHARE. See comment in variant_get_variant_name() */
 		char						*cmd = "SELECT variant_typmod, variant_enabled FROM _variant._registered WHERE lower(variant_name) = lower($1)";
 
 		/* command, nargs, Oid *argument_types, *values, *nulls, read_only, count */
@@ -635,8 +636,6 @@ variant_get_variant_name(int typmod, Oid org_typid)
 	bool						do_pop = _SPI_conn();
 	bool						isnull;
 	Oid							types[2] = {INT4OID, REGTYPEOID};
-	char						*cmd_wo_type = "SELECT variant_name, variant_enabled FROM _variant._registered WHERE variant_typmod = $1";
-	char						*cmd_w_type = "SELECT variant_name, variant_enabled, allowed_types @> array[ $2 ] FROM _variant._registered WHERE variant_typmod = $1";
 	char						*cmd;
 	int							nargs;
 	int							ret;
@@ -645,14 +644,28 @@ variant_get_variant_name(int typmod, Oid org_typid)
 
 	values[0] = Int32GetDatum(typmod);
 
+	/*
+	 * There's a race condition here; someone could be attempting to remove an
+	 * allowed type from this registered variant or even remove it entirely. We
+	 * could avoid that by taking a share/keyshare lock here and taking the
+	 * appropriate blocking lock when modifying the registration record. Doing
+	 * that would probably be quite bad though; not only are type IO and typmod
+	 * IO routines assumed to be non-volatile, taking such a lock would end up
+	 * generating a lot of lock updates to the registration rows.
+	 *
+	 * Since the whole purpose of registration is to handle the issue of someone
+	 * attempting to drop a type that has made it into a variant in a table
+	 * column, which we can't completely handle anyway, I don't think it's worth
+	 * it to lock the rows.
+	 */
 	if(org_typid == InvalidOid)
 	{
-		cmd = cmd_wo_type;
+		cmd = "SELECT variant_name, variant_enabled FROM _variant._registered WHERE variant_typmod = $1";
 		nargs = 1;
 	}
 	else
 	{
-		cmd = cmd_w_type;
+		cmd = "SELECT variant_name, variant_enabled, allowed_types @> array[ $2 ] FROM _variant._registered WHERE variant_typmod = $1";
 		nargs = 2;
 		values[1] = ObjectIdGetDatum(org_typid);
 	}
