@@ -11,7 +11,7 @@ SELECT plan( (
 	3 -- Simple cast, equality, NULL
 	+1 -- DEFAULT is disabled
 	+2 -- text in/out
-	+4 -- register
+	+5 -- register
 	+6 -- register__get*
 	+4 -- allowed types
 	+3 -- disallowed types
@@ -58,7 +58,7 @@ SELECT is(
  */
 SELECT row_eq(
 	'SELECT * FROM variant.registered WHERE variant_typmod = -1'
-	, ROW( -1, 'DEFAULT', false, '{}'::regtype[] )::variant.registered
+	, ROW( -1, 'DEFAULT', false, 0 )::variant.registered
 	, 'valid variant(DEFAULT)'
 );
 
@@ -72,9 +72,14 @@ SELECT lives_ok(
 	, 'Register variant'
 );
 SELECT bag_eq(
-	$$SELECT * FROM variant.registered WHERE variant_typmod IN (SELECT variant_typmod FROM test_typmod)$$
+	$$SELECT * FROM _variant._registered WHERE variant_typmod IN (SELECT variant_typmod FROM test_typmod)$$
 	, $$SELECT * FROM test_typmod$$
 	, 'registration test variant correctly added'
+);
+SELECT bag_eq(
+	$$SELECT * FROM variant.registered WHERE variant_typmod IN (SELECT variant_typmod FROM test_typmod)$$
+	, $$SELECT variant_typmod, variant_name, variant_enabled, 2 FROM test_typmod$$
+	, 'check variant.registered for newly added variant'
 );
 -- Sanity-check typmod output. Technically a typmod test, but it uses the test variant we register here
 SELECT is(

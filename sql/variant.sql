@@ -281,7 +281,10 @@ CREATE UNIQUE INDEX _registered_u_lcase_variant_name ON _variant._registered( lo
 
 INSERT INTO _variant._registered VALUES( -1, 'DEFAULT', false, '{}' );
 
-CREATE VIEW variant.registered AS SELECT * FROM _variant._registered;
+CREATE VIEW variant.registered AS
+  SELECT variant_typmod, variant_name, variant_enabled, coalesce( array_length(allowed_types, 1), 0 ) AS types_allowed
+    FROM _variant._registered
+;
 
 CREATE OR REPLACE FUNCTION variant.register(
   p_variant_name _variant._registered.variant_name%TYPE
