@@ -276,14 +276,72 @@ CREATE TABLE _variant._registered(
   , variant_name    varchar(100)  NOT NULL
   , variant_enabled boolean       NOT NULL DEFAULT true
   , allowed_types   regtype[]     NOT NULL
+    CONSTRAINT allowed_types_may_not_contain_nulls
+      -- Aside from being a good idea, this is required by _variant._tg_check_type_usage
+      CHECK( cardinality(allowed_types) = cardinality(array_remove(allowed_types, NULL)) )
 );
 CREATE UNIQUE INDEX _registered_u_lcase_variant_name ON _variant._registered( lower( variant_name ) );
 
 INSERT INTO _variant._registered VALUES( -1, 'DEFAULT', false, '{}' );
 
 CREATE VIEW variant.registered AS
+  -- TODO: quote_ident(variant_name)
   SELECT variant_typmod, variant_name, variant_enabled, coalesce( array_length(allowed_types, 1), 0 ) AS types_allowed
     FROM _variant._registered
+;
+CREATE VIEW _variant.stored AS
+  SELECT atttypmod AS variant_typmod, quote_ident(attname) AS column_name, a.*
+    FROM pg_attribute a
+    WHERE NOT attisdropped
+      AND atttypid = 'variant.variant'::regtype
+      -- NOTE: We intentionally look at all temp tables, not just our own
+;
+
+CREATE VIEW variant.stored AS
+  SELECT *
+      , array( SELECT attrelid::regclass || '.' || column_name FROM _variant.stored WHERE variant_typmod = r.variant_typmod )
+          AS columns_using_variant
+    FROM variant.registered r
+;
+
+CREATE OR REPLACE FUNCTION _variant._tg_check_type_usage(
+) RETURNS trigger LANGUAGE plpgsql AS $f$
+DECLARE
+  v_columns text[];
+  v_new _variant._registered.allowed_types%TYPE;
+BEGIN
+  IF TG_OP = 'UPDATE' THEN
+    IF NEW.allowed_types @> OLD.allowed_types THEN
+      -- User didn't remove any types
+      RETURN NULL;
+    END IF;
+
+    v_new := NEW.allowed_types;
+  ELSE
+    v_new := '{}';
+  END IF;
+
+  v_columns := columns_using_variant FROM variant.stored WHERE variant_typmod = OLD.variant_typmod;
+  RAISE DEBUG 'TG_OP: %, OLD.allowed_types %, NEW.allowed_types %, v_columns %'
+    , TG_WHEN
+    , OLD.allowed_types
+    , v_new
+    , v_columns
+  ;
+  IF v_columns IS DISTINCT FROM '{}' THEN
+    RAISE EXCEPTION 'variant % is still in use', OLD.variant_name
+      USING ERRCODE = 'dependent_objects_still_exist'
+        , DETAIL = E'in use by ' || array_to_string( v_columns, ', ' )
+    ;
+  END IF;
+
+  RETURN NULL;
+END
+$f$;
+CREATE TRIGGER check_type_usage
+  AFTER UPDATE OR DELETE ON _variant._registered
+  FOR EACH ROW
+  EXECUTE PROCEDURE _variant._tg_check_type_usage()
 ;
 
 CREATE OR REPLACE FUNCTION variant.register(
@@ -444,6 +502,47 @@ CREATE OR REPLACE FUNCTION variant.add_type(
   , p_type text
 ) RETURNS TABLE(allowed_type regtype) LANGUAGE sql AS $f$
   SELECT * FROM variant.add_types($1,array[ $2::regtype ])
+$f$;
+
+CREATE OR REPLACE FUNCTION variant.remove_types(
+  p_variant_name _variant._registered.variant_name%TYPE
+  , p_removed_types _variant._registered.allowed_types%TYPE
+) RETURNS TABLE(allowed_type regtype)
+LANGUAGE plpgsql AS $f$
+DECLARE
+  v_new_allowed _variant._registered.allowed_types%TYPE;
+  v_current record;
+BEGIN
+  -- Lock this record when we get it
+  v_current := _variant.registered__get( p_variant_name, true );
+  IF NOT v_current.allowed_types && p_removed_types THEN
+    IF array_length(p_removed_types, 1) = 1 THEN
+      RAISE NOTICE 'type %s was already not allowed in variant %s', p_removed_types[1], v_current.variant_name;
+    ELSE
+      RAISE NOTICE 'types %s were already not allowed in variant %s', p_removed_types, v_current.variant_name;
+    END IF;
+    v_new_allowed := v_current.allowed_types;
+  ELSE
+    UPDATE _variant._registered
+      -- It seems worthwhile to keep stuff unique
+      SET allowed_types = array(
+          SELECT t
+            FROM unnest( v_current.allowed_types ) t
+            WHERE t != ANY( p_removed_types )
+        )
+      WHERE variant_typmod = v_current.variant_typmod
+      RETURNING allowed_types INTO v_new_allowed
+    ;
+  END IF;
+
+  RETURN QUERY SELECT t FROM unnest(v_new_allowed) t(t) ORDER BY t::text;
+END
+$f$;
+CREATE OR REPLACE FUNCTION variant.remove_type(
+  p_variant_name _variant._registered.variant_name%TYPE
+  , p_type text
+) RETURNS TABLE(allowed_type regtype) LANGUAGE sql AS $f$
+  SELECT * FROM variant.remove_types($1,array[ $2::regtype ])
 $f$;
 
 -- vi: expandtab sw=2 ts=2

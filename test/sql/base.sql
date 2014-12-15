@@ -14,7 +14,7 @@ SELECT plan( (
 	+5 -- register
 	+6 -- register__get*
 	+4 -- allowed types
-	+3 -- disallowed types
+	+9 -- disallowed types
 	+2 -- typmod tests
 	+ (SELECT count(*) FROM typmod_chars)
 	+4 -- NULL
@@ -155,6 +155,10 @@ SELECT results_eq(
 /*
  * Disallowed types
  */
+SELECT throws_ok(
+	$$UPDATE _variant._registered SET allowed_types = allowed_types || array[NULL::regtype]$$
+	, 'new row for relation "_registered" violates check constraint "allowed_types_may_not_contain_nulls"'
+);
 SELECT lives_ok(
 	$$SELECT variant.register('test allowed types', '{}')$$
 	, 'Register allowed types variant'
@@ -168,6 +172,28 @@ SELECT throws_ok(
 	$$INSERT INTO test_allowed VALUES( 1::int )$$
 	, '22023'
 	, 'type integer is not allowed in variant.variant(test allowed types)'
+);
+SELECT lives_ok(
+	$$SELECT variant.add_type('test allowed types', 'int')$$
+	, $$Allow use of int$$
+);
+SELECT throws_ok(
+	$$INSERT INTO test_allowed VALUES( 1::int2 )$$
+	, '22023'
+	, 'type smallint is not allowed in variant.variant(test allowed types)'
+);
+SELECT throws_ok(
+	$$SELECT variant.remove_type('test allowed types', 'int')$$
+	, '2BP01'
+	, 'variant test allowed types is still in use'
+);
+SELECT lives_ok(
+	$$DROP TABLE test_allowed$$
+	, 'Drop temp table'
+);
+SELECT lives_ok(
+	$$SELECT variant.remove_type('test allowed types', 'int')$$
+	, 'remove type'
 );
 
 /*

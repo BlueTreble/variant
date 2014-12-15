@@ -2,7 +2,7 @@
 
 
 ok 1..0
-1..35
+1..41
 ok 1 - cast to text
 ok 2 - Check equality
 ok 3 - Check NULL
@@ -24,17 +24,23 @@ ok 18 - Verify current allowed types
 ok 19 - test variant.add_type
 ok 20 - test variant.add_types
 ok 21 - Verify newly added types
-ok 22 - Register allowed types variant
-ok 23 - Create table for testing allowed types
-ok 24 - threw 22023: type integer is not allowed in variant.variant(test allowed types)
-ok 25 - test valid variant names
-ok 26 - threw 42601
-ok 27 - test variant name (
-ok 28 - test variant name )
-ok 29 - test variant name "
-ok 30 - test variant name 99999
-ok 31 - (int,)::int = NULL
-ok 32 - (int,1)::int != NULL
-ok 33 - (int,)::int = NULL is NULL
-ok 34 - (int,1)::int != NULL is NULL
-ok 35 - Verify we are testing all storage options
+ok 22 - threw new row for relation "_registered" violates check constraint "allowed_types_may_not_contain_nulls"
+ok 23 - Register allowed types variant
+ok 24 - Create table for testing allowed types
+ok 25 - threw 22023: type integer is not allowed in variant.variant(test allowed types)
+ok 26 - Allow use of int
+ok 27 - threw 22023: type smallint is not allowed in variant.variant(test allowed types)
+ok 28 - threw 2BP01: variant test allowed types is still in use
+ok 29 - Drop temp table
+ok 30 - remove type
+ok 31 - test valid variant names
+ok 32 - threw 42601
+ok 33 - test variant name (
+ok 34 - test variant name )
+ok 35 - test variant name "
+ok 36 - test variant name 99999
+ok 37 - (int,)::int = NULL
+ok 38 - (int,1)::int != NULL
+ok 39 - (int,)::int = NULL is NULL
+ok 40 - (int,1)::int != NULL is NULL
+ok 41 - Verify we are testing all storage options
