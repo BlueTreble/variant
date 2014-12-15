@@ -59,6 +59,7 @@ static void _SPI_disc(bool pop);
 
 static int32 get_fn_expr_argtypmod(FmgrInfo *flinfo, int argnum);
 static int32 get_call_expr_argtypmod(Node *expr, int argnum);
+static StringInfo quote_variant_name_cstring(const char *variant_name);
 
 /*
  * You can include more files here if needed.
@@ -274,48 +275,34 @@ PG_FUNCTION_INFO_V1(variant_typmod_out);
 Datum
 variant_typmod_out(PG_FUNCTION_ARGS)
 {
-	StringInfoData	outd;
-	StringInfo			out = &outd;
+	StringInfo			out;
 	char						*variant_name;
-	bool						need_quote;
-	char						*tmp;
 
 	Assert(fcinfo->flinfo->fn_strict); /* Must be strict */
-	variant_name = variant_get_variant_name(PG_GETARG_INT32(0), InvalidOid);
 
 	/* TODO: cache this stuff */
-	initStringInfo(out);
-	appendStringInfoChar(out, '(');
-	need_quote = false;
-	for (tmp = variant_name; *tmp; tmp++)
-	{
-		char		ch = *tmp;
-
-		if (ch == '"' || ch == '(' || ch == ')' || ch == ',' ||
-			isspace((unsigned char) ch))
-		{
-			need_quote = true;
-			break;
-		}
-	}
-	if(!need_quote)
-		appendStringInfoString(out, variant_name);
-	else
-	{
-		appendStringInfoChar(out, '"');
-		for (tmp = variant_name; *tmp; tmp++)
-		{
-			char		ch = *tmp;
-
-			if (ch == '"')
-				appendStringInfoCharMacro(out, ch);
-			appendStringInfoCharMacro(out, ch);
-		}
-		appendStringInfoChar(out, '"');
-	}
-	appendStringInfoChar(out, ')');
+	variant_name = variant_get_variant_name(PG_GETARG_INT32(0), InvalidOid);
+	out = quote_variant_name_cstring(variant_name);
+	pfree(variant_name);
 
 	PG_RETURN_CSTRING(out->data);
+}
+PG_FUNCTION_INFO_V1(quote_variant_name);
+Datum
+quote_variant_name(PG_FUNCTION_ARGS)
+{
+	StringInfo			out;
+	char						*variant_name;
+
+	Assert(fcinfo->flinfo->fn_strict); /* Must be strict */
+
+	variant_name = text_to_cstring(PG_GETARG_TEXT_PP(0));
+
+	out = quote_variant_name_cstring(variant_name);
+
+	/* out is wrapped in () which is not what we want, so we don't return it directly */
+
+	PG_RETURN_TEXT_P( cstring_to_text_with_len(out->data + 1, out->len-2) );
 }
 
 
@@ -1087,6 +1074,47 @@ get_cache(FunctionCallInfo fcinfo, VariantInt vi, IOFuncSelector func)
 	}
 
 	return cache;
+}
+
+
+StringInfo
+quote_variant_name_cstring(const char *variant_name)
+{
+	StringInfo			out = makeStringInfo();
+	bool						need_quote;
+	const char			*tmp;
+
+	appendStringInfoChar(out, '(');
+	need_quote = false;
+	for (tmp = variant_name; *tmp; tmp++)
+	{
+		const char		ch = *tmp;
+
+		if (ch == '"' || ch == '(' || ch == ')' || ch == ',' ||
+			isspace((unsigned char) ch))
+		{
+			need_quote = true;
+			break;
+		}
+	}
+	if(!need_quote)
+		appendStringInfoString(out, variant_name);
+	else
+	{
+		appendStringInfoChar(out, '"');
+		for (tmp = variant_name; *tmp; tmp++)
+		{
+			const char		ch = *tmp;
+
+			if (ch == '"')
+				appendStringInfoCharMacro(out, ch);
+			appendStringInfoCharMacro(out, ch);
+		}
+		appendStringInfoChar(out, '"');
+	}
+	appendStringInfoChar(out, ')');
+
+	return out;
 }
 
 

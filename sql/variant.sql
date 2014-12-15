@@ -67,6 +67,9 @@ RETURNS variant.variant LANGUAGE sql IMMUTABLE STRICT AS $f$
 SELECT variant.text_in( $1, -1 )
 $f$;
 
+CREATE OR REPLACE FUNCTION _variant.quote_variant_name(text)
+RETURNS text LANGUAGE c IMMUTABLE STRICT
+AS '$libdir/variant', 'quote_variant_name';
 CREATE OR REPLACE FUNCTION variant.original_type(variant.variant)
 RETURNS text LANGUAGE c IMMUTABLE STRICT
 AS '$libdir/variant', 'variant_type_out';
@@ -285,8 +288,7 @@ CREATE UNIQUE INDEX _registered_u_lcase_variant_name ON _variant._registered( lo
 INSERT INTO _variant._registered VALUES( -1, 'DEFAULT', false, '{}' );
 
 CREATE VIEW variant.registered AS
-  -- TODO: quote_ident(variant_name)
-  SELECT variant_typmod, variant_name, variant_enabled, coalesce( array_length(allowed_types, 1), 0 ) AS types_allowed
+  SELECT variant_typmod, _variant.quote_variant_name(variant_name), variant_enabled, coalesce( array_length(allowed_types, 1), 0 ) AS types_allowed
     FROM _variant._registered
 ;
 CREATE VIEW _variant.stored AS

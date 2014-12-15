@@ -78,7 +78,7 @@ SELECT bag_eq(
 );
 SELECT bag_eq(
 	$$SELECT * FROM variant.registered WHERE variant_typmod IN (SELECT variant_typmod FROM test_typmod)$$
-	, $$SELECT variant_typmod, variant_name, variant_enabled, 2 FROM test_typmod$$
+	, $$SELECT variant_typmod, _variant.quote_variant_name(variant_name), variant_enabled, 2 FROM test_typmod$$
 	, 'check variant.registered for newly added variant'
 );
 -- Sanity-check typmod output. Technically a typmod test, but it uses the test variant we register here
