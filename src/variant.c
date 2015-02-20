@@ -497,7 +497,11 @@ variant_in_int(FunctionCallInfo fcinfo, char *input, int variant_typmod)
 		orgData = (text *) GetAttributeByNum( composite_tuple, 2, &vi->isnull );
 	/* End crap */
 
+#ifdef LONG_PARSETYPE
 	parseTypeString(text_to_cstring(orgType), &vi->typid, &vi->typmod, false);
+#else
+	parseTypeString(text_to_cstring(orgType), &vi->typid, &vi->typmod);
+#endif
 
 	/*
 	 * Verify we've been handed a valid typmod

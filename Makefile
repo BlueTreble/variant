@@ -12,6 +12,15 @@ MODULES      = $(patsubst %.c,%,$(wildcard src/*.c))
 PG_CONFIG    = pg_config
 PG91         = $(shell $(PG_CONFIG) --version | grep -qE " 8\.| 9\.0" && echo no || echo yes)
 
+VERSION 	 = $(shell $(PG_CONFIG) --version | awk '{print $$2}')
+MAJORVER 	 = $(shell echo $(VERSION) | cut -d . -f1,2 | tr -d .)
+
+GE94		 = $(shell test $(MAJORVER) -ge 94 && echo yes || echo no)
+
+ifeq ($(GE94),yes)
+override CFLAGS += -DLONG_PARSETYPE
+endif
+
 ifeq ($(PG91),yes)
 all: sql/$(EXTENSION)--$(EXTVERSION).sql
 
@@ -23,4 +32,8 @@ EXTRA_CLEAN = sql/$(EXTENSION)--$(EXTVERSION).sql
 endif
 
 PGXS := $(shell $(PG_CONFIG) --pgxs)
+
 include $(PGXS)
+
+# To use this, do make print-VARIABLE_NAME
+print-%  : ; @echo $* = $($*)
