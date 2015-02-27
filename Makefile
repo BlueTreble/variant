@@ -35,5 +35,9 @@ PGXS := $(shell $(PG_CONFIG) --pgxs)
 
 include $(PGXS)
 
+.PHONY: results
+results:
+	rsync -avP --delete results/ test/expected
+
 # To use this, do make print-VARIABLE_NAME
 print-%  : ; @echo $* = $($*)
