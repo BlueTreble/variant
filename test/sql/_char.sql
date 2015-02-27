@@ -1,4 +1,4 @@
-\set ECHO 0
+\set ECHO none
 \set QUIET 1
 /*
  * Postgres currently doesn't support comparing different string array types

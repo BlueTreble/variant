@@ -1,4 +1,4 @@
-\set ECHO 0
+\set ECHO none
 \set QUIET 1
 /*
  * NOTE! Unlike the other cases of duplication, we need to handle numeric,
