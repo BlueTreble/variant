@@ -78,6 +78,11 @@ PG_MODULE_MAGIC;
  * now, just store the raw _variant._variant Datum.
  */
 PG_FUNCTION_INFO_V1(variant_in);
+/* This ugly prototyping is because prior to 9.4 PG_FUNCTION_INFO_V1 doesn't
+ * include a prototype definition.
+ */
+Datum
+variant_in(PG_FUNCTION_ARGS);
 Datum
 variant_in(PG_FUNCTION_ARGS)
 {
@@ -97,6 +102,8 @@ variant_in(PG_FUNCTION_ARGS)
  * 	Variant
  */
 PG_FUNCTION_INFO_V1(variant_cast_in);
+Datum
+variant_cast_in(PG_FUNCTION_ARGS);
 Datum
 variant_cast_in(PG_FUNCTION_ARGS)
 {
@@ -125,6 +132,8 @@ variant_cast_in(PG_FUNCTION_ARGS)
 
 PG_FUNCTION_INFO_V1(variant_out);
 Datum
+variant_out(PG_FUNCTION_ARGS);
+Datum
 variant_out(PG_FUNCTION_ARGS)
 {
 	PG_RETURN_CSTRING( variant_out_int(fcinfo, PG_GETARG_VARIANT(0)) );
@@ -138,6 +147,8 @@ variant_out(PG_FUNCTION_ARGS)
  * defined for each type, but they all just call this C function.
  */
 PG_FUNCTION_INFO_V1(variant_cast_out);
+Datum
+variant_cast_out(PG_FUNCTION_ARGS);
 Datum
 variant_cast_out(PG_FUNCTION_ARGS)
 {
@@ -198,6 +209,8 @@ variant_cast_out(PG_FUNCTION_ARGS)
 }
 
 PG_FUNCTION_INFO_V1(variant_typmod_in);
+Datum
+variant_typmod_in(PG_FUNCTION_ARGS);
 Datum
 variant_typmod_in(PG_FUNCTION_ARGS)
 {
@@ -271,6 +284,8 @@ variant_typmod_in(PG_FUNCTION_ARGS)
 
 PG_FUNCTION_INFO_V1(variant_typmod_out);
 Datum
+variant_typmod_out(PG_FUNCTION_ARGS);
+Datum
 variant_typmod_out(PG_FUNCTION_ARGS)
 {
 	StringInfo			out;
@@ -286,6 +301,8 @@ variant_typmod_out(PG_FUNCTION_ARGS)
 	PG_RETURN_CSTRING(out->data);
 }
 PG_FUNCTION_INFO_V1(quote_variant_name);
+Datum
+quote_variant_name(PG_FUNCTION_ARGS);
 Datum
 quote_variant_name(PG_FUNCTION_ARGS)
 {
@@ -309,6 +326,8 @@ quote_variant_name(PG_FUNCTION_ARGS)
  */
 PG_FUNCTION_INFO_V1(variant_text_in);
 Datum
+variant_text_in(PG_FUNCTION_ARGS);
+Datum
 variant_text_in(PG_FUNCTION_ARGS)
 {
 	Assert(!fcinfo->flinfo->fn_strict);
@@ -324,12 +343,16 @@ variant_text_in(PG_FUNCTION_ARGS)
 }
 PG_FUNCTION_INFO_V1(variant_text_out);
 Datum
+variant_text_out(PG_FUNCTION_ARGS);
+Datum
 variant_text_out(PG_FUNCTION_ARGS)
 {
 	PG_RETURN_DATUM( CStringGetTextDatum( variant_out_int(fcinfo, PG_GETARG_VARIANT(0)) ) );
 }
 
 PG_FUNCTION_INFO_V1(variant_type_out);
+Datum
+variant_type_out(PG_FUNCTION_ARGS);
 Datum
 variant_type_out(PG_FUNCTION_ARGS)
 {
@@ -347,12 +370,16 @@ variant_type_out(PG_FUNCTION_ARGS)
  */
 PG_FUNCTION_INFO_V1(variant_cmp);
 Datum
+variant_cmp(PG_FUNCTION_ARGS);
+Datum
 variant_cmp(PG_FUNCTION_ARGS)
 {
 	PG_RETURN_INT32(variant_cmp_int(fcinfo));
 }
 
 PG_FUNCTION_INFO_V1(variant_lt);
+Datum
+variant_lt(PG_FUNCTION_ARGS);
 Datum
 variant_lt(PG_FUNCTION_ARGS)
 {
@@ -364,6 +391,8 @@ variant_lt(PG_FUNCTION_ARGS)
 	PG_RETURN_BOOL(ret < 0);
 }
 PG_FUNCTION_INFO_V1(variant_le);
+Datum
+variant_le(PG_FUNCTION_ARGS);
 Datum
 variant_le(PG_FUNCTION_ARGS)
 {
@@ -377,6 +406,8 @@ variant_le(PG_FUNCTION_ARGS)
 
 PG_FUNCTION_INFO_V1(variant_eq);
 Datum
+variant_eq(PG_FUNCTION_ARGS);
+Datum
 variant_eq(PG_FUNCTION_ARGS)
 {
 	int ret = variant_cmp_int(fcinfo);
@@ -387,6 +418,8 @@ variant_eq(PG_FUNCTION_ARGS)
 	PG_RETURN_BOOL(ret == 0);
 }
 PG_FUNCTION_INFO_V1(variant_ne);
+Datum
+variant_ne(PG_FUNCTION_ARGS);
 Datum
 variant_ne(PG_FUNCTION_ARGS)
 {
@@ -400,6 +433,8 @@ variant_ne(PG_FUNCTION_ARGS)
 
 PG_FUNCTION_INFO_V1(variant_ge);
 Datum
+variant_ge(PG_FUNCTION_ARGS);
+Datum
 variant_ge(PG_FUNCTION_ARGS)
 {
 	int ret = variant_cmp_int(fcinfo);
@@ -410,6 +445,8 @@ variant_ge(PG_FUNCTION_ARGS)
 	PG_RETURN_BOOL(ret >= 0);
 }
 PG_FUNCTION_INFO_V1(variant_gt);
+Datum
+variant_gt(PG_FUNCTION_ARGS);
 Datum
 variant_gt(PG_FUNCTION_ARGS)
 {
@@ -428,6 +465,8 @@ variant_gt(PG_FUNCTION_ARGS)
  * everything.
  */
 PG_FUNCTION_INFO_V1(variant_image_eq);
+Datum
+variant_image_eq(PG_FUNCTION_ARGS);
 Datum
 variant_image_eq(PG_FUNCTION_ARGS)
 {
