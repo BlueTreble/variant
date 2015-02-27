@@ -5,6 +5,9 @@
 #ifndef VARIANT_H 
 #define VARIANT_H 
 
+#include "c.h"
+#include "postgres.h"
+
 typedef struct
 {
 	int32				vl_len_;		/* varlena header (do not touch directly!) */

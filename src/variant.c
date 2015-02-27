@@ -11,8 +11,7 @@
  * Copyright (c) 2014 Jim Nasby, Blue Treble Consulting http://BlueTreble.com
  */
 
-#include "c.h"
-#include "postgres.h"
+#include "variant.h"
 #include "fmgr.h"
 #include "lib/stringinfo.h"
 #include "access/htup_details.h"
@@ -26,7 +25,6 @@
 #include "utils/typcache.h"
 #include "utils/lsyscache.h"
 #include "catalog/pg_type.h"
-#include "variant.h"
 
 /* fn_extra cache entry */
 typedef struct VariantCache
