@@ -2,6 +2,9 @@
  * Copyright (c) 2014 Jim Nasby, Blue Treble Consulting http://BlueTreble.com
  */
 
+#ifndef VARIANT_H 
+#define VARIANT_H 
+
 typedef struct
 {
 	int32				vl_len_;		/* varlena header (do not touch directly!) */
@@ -69,3 +72,6 @@ typedef VariantDataInt *VariantInt;
 #define PG_GETARG_VARIANT(n)			DatumGetVariantType(PG_GETARG_DATUM(n))
 #define PG_GETARG_VARIANT_COPY(n)		DatumGetVariantTypeCopy(PG_GETARG_DATUM(n))
 #define PG_RETURN_VARIANT(x)			return VariantTypeGetDatum(x)
+
+#endif   /* VARIANT_H */
+
