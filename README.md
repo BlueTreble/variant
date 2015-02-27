@@ -26,6 +26,10 @@ and then in your database:
 
 See "Building" below for more details or if you run into a problem.
 
+Current Status
+==============
+You can see the curren status of this extension at http://pgxn-tester.org/distributions/variant
+
 Building
 ========
 To build variant, do this:

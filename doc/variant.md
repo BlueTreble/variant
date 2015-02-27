@@ -135,6 +135,8 @@ Once we can restrict registered variants to only using particular types, it woul
 Support
 -------
 
+  Current test status can be found at http://pgxn-tester.org/distributions/variant.
+
   Please report issues at <https://github.com/decibel/variant/issues>.
 
 Author
