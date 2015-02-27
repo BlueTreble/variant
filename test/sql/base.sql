@@ -13,7 +13,7 @@ SELECT plan( (
 	+2 -- text in/out
 	+5 -- register
 	+6 -- register__get*
-	+4 -- allowed types
+	+5 -- allowed types
 	+9 -- disallowed types
 	+2 -- typmod tests
 	+ (SELECT count(*) FROM typmod_chars)
@@ -133,6 +133,19 @@ SELECT results_eq(
 	$$SELECT * FROM variant.allowed_types((SELECT variant_name FROM test_typmod))$$
 	, $$SELECT * FROM atypes ORDER BY 1$$
 	, 'Verify current allowed types'
+);
+-- Verify handling of NULL
+SELECT throws_ok(
+	$$SELECT * FROM variant.add_type( (SELECT variant_name FROM test_typmod), NULL )$$
+	, '23514'
+	/*
+	 * NOTE: We care about the actual error message to ensure there's a CHECK
+	 * constraint on the table and not just something in the function. If you
+	 * add a check to the function create another test to verify the table
+	* CHECK still works.
+	 */
+	, 'new row for relation "_registered" violates check constraint "allowed_types_may_not_contain_nulls"'
+	, 'NULLs not allowed in allowed_types'
 );
 INSERT INTO atypes VALUES('box');
 SELECT results_eq(
