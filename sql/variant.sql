@@ -280,8 +280,11 @@ CREATE TABLE _variant._registered(
   , variant_enabled boolean       NOT NULL DEFAULT true
   , allowed_types   regtype[]     NOT NULL
     CONSTRAINT allowed_types_may_not_contain_nulls
-      -- Aside from being a good idea, this is required by _variant._tg_check_type_usage
-      CHECK( cardinality(allowed_types) = cardinality(array_remove(allowed_types, NULL)) )
+      /*
+       * Make sure there's no NULLs in allowed_types. Aside from being a good
+       * idea, this is required by _variant._tg_check_type_usage.
+       */
+      CHECK( allowed_types = array_remove(allowed_types, NULL) )
 );
 CREATE UNIQUE INDEX _registered_u_lcase_variant_name ON _variant._registered( lower( variant_name ) );
 
@@ -308,6 +311,13 @@ CREATE VIEW variant.stored AS
 
 CREATE OR REPLACE FUNCTION _variant._tg_check_type_usage(
 ) RETURNS trigger LANGUAGE plpgsql AS $f$
+/*
+ * Verify that if we're removing a type from the list of allowed types that
+ * this registered variant isn't being used in a table anywhere.
+ *
+ * TODO: We should have a way to verify that a table doesn't contain any rows
+ * with a particular type.
+ */
 DECLARE
   v_columns text[];
   v_new _variant._registered.allowed_types%TYPE;
