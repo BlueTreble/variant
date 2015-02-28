@@ -1,10 +1,21 @@
+# Editor stuff
 .*.swp
-results/
+
+# Build output
 *.so
-tmp/
 *.o
+.deps/
+
+# dist output
+/variant-*.zip
+
+/sql/variant--*
+!/sql/variant--*--*.sql
+
+# Test artifacts
+results/
 regression.diffs
 regression.out
-/sql/ extension_name =>--*
-!/sql/<%= extension_name =>--*--*.sql
-.deps/
+
+# Misc crap
+tmp/
