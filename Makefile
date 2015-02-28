@@ -40,7 +40,7 @@ results:
 	rsync -avP --delete results/ test/expected
 
 dist:
-	git archive --format zip --prefix=$(EXTENSION)-$(EXTVERSION)/ -o $(EXTENSION)-$(EXTVERSION).zip HEAD
+	git archive --prefix=$(EXTENSION)-$(EXTVERSION)/ -o $(EXTENSION)-$(EXTVERSION).zip HEAD
 
 # To use this, do make print-VARIABLE_NAME
 print-%  : ; @echo $* = $($*)
