@@ -12,7 +12,7 @@
         "variant": {
             "abstract": "Variant data type for PostgreSQL",
             "file": "sql/variant.sql",
-            "docfile": "doc/variant.md",
+            "docfile": "doc/variant.md"
         }
     },
 
