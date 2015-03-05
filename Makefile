@@ -9,10 +9,10 @@ TESTS        = $(wildcard test/sql/*.sql)
 REGRESS      = $(patsubst test/sql/%.sql,%,$(TESTS))
 REGRESS_OPTS = --inputdir=test --load-language=plpgsql
 MODULES      = $(patsubst %.c,%,$(wildcard src/*.c))
-EXTRA_CLEAN  = $(wildcard $(EXTENSION)-*.zip)
 PG_CONFIG    = pg_config
 PG91         = $(shell $(PG_CONFIG) --version | grep -qE " 8\.| 9\.0" && echo no || echo yes)
 
+EXTRA_CLEAN  = $(wildcard $(EXTENSION)-*.zip)
 VERSION 	 = $(shell $(PG_CONFIG) --version | awk '{print $$2}')
 MAJORVER 	 = $(shell echo $(VERSION) | cut -d . -f1,2 | tr -d .)
 
