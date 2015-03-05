@@ -10,25 +10,27 @@ REGRESS      = $(patsubst test/sql/%.sql,%,$(TESTS))
 REGRESS_OPTS = --inputdir=test --load-language=plpgsql
 MODULES      = $(patsubst %.c,%,$(wildcard src/*.c))
 PG_CONFIG    = pg_config
-PG91         = $(shell $(PG_CONFIG) --version | grep -qE " 8\.| 9\.0" && echo no || echo yes)
 
 EXTRA_CLEAN  = $(wildcard $(EXTENSION)-*.zip)
 VERSION 	 = $(shell $(PG_CONFIG) --version | awk '{print $$2}')
 MAJORVER 	 = $(shell echo $(VERSION) | cut -d . -f1,2 | tr -d .)
 
-GE94		 = $(shell test $(MAJORVER) -ge 94 && echo yes || echo no)
+GE91		 = $(call test, $(MAJORVER), -ge, 91)
+GE94		 = $(call test, $(MAJORVER), -ge, 94)
+
+
 
 ifeq ($(GE94),yes)
 override CFLAGS += -DLONG_PARSETYPE
 endif
 
-ifeq ($(PG91),yes)
+ifeq ($(GE91),yes)
 all: sql/$(EXTENSION)--$(EXTVERSION).sql
 
 sql/$(EXTENSION)--$(EXTVERSION).sql: sql/$(EXTENSION).sql
 	cp $< $@
 
-DATA = $(wildcard sql/*--*.sql) sql/$(EXTENSION)--$(EXTVERSION).sql
+DATA = $(wildcard sql/*--*.sql)
 EXTRA_CLEAN += sql/$(EXTENSION)--$(EXTVERSION).sql
 endif
 
