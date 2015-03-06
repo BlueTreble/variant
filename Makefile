@@ -43,8 +43,8 @@ results:
 	rsync -avP --delete results/ test/expected
 
 dist:
-	git branch --set-upstream origin --track $(EXTVERSION)
-	git push origin $(EXTVERSION)
+	git branch $(EXTVERSION)
+	git push --set-upstream origin $(EXTVERSION)
 	git archive --prefix=$(EXTENSION)-$(EXTVERSION)/ -o $(EXTENSION)-$(EXTVERSION).zip HEAD
 
 # To use this, do make print-VARIABLE_NAME
