@@ -15,9 +15,10 @@ EXTRA_CLEAN  = $(wildcard $(EXTENSION)-*.zip)
 VERSION 	 = $(shell $(PG_CONFIG) --version | awk '{print $$2}')
 MAJORVER 	 = $(shell echo $(VERSION) | cut -d . -f1,2 | tr -d .)
 
+test		 = $(shell test $(1) $(2) $(3) && echo yes || echo no)
+
 GE91		 = $(call test, $(MAJORVER), -ge, 91)
 GE94		 = $(call test, $(MAJORVER), -ge, 94)
-
 
 
 ifeq ($(GE94),yes)
