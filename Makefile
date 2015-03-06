@@ -43,9 +43,11 @@ include $(PGXS)
 results:
 	rsync -avP --delete results/ test/expected
 
-dist:
+tag:
 	git branch $(EXTVERSION)
 	git push --set-upstream origin $(EXTVERSION)
+
+dist:
 	git archive --prefix=$(EXTENSION)-$(EXTVERSION)/ -o $(EXTENSION)-$(EXTVERSION).zip HEAD
 
 # To use this, do make print-VARIABLE_NAME
