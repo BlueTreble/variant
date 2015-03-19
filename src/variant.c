@@ -25,6 +25,7 @@
 #include "utils/typcache.h"
 #include "utils/lsyscache.h"
 #include "catalog/pg_type.h"
+#include "port.h"
 
 /* fn_extra cache entry */
 typedef struct VariantCache

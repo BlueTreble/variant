@@ -18,8 +18,13 @@ MAJORVER 	 = $(shell echo $(VERSION) | cut -d . -f1,2 | tr -d .)
 test		 = $(shell test $(1) $(2) $(3) && echo yes || echo no)
 
 GE91		 = $(call test, $(MAJORVER), -ge, 91)
+LT94		 = $(call test, $(MAJORVER), -lt, 94)
 GE94		 = $(call test, $(MAJORVER), -ge, 94)
 
+
+ifeq ($(LT94),yes)
+override CFLAGS += -DOVERRIDE_FINFO
+endif
 
 ifeq ($(GE94),yes)
 override CFLAGS += -DLONG_PARSETYPE
