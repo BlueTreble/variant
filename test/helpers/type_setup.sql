@@ -12,7 +12,7 @@
  *
  * Note that this is used as a string value!
  */
-\set op_test_order_by 'ORDER BY compare_type, base_type, compare_value, base_value'
+\set op_test_order_by 'ORDER BY compare_type COLLATE "C", base_type COLLATE "C", compare_value, base_value'
 
 BEGIN;
 \i test/helpers/tap_setup.sql

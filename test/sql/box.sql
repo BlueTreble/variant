@@ -22,7 +22,7 @@
  *
  * Note that this is used as a string value!
  */
-\set op_test_order_by 'ORDER BY compare_type, base_type, compare_value::text, base_value::text'
+\set op_test_order_by 'ORDER BY compare_type, base_type, compare_value::text COLLATE "C", base_value::text COLLATE "C"'
 
 -- Box also doesn't have a != operator
 DELETE FROM operator WHERE op ~ '!=';
