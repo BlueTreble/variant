@@ -258,6 +258,10 @@ SELECT bag_eq(
 	, 'Verify we are testing all storage options'
 );
 
+/*
+ * Currently causes a segfault
+DO $$DECLARE v variant.variant(test); BEGIN PERFORM variant.register( 'test', 'text' ); v := 'moo'::text; END$$;
+ */
 SELECT finish();
 
 -- vi: noexpandtab sw=4 ts=4
