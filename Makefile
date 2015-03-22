@@ -12,7 +12,7 @@ MODULES      = $(patsubst %.c,%,$(wildcard src/*.c))
 PG_CONFIG    = pg_config
 
 EXTRA_CLEAN  = $(wildcard $(EXTENSION)-*.zip)
-VERSION 	 = $(shell $(PG_CONFIG) --version | awk '{print $$2}')
+VERSION 	 = $(shell $(PG_CONFIG) --version | awk '{print $$2}' | sed -e 's/devel$$//')
 MAJORVER 	 = $(shell echo $(VERSION) | cut -d . -f1,2 | tr -d .)
 
 test		 = $(shell test $(1) $(2) $(3) && echo yes || echo no)
