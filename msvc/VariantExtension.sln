@@ -1,0 +1,29 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.31101.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "VariantExtension", "VariantExtension\VariantExtension.vcxproj", "{60621E90-EAAE-42D4-8C0A-C0DE97FEC936}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "extension", "extension", "{3BF60E85-AF5F-4C12-B0CE-47E5AA9CED9F}"
+	ProjectSection(SolutionItems) = preProject
+		query.sql = query.sql
+		extension\variant--1.0.0-beta3.sql = extension\variant--1.0.0-beta3.sql
+		extension\variant.control = extension\variant.control
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{60621E90-EAAE-42D4-8C0A-C0DE97FEC936}.Debug|Win32.ActiveCfg = Debug|Win32
+		{60621E90-EAAE-42D4-8C0A-C0DE97FEC936}.Debug|Win32.Build.0 = Debug|Win32
+		{60621E90-EAAE-42D4-8C0A-C0DE97FEC936}.Release|Win32.ActiveCfg = Release|Win32
+		{60621E90-EAAE-42D4-8C0A-C0DE97FEC936}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
