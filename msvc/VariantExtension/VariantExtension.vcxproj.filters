@@ -15,12 +15,12 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="variant.c">
+    <ClCompile Include="..\..\src\variant.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="variant.h">
+    <ClInclude Include="..\..\src\variant.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

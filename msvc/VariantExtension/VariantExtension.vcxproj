@@ -97,10 +97,10 @@ copy "$(SolutionDir)extension\*.*" "$(SolutionDir)out\share\extension\"</Command
     </ProjectReference>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="variant.c" />
+    <ClCompile Include="..\..\src\variant.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="variant.h" />
+    <ClInclude Include="..\..\src\variant.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
