@@ -259,9 +259,12 @@ SELECT bag_eq(
 );
 
 /*
- * Currently causes a segfault
-DO $$DECLARE v variant.variant(test); BEGIN PERFORM variant.register( 'test', 'text' ); v := 'moo'::text; END$$;
+ * Sanity-check via PLpgsql. This helps catch bugs with SPI handling.
+ *
+ * TODO: More extensive tests
  */
+DO $$DECLARE v variant.variant(test); BEGIN PERFORM variant.register( 'test', 'text' ); v := 'moo'::text; END$$;
+
 SELECT finish();
 
 -- vi: noexpandtab sw=4 ts=4

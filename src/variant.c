@@ -176,7 +176,7 @@ variant_cast_out(PG_FUNCTION_ARGS)
 		initStringInfo(cmd);
 		appendStringInfo( cmd, "SELECT $1::%s", format_type_be(targettypid) );
 		/* command, nargs, Oid *argument_types, *values, *nulls, read_only, count */
-		if( !(ret =SPI_execute_with_args( cmd->data, 1, &vi->typid, &vi->data, nulls, true, 0 )) )
+		if( (ret = SPI_execute_with_args( cmd->data, 1, &vi->typid, &vi->data, nulls, true, 0 )) != SPI_OK_SELECT )
 			elog( ERROR, "SPI_execute_with_args returned %s", SPI_result_code_string(ret));
 
 		/*
@@ -230,7 +230,7 @@ variant_typmod_in(PG_FUNCTION_ARGS)
 		char						*cmd = "SELECT variant_typmod, variant_enabled FROM _variant._registered WHERE lower(variant_name) = lower($1)";
 
 		/* command, nargs, Oid *argument_types, *values, *nulls, read_only, count */
-		if( !(ret =SPI_execute_with_args( cmd, 1, &type, &inputDatum, " ", true, 0 )) )
+		if( (ret = SPI_execute_with_args( cmd, 1, &type, &inputDatum, " ", true, 0 )) != SPI_OK_SELECT )
 			elog( ERROR, "SPI_execute_with_args(%s) returned %s", cmd, SPI_result_code_string(ret));
 
 		Assert( SPI_tuptable );
@@ -256,6 +256,7 @@ variant_typmod_in(PG_FUNCTION_ARGS)
 					)
 			);
 
+		/* Don't need to copy the tuple because int is pass by value */
 		out = heap_getattr( SPI_tuptable->vals[0], 1, SPI_tuptable->tupdesc, &isnull );
 		if( isnull )
 			ereport( ERROR,
@@ -661,7 +662,7 @@ variant_get_variant_name(int typmod, Oid org_typid)
 	}
 
 	/* command, nargs, Oid *argument_types, *values, *nulls, read_only, count */
-	if( !(ret =SPI_execute_with_args( cmd, nargs, types, values, "  ", true, 0 )) )
+	if( (ret = SPI_execute_with_args( cmd, nargs, types, values, "  ", true, 0 )) != SPI_OK_SELECT )
 		elog( ERROR, "SPI_execute_with_args(%s) returned %s", cmd, SPI_result_code_string(ret));
 	Assert( SPI_tuptable );
 
@@ -722,7 +723,7 @@ variant_cmp_int(FunctionCallInfo fcinfo)
 	Variant			l, r;
 	VariantInt	li;
 	VariantInt	ri;
-	int					result;
+	int					out;
 	
 	Assert(fcinfo->flinfo->fn_strict); /* Must not be callable on NULL input */
 	l = PG_GETARG_VARIANT(0);
@@ -789,21 +790,23 @@ variant_cmp_int(FunctionCallInfo fcinfo)
 		values[1] = ri->data;
 		nulls[1] = ri->isnull;
 
-		if( !(ret = SPI_execute_with_args(
+		if( (ret = SPI_execute_with_args(
 						cmd, 2, types, values, nulls,
 						true, /* read-only */
 						0 /* count */
-					)) )
+					)) != SPI_OK_SELECT )
 			elog( ERROR, "SPI_execute_with_args returned %s", SPI_result_code_string(ret));
 
 		/* Note 0 vs 1 based numbering */
 		Assert(SPI_tuptable->tupdesc->attrs[0]->atttypid == INT4OID);
-		result = DatumGetObjectId( heap_getattr(SPI_tuptable->vals[0], 1, SPI_tuptable->tupdesc, &fcinfo->isnull) );
+
+		/* Don't need to copy the tuple because int is pass by value */
+		out = DatumGetInt32( heap_getattr(SPI_tuptable->vals[0], 1, SPI_tuptable->tupdesc, &fcinfo->isnull) );
 
 		_SPI_disc(do_pop);
 	}
 
-	return result;
+	return out;
 }
 
 /*
@@ -1135,9 +1138,10 @@ getIntOid()
 	 * Get OID of our internal data type. This is necessary because record_in and
 	 * record_out need it.
 	 */
-	if (!(ret = SPI_execute("SELECT '_variant._variant'::regtype::oid", true, 1)))
+	if ( (ret = SPI_execute("SELECT '_variant._variant'::regtype::oid", true, 1)) != SPI_OK_SELECT )
 		elog( ERROR, "SPI_execute returned %s", SPI_result_code_string(ret));
 
+	/* Don't need to copy the tuple because Oid is pass by value */
 	out = DatumGetObjectId( heap_getattr(SPI_tuptable->vals[0], 1, SPI_tuptable->tupdesc, &isnull) );
 
 	/* Remember this frees everything palloc'd since our connect/push call */
@@ -1149,20 +1153,26 @@ getIntOid()
 static bool
 _SPI_conn()
 {
-	if( SPI_connect() )
+	int		ret;
+
+	if( SPI_connect() == SPI_OK_CONNECT )
 		return false;
 
 	SPI_push();
+	if( (ret = SPI_connect()) != SPI_OK_CONNECT )
+		elog( ERROR, "SPI_connect returned %s", SPI_result_code_string(ret));
 	return true;
 }
 
 static void
 _SPI_disc(bool pop)
 {
+	int		ret;
+
+	if( (ret = SPI_finish()) != SPI_OK_FINISH )
+		elog( ERROR, "SPI_finish returned %s", SPI_result_code_string(ret));
 	if(pop)
 		SPI_pop();
-	else
-		SPI_finish();
 }
 
 /*
