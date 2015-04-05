@@ -91,6 +91,7 @@ INSERT INTO plan SELECT count(*), 'Verify base data casted correctly' FROM base_
 INSERT INTO plan SELECT 1,        'UPDATE base_variant_b';
 INSERT INTO plan SELECT count(*), 'Verify text_in(text_out())' FROM base_data;
 INSERT INTO plan SELECT count(*), 'Verify variant.original_type())' FROM base_data;
+INSERT INTO plan SELECT count(*), 'Verify variant.original_regtype())' FROM base_data;
 
 /*
  * Same as above, but for compare values

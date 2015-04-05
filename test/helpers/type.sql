@@ -48,6 +48,12 @@ SELECT is(
   )
   FROM base_data
 ;
+SELECT is(
+    variant.original_regtype(base_variant)
+    , formatted_type::regtype
+  )
+  FROM base_data
+;
 
 
 /*

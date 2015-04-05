@@ -45,6 +45,10 @@ ok 39 - (int,1)::int != NULL
 ok 40 - (int,)::int = NULL is NULL
 ok 41 - (int,1)::int != NULL is NULL
 ok 42 - Verify we are testing all storage options
-ERROR:  variant.variant(test) is not registered
-LINE 6: DO $$DECLARE v variant.variant(test); BEGIN PERFORM variant....
-                       ^
+t
+moo
+moo
+moo
+moo
+moo
+moo

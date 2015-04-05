@@ -73,6 +73,9 @@ AS '$libdir/variant', 'quote_variant_name';
 CREATE OR REPLACE FUNCTION variant.original_type(variant.variant)
 RETURNS text LANGUAGE c IMMUTABLE STRICT
 AS '$libdir/variant', 'variant_type_out';
+CREATE OR REPLACE FUNCTION variant.original_regtype(variant.variant)
+RETURNS regtype LANGUAGE sql IMMUTABLE STRICT AS
+$$SELECT variant.original_type($1)::regtype$$;
 
 SELECT NULL = count(*) FROM ( -- Supress tons of blank lines
 SELECT _variant.exec( format($$
@@ -84,42 +87,42 @@ CREATE OR REPLACE FUNCTION _variant.variant_%1$s(variant.variant, variant.varian
 FROM unnest(string_to_array('lt le eq ne ge gt', ' ')) AS op
 ) a;
 
-CREATE OPERATOR < (
+CREATE OPERATOR variant.< (
   PROCEDURE = _variant.variant_lt
   , LEFTARG = variant.variant
   , RIGHTARG = variant.variant
   , COMMUTATOR = >
   , NEGATOR = >=
 );
-CREATE OPERATOR <= (
+CREATE OPERATOR variant.<= (
   PROCEDURE = _variant.variant_le
   , LEFTARG = variant.variant
   , RIGHTARG = variant.variant
   , COMMUTATOR = >=
   , NEGATOR = >
 );
-CREATE OPERATOR = (
+CREATE OPERATOR variant.= (
   PROCEDURE = _variant.variant_eq
   , LEFTARG = variant.variant
   , RIGHTARG = variant.variant
   , COMMUTATOR = =
   , NEGATOR = !=
 );
-CREATE OPERATOR != (
+CREATE OPERATOR variant.!= (
   PROCEDURE = _variant.variant_ne
   , LEFTARG = variant.variant
   , RIGHTARG = variant.variant
   , COMMUTATOR = !=
   , NEGATOR = =
 );
-CREATE OPERATOR >= (
+CREATE OPERATOR variant.>= (
   PROCEDURE = _variant.variant_ge
   , LEFTARG = variant.variant
   , RIGHTARG = variant.variant
   , COMMUTATOR = <=
   , NEGATOR = <
 );
-CREATE OPERATOR > (
+CREATE OPERATOR variant.> (
   PROCEDURE = _variant.variant_gt
   , LEFTARG = variant.variant
   , RIGHTARG = variant.variant
@@ -207,8 +210,9 @@ BEGIN
     )
   );
   PERFORM _variant.exec(
-    format( 'CREATE CAST( %s AS variant.variant ) WITH FUNCTION _variant.cast_in( %1$s, int, boolean ) AS ASSIGNMENT'
+    format( 'CREATE CAST( %s AS variant.variant ) WITH FUNCTION _variant.cast_in( %1$s, int, boolean ) AS %s'
       , p_source
+      , CASE (SELECT typcategory FROM pg_type WHERE oid = p_source) WHEN 'A' THEN 'ASSIGNMENT' ELSE 'IMPLICIT' END
     )
   );
 END
@@ -284,14 +288,14 @@ CREATE TABLE _variant._registered(
        * Make sure there's no NULLs in allowed_types. Aside from being a good
        * idea, this is required by _variant._tg_check_type_usage.
        */
-      CHECK( allowed_types = array_remove(allowed_types, NULL) )
+      CHECK( allowed_types::text[] = array_remove(allowed_types::text[], NULL) )
 );
 CREATE UNIQUE INDEX _registered_u_lcase_variant_name ON _variant._registered( lower( variant_name ) );
 
 INSERT INTO _variant._registered VALUES( -1, 'DEFAULT', false, '{}' );
 
 CREATE VIEW variant.registered AS
-  SELECT variant_typmod, _variant.quote_variant_name(variant_name), variant_enabled, coalesce( array_length(allowed_types, 1), 0 ) AS types_allowed
+  SELECT variant_typmod, _variant.quote_variant_name(variant_name) AS variant_name, variant_enabled, coalesce( array_length(allowed_types, 1), 0 ) AS types_allowed
     FROM _variant._registered
 ;
 CREATE VIEW _variant.stored AS

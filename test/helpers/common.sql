@@ -42,3 +42,5 @@ CREATE TEMP TABLE plan(
     test_count      int     NOT NULL
     , test_desc     text
 );
+
+SET search_path = variant, public;

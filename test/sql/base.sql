@@ -84,7 +84,11 @@ SELECT bag_eq(
 -- Sanity-check typmod output. Technically a typmod test, but it uses the test variant we register here
 SELECT is(
 			pg_catalog.format_type('variant.variant'::regtype, variant_typmod)
-			, format('variant.variant("%s")', regexp_replace(variant_name, '"', '""', 'g'))
+			, format(
+				'%s("%s")'
+				, 'variant.variant'::regtype -- Deal with search_path changes
+				, regexp_replace(variant_name, '"', '""', 'g')
+			)
 			, 'Check format_type() output'
 		)
 	FROM test_typmod
@@ -263,7 +267,53 @@ SELECT bag_eq(
  *
  * TODO: More extensive tests
  */
-DO $$DECLARE v variant.variant(test); BEGIN PERFORM variant.register( 'test', 'text' ); v := 'moo'::text; END$$;
+\set ON_ERROR_STOP false
+SAVEPOINT a;
+SELECT variant.register( 'variant plpgsql test', '{text}' ) IS NOT NULL
+	WHERE NOT EXISTS(
+		SELECT 1 FROM variant.registered WHERE variant_name = 'variant plpgsql test'
+	)
+;
+SAVEPOINT b;
+DO $$DECLARE v variant.variant("variant plpgsql test"); BEGIN v := 'moo'::text; END$$;
+ROLLBACK TO b;
+CREATE FUNCTION pg_temp.test_sql(
+	a anyelement
+--	a variant.variant("variant plpgsql test" )
+) RETURNS text LANGUAGE sql AS $body$
+	SELECT $1::variant.variant("variant plpgsql test")::text;
+$body$;
+CREATE FUNCTION pg_temp.test_pgsql(
+	a anyelement
+--	a variant.variant("variant plpgsql test" )
+) RETURNS text LANGUAGE plpgsql AS $body$
+DECLARE
+	v variant.variant("variant plpgsql test" ) := a;
+BEGIN
+	RETURN v::text;
+END
+$body$;
+SAVEPOINT c;
+--SELECT pg_temp.test_pgsql( 'moo' );
+ROLLBACK TO c;
+SELECT pg_temp.test_pgsql( ('moo'::text) );
+ROLLBACK TO c;
+CREATE TEMP TABLE t AS SELECT 'moo'::text AS t;
+SELECT pg_temp.test_pgsql(t) FROM t;
+ROLLBACK TO c;
+SELECT pg_temp.test_pgsql( variant.text_in('(text,moo)', 'variant plpgsql test') );
+
+ROLLBACK TO c;
+--SELECT pg_temp.test_sql( 'moo' );
+ROLLBACK TO c;
+SELECT pg_temp.test_sql( ('moo'::text) );
+ROLLBACK TO c;
+CREATE TEMP TABLE t AS SELECT 'moo'::text AS t;
+SELECT pg_temp.test_sql(t) FROM t;
+ROLLBACK TO c;
+SELECT pg_temp.test_sql( variant.text_in('(text,moo)', 'variant plpgsql test') );
+
+ROLLBACK TO a;
 
 SELECT finish();
 
