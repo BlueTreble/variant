@@ -13,6 +13,7 @@ SELECT plan( (
 	+6 -- register__get*
 	+5 -- allowed types
 	+9 -- disallowed types
+	+16 -- storage tests
 	+2 -- typmod tests
 	+ (SELECT count(*) FROM typmod_chars)
 	+4 -- NULL
@@ -164,43 +165,6 @@ SELECT results_eq(
 );
 
 /*
- * Storage allowed
- */
-SELECT is( storage_allowed, false, 'test variant allows storage' ) FROM _variant.registered__get( 'test variant' ) a;
-SELECT lives_ok(
-	$$SELECT variant.storage_allowed( 'test variant', false )$$
-	, 'Disallow storage on test variant'
-);
-SELECT is( storage_allowed, false, 'test variant disallows storage' ) FROM _variant.registered__get( 'test variant' ) a;
-
-DROP EVENT TRIGGER variant_storage_check_start;
-DROP EVENT TRIGGER variant_storage_check_end;
-SELECT lives_ok(
-	$$CREATE TEMP TABLE storage_test( v variant.variant("test variant") )$$
-	, 'Create storage test table with event triggers disabled'
-);
-
-\echo Verify we get WARNINGs because EVENT TRIGGERs are MIA
-SELECT lives_ok(
-	$$SELECT variant.storage_allowed( 'DEFAULT', false )$$
-	, 'Disallow storage on DEFAULT variant'
-);
-
-SELECT throws_ok(
-	$$SELECT variant.storage_allowed( 'test variant', false )$$
-	, '2BP01'
-	, 'variant "test variant" is still in use'
-	, 'Not allowed to disable variant storage while in use'
-);
-
-SELECT throws_ok(
-	$$SELECT variant.storage_allowed( 'DEFAULT', true )$$
-	, '22023'
-	, 'Enabling storage of DEFAULT variant is not allowed'
-	, 'Not allowed to disable variant storage'
-);
-
-/*
  * Disallowed types
  */
 SELECT throws_ok(
@@ -248,7 +212,7 @@ SELECT lives_ok(
  * typmod testing
  */
 SELECT lives_ok(
-	$$SELECT variant.register(ch, '{int}') FROM typmod_chars$$
+	$$SELECT variant.register(ch, '{int}', true) FROM typmod_chars$$
 	, 'test valid variant names'
 );
 SELECT throws_ok(
@@ -292,6 +256,81 @@ SELECT bag_eq(
 	, $$SELECT DISTINCT typbyval, typlen FROM pg_type WHERE (typlen <= 8 OR typlen % 4 != 0) AND typname NOT IN( 'cstring', 'unknown' )$$
 	, 'Verify we are testing all storage options'
 );
+
+/*
+ * Storage allowed
+ */
+SELECT throws_ok(
+	$$SELECT variant.storage_allowed( 'DEFAULT', true )$$
+	, '22023'
+	, 'Enabling storage of DEFAULT variant is not allowed'
+	, 'Not allowed to disable variant storage'
+);
+
+SELECT lives_ok(
+	$$SELECT variant.register( 'test storage' )$$
+	, 'Register test storage variant'
+);
+SELECT is( storage_allowed, false, 'test storage disallows storage' ) FROM _variant.registered__get( 'test storage' ) a;
+
+SELECT throws_ok(
+	$$CREATE TEMP TABLE storage_test( v variant.variant("test storage") )$$
+	, '22023'
+	, 'detected tables containing variants that do not allow storage'
+	, 'Verify event trigger'
+);
+
+SELECT lives_ok(
+	$$DROP EVENT TRIGGER variant_storage_check_end$$
+	, 'Drop _end trigger'
+);
+SELECT lives_ok(
+	$$CREATE TEMP TABLE storage_test( v variant.variant("test storage") )$$
+	, 'Create storage test table with event triggers disabled'
+);
+SELECT lives_ok(
+	$$DROP EVENT TRIGGER variant_storage_check_start$$
+	, 'Drop _start trigger'
+);
+
+\echo Verify we get WARNINGs because EVENT TRIGGERs are MIA
+SELECT lives_ok(
+	$$SELECT variant.storage_allowed( 'DEFAULT', false )$$
+	, 'Disallow storage on DEFAULT variant'
+);
+SELECT is( storage_allowed, true, 'test storage allows storage after fixup' ) FROM _variant.registered__get( 'test storage' ) a;
+SELECT is_empty(
+	$$SELECT * FROM variant.stored__bad$$
+	, 'No records found in variant.stored__bad'
+);
+
+SELECT throws_ok(
+	$$ALTER TABLE storage_test ALTER v TYPE variant.variant$$
+	, '22023'
+	, 'detected tables containing variants that do not allow storage'
+	, 'Can not ALTER TABLE'
+);
+
+SELECT throws_ok(
+	$$SELECT variant.storage_allowed( 'test storage', false )$$
+	, '2BP01'
+	, 'variant "test storage" is still in use'
+	, 'Not allowed to disable variant storage while in use'
+);
+
+SELECT lives_ok(
+	$$ALTER TABLE storage_test ALTER v TYPE variant.variant("test variant")$$
+	, 'Can ALTER TABLE to use "test variant"'
+);
+SELECT lives_ok(
+	$$CREATE TEMP VIEW storage_test_v AS SELECT * FROM storage_test$$
+	, 'Can CREATE VIEW'
+);
+SELECT lives_ok(
+	$$SELECT variant.storage_allowed( 'test storage', false )$$
+	, 'Can disallow storage'
+);
+SELECT is( storage_allowed, false, 'test storage disallows storage' ) FROM _variant.registered__get( 'test storage' ) a;
 
 SELECT finish();
 

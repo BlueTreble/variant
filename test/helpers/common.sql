@@ -2,7 +2,7 @@
 
 CREATE TEMP TABLE test_variant_typmod AS
     SELECT *
-        FROM variant.register( 'test variant', '{int2,int4,int8,real,float,numeric,char,"\"char\"",varchar,text,box,macaddr}' ) AS r(variant_typmod)
+        FROM variant.register( 'test variant', '{int2,int4,int8,real,float,numeric,char,"\"char\"",varchar,text,box,macaddr}', true ) AS r(variant_typmod)
 ;
 -- Add array variations on all the types we added
 -- Be easier to use lives_ok, but we need this stuff in place before we call plan()

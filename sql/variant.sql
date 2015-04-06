@@ -289,7 +289,8 @@ CREATE TABLE _variant._registered(
   , CONSTRAINT storing_default_variant_not_supported
       CHECK( variant_typmod >= 0 OR NOT storage_allowed )
 );
-CREATE UNIQUE INDEX _registered_u_lcase_variant_name ON _variant._registered( lower( variant_name ) );
+CREATE UNIQUE INDEX _registered__u_lcase_variant_name ON _variant._registered( lower( variant_name ) );
+CREATE UNIQUE INDEX _registered__u_quote_variant_name ON _variant._registered( _variant.quote_variant_name( variant_name ) );
 
 INSERT INTO _variant._registered VALUES( -1, 'DEFAULT', false, false, '{}' );
 
@@ -310,6 +311,14 @@ CREATE VIEW variant.stored AS
       , array( SELECT attrelid::regclass || '.' || column_name FROM _variant.stored WHERE variant_typmod = r.variant_typmod )
           AS columns_using_variant
     FROM variant.registered r
+;
+CREATE VIEW variant.stored__bad AS
+  SELECT r.*, attrelid::regclass AS table_name, column_name, format_type(atttypid, variant_typmod) AS type_name
+    FROM _variant.stored s
+      LEFT JOIN variant.registered r USING( variant_typmod )
+    WHERE 
+            NOT storage_allowed
+            OR NOT variant_enabled
 ;
 
 CREATE OR REPLACE FUNCTION _variant._tg_check_type_usage(
@@ -393,47 +402,37 @@ CREATE TRIGGER check_type_usage
   EXECUTE PROCEDURE _variant._tg_check_type_usage()
 ;
 
-CREATE OR REPLACE FUNCTION _variant.storage__ok(
-) RETURNS boolean LANGUAGE sql AS $body$
-SELECT EXISTS(
-  SELECT 1
-    FROM variant.stored
-    WHERE NOT storage_allowed
+CREATE OR REPLACE FUNCTION _variant.stored__bad(
+) RETURNS text[] LANGUAGE sql AS $body$
+SELECT array(
+  SELECT table_name || '.' || column_name || ' ' || type_name
+    FROM variant.stored__bad
 )
-$body$;
-
-CREATE OR REPLACE FUNCTION _variant._storage__fix(
-) RETURNS void LANGUAGE plpgsql AS $body$
-DECLARE
-  v_bad CONSTANT text := array_to_string(
-    array( SELECT quote_variant_name FROM variant.stored WHERE NOT storage_allowed )
-    , E'\n\t'
-  );
-BEGIN
-  UPDATE _variant._registered
-    SET storage_allowed = true
-      , variant_enabled = true
-    WHERE variant_typmod IN ( SELECT variant_typmod FROM _variant.stored )
-  ;
-  IF FOUND THEN
-    RAISE WARNING 'Found table columns with variants that were disabled or disallowed storage'
-      USING DETAIL = 'The following variants were enabled and had storage allowed:' || E'\n\t' || v_bad
-    ;
-  END IF;
-END
 $body$;
 
 CREATE OR REPLACE FUNCTION _variant._verify_storage(
   p_fix_it boolean
 ) RETURNS void LANGUAGE plpgsql AS $body$
+DECLARE
+  v_bad CONSTANT text[] := _variant.stored__bad();
 BEGIN
-  IF NOT _variant.storage__ok() THEN
+  IF v_bad IS DISTINCT FROM '{}' THEN
     IF p_fix_it THEN
-      PERFORM _variant._storage__fix();
+      UPDATE _variant._registered
+        SET storage_allowed = true
+          , variant_enabled = true
+        WHERE _variant.quote_variant_name( variant_name )
+          IN ( SELECT quote_variant_name FROM variant.stored__bad )
+      ;
+      RAISE WARNING 'Found table columns with variants that were disabled or disallowed storage'
+        USING DETAIL = 'The following variants were enabled and had storage allowed:' || E'\n\t'
+          || array_to_string( v_bad, E'\n\t' )
+      ;
     ELSE
       RAISE EXCEPTION 'detected tables containing variants that do not allow storage'
         USING ERRCODE = 'invalid_parameter_value'
-          , DETAIL = 'to get a list, SELECT * FROM variant.stored WHERE NOT storage_allowed'
+          , DETAIL = 'Bad table columns and types:' || E'\n\t'
+            || array_to_string( v_bad, E'\n\t' )
           , HINT = 'Use variant.storage_allowed() to allow storage for a variant'
       ;
     END IF;
@@ -505,7 +504,8 @@ BEGIN
   -- NOTE: Must do it this way or the optimizer gets cute and doesn't call the function both times
   IF bool_or( _variant._ensure_storage_check_one( p_warning, a ) ) FROM unnest( array[ 'start', 'end' ] ) a
   THEN
-    PERFORM _variant._storage__fix();
+    -- Since we were missing one or both event triggers fix anything that's now broken
+    PERFORM _variant._verify_storage(true);
   END IF;
 END
 $body$;
