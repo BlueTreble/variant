@@ -268,6 +268,9 @@ CREATE FUNCTION pg_temp.test_cmp_%s(
 	, v2 variant.variant(%2$s)
 ) RETURNS pg_temp.cmp_out LANGUAGE plpgsql AS $f$
 DECLARE
+	-- Test assignment
+	v1 variant.variant(%2$s) := p1;
+	v2 variant.variant(%2$s) := p2;
 	ret pg_temp.cmp_out;
 BEGIN
 	ret.lt := v1 < v2;
