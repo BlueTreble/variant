@@ -46,7 +46,7 @@ include $(PGXS)
 
 .PHONY: results
 results:
-	rsync -avP --delete results/ test/expected
+	rsync -rlpgovP results/ test/expected
 
 tag:
 	git branch $(EXTVERSION)

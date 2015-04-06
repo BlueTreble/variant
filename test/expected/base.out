@@ -2,7 +2,7 @@
 
 
 ok 1..0
-1..42
+1..48
 ok 1 - cast to text
 ok 2 - Check equality
 ok 3 - Check NULL
@@ -45,6 +45,12 @@ ok 39 - (int,1)::int != NULL
 ok 40 - (int,)::int = NULL is NULL
 ok 41 - (int,1)::int != NULL is NULL
 ok 42 - Verify we are testing all storage options
+ok 43 - Create cmp_out type
+ok 44 - Register "test no store"
+ok 45 - Create test_cmp for "test variant"
+ok 46 - Create test_cmp for "test no store"
+ok 47 - Test results from "test variant"
+ok 48 - Test results from "test no store"
 t
 moo
 moo
