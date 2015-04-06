@@ -2,7 +2,7 @@
 
 
 ok 1..0
-1..48
+1..49
 ok 1 - cast to text
 ok 2 - Check equality
 ok 3 - Check NULL
@@ -50,11 +50,14 @@ ok 44 - Register "test no store"
 ok 45 - Create test_cmp for "test variant"
 ok 46 - Create test_cmp for "test no store"
 ok 47 - Test results from "test variant"
-ok 48 - Test results from "test no store"
+ok 48 - Test results from "test variant"
+ok 49 - Test results from "test no store"
 t
 moo
+{moo}
 moo
 moo
 moo
+{moo}
 moo
 moo

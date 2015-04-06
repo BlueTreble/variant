@@ -288,7 +288,7 @@ CREATE TABLE _variant._registered(
        * Make sure there's no NULLs in allowed_types. Aside from being a good
        * idea, this is required by _variant._tg_check_type_usage.
        */
-      CHECK( allowed_types::text[] = array_remove(allowed_types::text[], NULL) )
+      CHECK( allowed_types = array_remove(allowed_types, NULL) )
 );
 CREATE UNIQUE INDEX _registered_u_lcase_variant_name ON _variant._registered( lower( variant_name ) );
 

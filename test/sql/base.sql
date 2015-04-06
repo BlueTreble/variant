@@ -17,7 +17,7 @@ SELECT plan( (
 	+ (SELECT count(*) FROM typmod_chars)
 	+4 -- NULL
 	+1 -- Type storage options
-	+6 -- plpgsql
+	+7 -- plpgsql
 )::int );
 
 SELECT is(
@@ -314,9 +314,14 @@ SELECT lives_ok(
 	FROM mod
 ;
 
-UPDATE _variant._registered SET variant_enabled = true, allowed_types = '{int}' WHERE variant_typmod = -1;
+UPDATE _variant._registered SET variant_enabled = true, allowed_types = '{int,int[],text,text[]}' WHERE variant_typmod = -1;
 SELECT is(
 	pg_temp.test_cmp_1( 1::int, 2::int::variant.variant("test variant") )
+	, (true, true, false, false, false)::cmp_out
+	, 'Test results from "test variant"'
+);
+SELECT is(
+	pg_temp.test_cmp_1( '{1,1}'::int[]::variant.variant, '{1,2}'::int[]::variant.variant("test variant") )
 	, (true, true, false, false, false)::cmp_out
 	, 'Test results from "test variant"'
 );
@@ -339,14 +344,14 @@ SAVEPOINT b;
 DO $$DECLARE v variant.variant("variant plpgsql test"); BEGIN v := 'moo'::text; END$$;
 ROLLBACK TO b;
 CREATE FUNCTION pg_temp.test_sql(
-	a anyelement
---	a variant.variant("variant plpgsql test" )
+--	a anyelement
+	a variant.variant("variant plpgsql test" )
 ) RETURNS text LANGUAGE sql AS $body$
 	SELECT $1::variant.variant("variant plpgsql test")::text;
 $body$;
 CREATE FUNCTION pg_temp.test_pgsql(
-	a anyelement
---	a variant.variant("variant plpgsql test" )
+--	a anyelement
+	a variant.variant("variant plpgsql test" )
 ) RETURNS text LANGUAGE plpgsql AS $body$
 DECLARE
 	v variant.variant("variant plpgsql test" ) := a;
@@ -359,6 +364,8 @@ SAVEPOINT c;
 ROLLBACK TO c;
 SELECT pg_temp.test_pgsql( ('moo'::text) );
 ROLLBACK TO c;
+SELECT pg_temp.test_pgsql( ('{moo}'::text[]::variant.variant) );
+ROLLBACK TO c;
 CREATE TEMP TABLE t AS SELECT 'moo'::text AS t;
 SELECT pg_temp.test_pgsql(t) FROM t;
 ROLLBACK TO c;
@@ -368,6 +375,8 @@ ROLLBACK TO c;
 --SELECT pg_temp.test_sql( 'moo' );
 ROLLBACK TO c;
 SELECT pg_temp.test_sql( ('moo'::text) );
+ROLLBACK TO c;
+SELECT pg_temp.test_sql( ('{moo}'::text[]::variant.variant) );
 ROLLBACK TO c;
 CREATE TEMP TABLE t AS SELECT 'moo'::text AS t;
 SELECT pg_temp.test_sql(t) FROM t;
