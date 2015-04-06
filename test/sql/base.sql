@@ -17,6 +17,7 @@ SELECT plan( (
 	+ (SELECT count(*) FROM typmod_chars)
 	+4 -- NULL
 	+1 -- Type storage options
+	+6 -- plpgsql
 )::int );
 
 SELECT is(
@@ -256,14 +257,70 @@ SELECT bag_eq(
 	, 'Verify we are testing all storage options'
 );
 
-SELECT finish();
 
 /*
- * Sanity-check via PLpgsql. This helps catch bugs with SPI handling.
- *
- * TODO: More extensive tests
+ * Test plpgsql
  */
-DO $$DECLARE v variant.variant(test); BEGIN PERFORM variant.register( 'test', 'text' ); v := 'moo'::text; END$$;
+CREATE TEMP VIEW test_cmp AS
+	SELECT $template$
+CREATE FUNCTION pg_temp.test_cmp_%s(
+	v1 variant.variant(%2$s)
+	, v2 variant.variant(%2$s)
+) RETURNS pg_temp.cmp_out LANGUAGE plpgsql AS $f$
+DECLARE
+	ret pg_temp.cmp_out;
+BEGIN
+	ret.lt := v1 < v2;
+	ret.le := v1 <= v2;
+	ret.eq := v1 = v2;
+	ret.ge := v1 >= v2;
+	ret.gt := v1 > v2;
 
+	RETURN ret;
+END
+$f$
+$template$::text AS template
+;
+
+SELECT lives_ok(
+	$live$
+CREATE TYPE pg_temp.cmp_out AS(
+	lt boolean
+	, le boolean
+	, eq boolean
+	, ge boolean
+	, gt boolean
+);
+	$live$
+	, 'Create cmp_out type'
+);
+SELECT lives_ok(
+	$$SELECT variant.register( 'test no store', '{int}' )$$
+	, 'Register "test no store"'
+);
+
+CREATE TEMP VIEW mod AS
+	SELECT 1::int AS id, '"test variant"'::text AS mod
+	UNION ALL SELECT 2, '"test no store"'
+;
+SELECT lives_ok(
+			format( (SELECT template FROM test_cmp), id, mod )
+			, 'Create test_cmp for ' || mod
+		)
+	FROM mod
+;
+
+SELECT is(
+	pg_temp.test_cmp_1( 1::int::variant.variant("test variant"), 2::int::variant.variant("test variant") )
+	, (true, true, false, false, false)::cmp_out
+	, 'Test results from "test variant"'
+);
+SELECT is(
+	pg_temp.test_cmp_2( 1::int::variant.variant("test no store"), 2::int::variant.variant("test no store") )
+	, (true, true, false, false, false)::cmp_out
+	, 'Test results from "test no store"'
+);
+
+SELECT finish();
 
 -- vi: noexpandtab sw=4 ts=4
