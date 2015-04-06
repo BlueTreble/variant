@@ -58,7 +58,7 @@ SELECT is(
  */
 SELECT row_eq(
 	'SELECT * FROM variant.registered WHERE variant_typmod = -1'
-	, ROW( -1, 'DEFAULT', false, 0 )::variant.registered
+	, ROW( -1, 'DEFAULT', false, false, 0 )::variant.registered
 	, 'valid variant(DEFAULT)'
 );
 
@@ -66,7 +66,7 @@ SELECT row_eq(
 CREATE TEMP TABLE atypes AS SELECT t::text AS type_name FROM unnest( '{int4,int2}'::regtype[] ) t;
 SELECT lives_ok(
 	$test$CREATE TEMP TABLE test_typmod AS
-				SELECT *, ' registration "TEST" (,/) variant '::text AS variant_name, true AS variant_enabled, '{int4,int2}'::regtype[]
+				SELECT *, ' registration "TEST" (,/) variant '::text AS variant_name, true AS variant_enabled, false AS storage_allowed, '{int4,int2}'::regtype[]
 					FROM variant.register( ' registration "TEST" (,/) variant ', array(SELECT type_name::regtype FROM atypes) ) AS r(variant_typmod)
 	$test$
 	, 'Register variant'
@@ -78,7 +78,7 @@ SELECT bag_eq(
 );
 SELECT bag_eq(
 	$$SELECT * FROM variant.registered WHERE variant_typmod IN (SELECT variant_typmod FROM test_typmod)$$
-	, $$SELECT variant_typmod, _variant.quote_variant_name(variant_name), variant_enabled, 2 FROM test_typmod$$
+	, $$SELECT variant_typmod, _variant.quote_variant_name(variant_name), variant_enabled, storage_allowed, 2 FROM test_typmod$$
 	, 'check variant.registered for newly added variant'
 );
 -- Sanity-check typmod output. Technically a typmod test, but it uses the test variant we register here
@@ -166,6 +166,43 @@ SELECT results_eq(
 );
 
 /*
+ * Storage allowed
+ */
+SELECT is( storage_allowed, false, 'test variant allows storage' ) FROM _variant.registered__get( 'test variant' ) a;
+SELECT lives_ok(
+	$$SELECT variant.storage_allowed( 'test variant', false )$$
+	, 'Disallow storage on test variant'
+);
+SELECT is( storage_allowed, false, 'test variant disallows storage' ) FROM _variant.registered__get( 'test variant' ) a;
+
+DROP EVENT TRIGGER variant_storage_check_start;
+DROP EVENT TRIGGER variant_storage_check_end;
+SELECT lives_ok(
+	$$CREATE TEMP TABLE storage_test( v variant.variant("test variant") )$$
+	, 'Create storage test table with event triggers disabled'
+);
+
+\echo Verify we get WARNINGs because EVENT TRIGGERs are MIA
+SELECT lives_ok(
+	$$SELECT variant.storage_allowed( 'DEFAULT', false )$$
+	, 'Disallow storage on DEFAULT variant'
+);
+
+SELECT throws_ok(
+	$$SELECT variant.storage_allowed( 'test variant', false )$$
+	, '2BP01'
+	, 'variant "test variant" is still in use'
+	, 'Not allowed to disable variant storage while in use'
+);
+
+SELECT throws_ok(
+	$$SELECT variant.storage_allowed( 'DEFAULT', true )$$
+	, '22023'
+	, 'Enabling storage of DEFAULT variant is not allowed'
+	, 'Not allowed to disable variant storage'
+);
+
+/*
  * Disallowed types
  */
 SELECT throws_ok(
@@ -173,7 +210,7 @@ SELECT throws_ok(
 	, 'new row for relation "_registered" violates check constraint "allowed_types_may_not_contain_nulls"'
 );
 SELECT lives_ok(
-	$$SELECT variant.register('test allowed types', '{}')$$
+	$$SELECT variant.register('test allowed types', '{}', true)$$
 	, 'Register allowed types variant'
 );
 SELECT lives_ok(
@@ -198,7 +235,7 @@ SELECT throws_ok(
 SELECT throws_ok(
 	$$SELECT variant.remove_type('test allowed types', 'int')$$
 	, '2BP01'
-	, 'variant test allowed types is still in use'
+	, 'variant "test allowed types" is still in use'
 );
 SELECT lives_ok(
 	$$DROP TABLE test_allowed$$

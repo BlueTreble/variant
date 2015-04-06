@@ -1,6 +1,7 @@
 \set ECHO none
 
 
+
 ok 1..0
 1..42
 ok 1 - cast to text
@@ -25,26 +26,59 @@ ok 19 - NULLs not allowed in allowed_types
 ok 20 - test variant.add_type
 ok 21 - test variant.add_types
 ok 22 - Verify newly added types
-ok 23 - threw new row for relation "_registered" violates check constraint "allowed_types_may_not_contain_nulls"
-ok 24 - Register allowed types variant
-ok 25 - Create table for testing allowed types
-ok 26 - threw 22023: type integer is not allowed in variant.variant(test allowed types)
-ok 27 - Allow use of int
-ok 28 - threw 22023: type smallint is not allowed in variant.variant(test allowed types)
-ok 29 - threw 2BP01: variant test allowed types is still in use
-ok 30 - Drop temp table
-ok 31 - remove type
-ok 32 - test valid variant names
-ok 33 - threw 42601
-ok 34 - test variant name (
-ok 35 - test variant name )
-ok 36 - test variant name "
-ok 37 - test variant name 99999
-ok 38 - (int,)::int = NULL
-ok 39 - (int,1)::int != NULL
-ok 40 - (int,)::int = NULL is NULL
-ok 41 - (int,1)::int != NULL is NULL
-ok 42 - Verify we are testing all storage options
+ok 23 - test variant allows storage
+ok 24 - Disallow storage on test variant
+ok 25 - test variant disallows storage
+ok 26 - Create storage test table with event triggers disabled
+Verify we get WARNINGs because EVENT TRIGGERs are MIA
+WARNING:  No ddl_command_start event trigger to verify variant storage; re-creating
+CONTEXT:  SQL statement "SELECT bool_or( _variant._ensure_storage_check_one( p_warning, a ) ) FROM unnest( array[ 'start', 'end' ] ) a"
+PL/pgSQL function _variant._ensure_storage_check(boolean) line 4 at IF
+SQL statement "SELECT _variant._ensure_storage_check()"
+PL/pgSQL function variant.storage_allowed(character varying,boolean) line 5 at PERFORM
+SQL statement "SELECT variant.storage_allowed( 'DEFAULT', false )"
+PL/pgSQL function lives_ok(text,text) line 6 at EXECUTE statement
+WARNING:  No ddl_command_end event trigger to verify variant storage; re-creating
+CONTEXT:  SQL statement "SELECT bool_or( _variant._ensure_storage_check_one( p_warning, a ) ) FROM unnest( array[ 'start', 'end' ] ) a"
+PL/pgSQL function _variant._ensure_storage_check(boolean) line 4 at IF
+SQL statement "SELECT _variant._ensure_storage_check()"
+PL/pgSQL function variant.storage_allowed(character varying,boolean) line 5 at PERFORM
+SQL statement "SELECT variant.storage_allowed( 'DEFAULT', false )"
+PL/pgSQL function lives_ok(text,text) line 6 at EXECUTE statement
+WARNING:  Found table columns with variants that were disabled or disallowed storage
+DETAIL:  The following variants were enabled and had storage allowed:
+	DEFAULT
+	"test variant"
+	" registration ""TEST"" (,/) variant "
+CONTEXT:  SQL statement "SELECT _variant._storage__fix()"
+PL/pgSQL function _variant._ensure_storage_check(boolean) line 6 at PERFORM
+SQL statement "SELECT _variant._ensure_storage_check()"
+PL/pgSQL function variant.storage_allowed(character varying,boolean) line 5 at PERFORM
+SQL statement "SELECT variant.storage_allowed( 'DEFAULT', false )"
+PL/pgSQL function lives_ok(text,text) line 6 at EXECUTE statement
+ok 27 - Disallow storage on DEFAULT variant
+ok 28 - Not allowed to disable variant storage while in use
+ok 29 - Not allowed to disable variant storage
+ok 30 - threw new row for relation "_registered" violates check constraint "allowed_types_may_not_contain_nulls"
+ok 31 - Register allowed types variant
+ok 32 - Create table for testing allowed types
+ok 33 - threw 22023: type integer is not allowed in variant.variant(test allowed types)
+ok 34 - Allow use of int
+ok 35 - threw 22023: type smallint is not allowed in variant.variant(test allowed types)
+ok 36 - threw 2BP01: variant "test allowed types" is still in use
+ok 37 - Drop temp table
+ok 38 - remove type
+ok 39 - test valid variant names
+ok 40 - threw 42601
+ok 41 - test variant name (
+ok 42 - test variant name )
+ok 43 - test variant name "
+ok 44 - test variant name 99999
+ok 45 - (int,)::int = NULL
+ok 46 - (int,1)::int != NULL
+ok 47 - (int,)::int = NULL is NULL
+ok 48 - (int,1)::int != NULL is NULL
+ok 49 - Verify we are testing all storage options
 ERROR:  variant.variant(test) is not registered
 LINE 6: DO $$DECLARE v variant.variant(test); BEGIN PERFORM variant....
                        ^
