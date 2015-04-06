@@ -5,8 +5,6 @@ CREATE TEMP VIEW typmod_chars AS SELECT * FROM unnest( string_to_array('( ) " 99
 \i test/helpers/tap_setup.sql
 \i test/helpers/common.sql
 
-\set ON_ERROR_STOP true
-
 SELECT plan( (
 	3 -- Simple cast, equality, NULL
 	+1 -- DEFAULT is disabled
@@ -295,6 +293,8 @@ SELECT bag_eq(
 	, 'Verify we are testing all storage options'
 );
 
+SELECT finish();
+
 /*
  * Sanity-check via PLpgsql. This helps catch bugs with SPI handling.
  *
@@ -302,6 +302,5 @@ SELECT bag_eq(
  */
 DO $$DECLARE v variant.variant(test); BEGIN PERFORM variant.register( 'test', 'text' ); v := 'moo'::text; END$$;
 
-SELECT finish();
 
 -- vi: noexpandtab sw=4 ts=4
