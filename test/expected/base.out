@@ -3,11 +3,11 @@
 
 
 ok 1..0
-1..65
+1..67
 ok 1 - cast to text
 ok 2 - Check equality
 ok 3 - Check NULL
-ok 4 - threw 22023: variant.variant(DEFAULT) is disabled
+ok 4 - variant.variant() works
 ok 5 - variant.text_in()
 ok 6 - variant.text_out()
 ok 7 - valid variant(DEFAULT)
@@ -47,12 +47,13 @@ ok 40 - (int,)::int = NULL is NULL
 ok 41 - (int,1)::int != NULL is NULL
 ok 42 - Verify we are testing all storage options
 ok 43 - Not allowed to disable variant storage
-ok 44 - Register test storage variant
-ok 45 - test storage disallows storage
-ok 46 - Verify event trigger
-ok 47 - Drop _end trigger
-ok 48 - Create storage test table with event triggers disabled
-ok 49 - Drop _start trigger
+ok 44 - Not allowed to disable variant storage
+ok 45 - Register test storage variant
+ok 46 - test storage disallows storage
+ok 47 - Verify event trigger
+ok 48 - Drop _end trigger
+ok 49 - Create storage test table with event triggers disabled
+ok 50 - Drop _start trigger
 Verify we get WARNINGs because EVENT TRIGGERs are MIA
 WARNING:  No ddl_command_start event trigger to verify variant storage; re-creating
 CONTEXT:  SQL statement "SELECT bool_or( _variant._ensure_storage_check_one( p_warning, a ) ) FROM unnest( array[ 'start', 'end' ] ) a"
@@ -77,19 +78,20 @@ SQL statement "SELECT _variant._ensure_storage_check()"
 PL/pgSQL function variant.storage_allowed(character varying,boolean) line 5 at PERFORM
 SQL statement "SELECT variant.storage_allowed( 'DEFAULT', false )"
 PL/pgSQL function lives_ok(text,text) line 6 at EXECUTE statement
-ok 50 - Disallow storage on DEFAULT variant
-ok 51 - test storage allows storage after fixup
-ok 52 - No records found in variant.stored__bad
-ok 53 - Can not ALTER TABLE
-ok 54 - Not allowed to disable variant storage while in use
-ok 55 - Can ALTER TABLE to use "test variant"
-ok 56 - Can CREATE VIEW
-ok 57 - Can disallow storage
-ok 58 - test storage disallows storage
-ok 59 - Create test template
-ok 60 - Create cmp_out type
-ok 61 - Register "test no store"
-ok 62 - Create test_cmp for "test variant"
-ok 63 - Create test_cmp for "test no store"
-ok 64 - Test results from "test variant"
-ok 65 - Test results from "test no store"
+ok 51 - Disallow storage on DEFAULT variant
+ok 52 - test storage allows storage after fixup
+ok 53 - No records found in variant.stored__bad
+ok 54 - Can not ALTER TABLE
+ok 55 - Not allowed to disable variant storage while in use
+ok 56 - Ensure we can store in "test storage"
+ok 57 - Can ALTER TABLE to use "test variant"
+ok 58 - Can CREATE VIEW
+ok 59 - Can disallow storage
+ok 60 - test storage disallows storage
+ok 61 - Create test template
+ok 62 - Create cmp_out type
+ok 63 - Register "test no store" with no types to ensure we ignore them when there are none
+ok 64 - Create test_cmp for "test variant"
+ok 65 - Create test_cmp for "test no store"
+ok 66 - Test results from "test variant"
+ok 67 - Test results from "test no store"

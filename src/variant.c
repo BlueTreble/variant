@@ -47,7 +47,7 @@ typedef struct VariantCache
 static Variant variant_in_int(FunctionCallInfo fcinfo, char *input, int variant_typmod);
 static char * variant_out_int(FunctionCallInfo fcinfo, Variant input);
 static int variant_cmp_int(FunctionCallInfo fcinfo);
-static char * variant_get_variant_name(int typmod, Oid org_typid);
+static char * variant_get_variant_name(int typmod, Oid org_typid, bool ignore_storage);
 static VariantInt make_variant_int(Variant v, FunctionCallInfo fcinfo, IOFuncSelector func);
 static Variant make_variant(VariantInt vi, FunctionCallInfo fcinfo, IOFuncSelector func);
 static VariantCache * get_cache(FunctionCallInfo fcinfo, VariantInt vi, IOFuncSelector func);
@@ -115,7 +115,7 @@ variant_cast_in(PG_FUNCTION_ARGS)
 	/* Validate that we're casting to a registered variant */
 	if( PG_ARGISNULL(1) )
 		elog( ERROR, "Target typemod must not be NULL" );
-	variant_get_variant_name(PG_GETARG_INT32(1), vi->typid);
+	variant_get_variant_name(PG_GETARG_INT32(1), vi->typid, false);
 
 	if( !vi->isnull )
 		vi->data = PG_GETARG_DATUM(0);
@@ -281,7 +281,7 @@ variant_typmod_out(PG_FUNCTION_ARGS)
 	Assert(fcinfo->flinfo->fn_strict); /* Must be strict */
 
 	/* TODO: cache this stuff */
-	variant_name = variant_get_variant_name(PG_GETARG_INT32(0), InvalidOid);
+	variant_name = variant_get_variant_name(PG_GETARG_INT32(0), InvalidOid, true);
 	out = quote_variant_name_cstring(variant_name);
 	pfree(variant_name);
 
@@ -506,7 +506,7 @@ variant_in_int(FunctionCallInfo fcinfo, char *input, int variant_typmod)
 	/*
 	 * Verify we've been handed a valid typmod
 	 */
-	variant_get_variant_name(variant_typmod, vi->typid);
+	variant_get_variant_name(variant_typmod, vi->typid, false);
 
 	cache = get_cache(fcinfo, vi, IOFunc_input);
 
@@ -620,7 +620,7 @@ variant_out_int(FunctionCallInfo fcinfo, Variant input)
  * variant_get_variant_name: Return the name of a named variant
  */
 char *
-variant_get_variant_name(int typmod, Oid org_typid)
+variant_get_variant_name(int typmod, Oid org_typid, bool ignore_storage)
 {
 	Datum						values[2];
 	MemoryContext		cctx = CurrentMemoryContext;
@@ -649,14 +649,14 @@ variant_get_variant_name(int typmod, Oid org_typid)
 	 * column, which we can't completely handle anyway, I don't think it's worth
 	 * it to lock the rows.
 	 */
-	if(org_typid == InvalidOid)
+	if(ignore_storage)
 	{
-		cmd = "SELECT variant_name, variant_enabled FROM _variant._registered WHERE variant_typmod = $1";
+		cmd = "SELECT variant_name, variant_enabled, storage_allowed FROM _variant._registered WHERE variant_typmod = $1";
 		nargs = 1;
 	}
 	else
 	{
-		cmd = "SELECT variant_name, variant_enabled, allowed_types @> array[ $2 ] FROM _variant._registered WHERE variant_typmod = $1";
+		cmd = "SELECT variant_name, variant_enabled, storage_allowed, allowed_types @> array[ $2 ] FROM _variant._registered WHERE variant_typmod = $1";
 		nargs = 2;
 		values[1] = ObjectIdGetDatum(org_typid);
 	}
@@ -678,6 +678,7 @@ variant_get_variant_name(int typmod, Oid org_typid)
 	/* Note 0 vs 1 based numbering */
 	Assert(SPI_tuptable->tupdesc->attrs[0]->atttypid == VARCHAROID);
 	Assert(SPI_tuptable->tupdesc->attrs[1]->atttypid == BOOLOID);
+	Assert(SPI_tuptable->tupdesc->attrs[2]->atttypid == BOOLOID);
 	result = heap_getattr( SPI_tuptable->vals[0], 1, SPI_tuptable->tupdesc, &isnull );
 	if( isnull )
 		ereport( ERROR,
@@ -697,16 +698,31 @@ variant_get_variant_name(int typmod, Oid org_typid)
 				)
 			);
 
-	if(org_typid != InvalidOid)
+	/*
+	 * If storage is allowed, then throw an error if we don't know what our
+	 * original type is, or if that type is not listed as allowed.
+	 */
+	if(!ignore_storage)
 	{
 		result = heap_getattr( SPI_tuptable->vals[0], 3, SPI_tuptable->tupdesc, &isnull );
-		if( !DatumGetBool(result) )
-			ereport( ERROR,
-					( errcode(ERRCODE_INVALID_PARAMETER_VALUE),
-						errmsg( "type %s is not allowed in variant.variant(%s)", format_type_be(org_typid), out ),
-						errhint( "you can permanently allow a type to be used by calling variant.allow_type()" )
-					)
-				);
+		if( DatumGetBool(result) )
+		{
+			if( org_typid == InvalidOid)
+				ereport( ERROR,
+						( errcode(ERRCODE_INVALID_PARAMETER_VALUE),
+							errmsg( "Unable to determine original type" )
+						)
+					);
+
+			result = heap_getattr( SPI_tuptable->vals[0], 4, SPI_tuptable->tupdesc, &isnull );
+			if( !DatumGetBool(result) )
+				ereport( ERROR,
+						( errcode(ERRCODE_INVALID_PARAMETER_VALUE),
+							errmsg( "type %s is not allowed in variant.variant(%s)", format_type_be(org_typid), out ),
+							errhint( "you can permanently allow a type to be used by calling variant.allow_type()" )
+						)
+					);
+		}
 	}
 
 	_SPI_disc(do_pop); /* pfree's all SPI stuff */

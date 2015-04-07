@@ -7,13 +7,13 @@ CREATE TEMP VIEW typmod_chars AS SELECT * FROM unnest( string_to_array('( ) " 99
 
 SELECT plan( (
 	3 -- Simple cast, equality, NULL
-	+1 -- DEFAULT is disabled
+	+1 -- DEFAULT
 	+2 -- text in/out
 	+5 -- register
 	+6 -- register__get*
 	+5 -- allowed types
 	+9 -- disallowed types
-	+16 -- storage tests
+	+18 -- storage tests
 	+2 -- typmod tests
 	+ (SELECT count(*) FROM typmod_chars)
 	+4 -- NULL
@@ -36,10 +36,9 @@ SELECT is(
 	, NULL
 	, 'Check NULL'
 );
-SELECT throws_ok(
+SELECT lives_ok(
 	$$SELECT 't'::text::variant.variant$$
-	, '22023'
-	, 'variant.variant(DEFAULT) is disabled'
+	, 'variant.variant() works'
 );
 
 SELECT is(
@@ -58,7 +57,7 @@ SELECT is(
  */
 SELECT row_eq(
 	'SELECT * FROM variant.registered WHERE variant_typmod = -1'
-	, ROW( -1, 'DEFAULT', false, false, 0 )::variant.registered
+	, ROW( -1, 'DEFAULT', true, false, 0 )::variant.registered
 	, 'valid variant(DEFAULT)'
 );
 
@@ -262,6 +261,12 @@ SELECT bag_eq(
  * Storage allowed
  */
 SELECT throws_ok(
+	$$UPDATE _variant._registered SET storage_allowed = true WHERE variant_typmod = -1$$
+	, 'new row for relation "_registered" violates check constraint "storing_default_variant_not_supported"'
+	, 'Not allowed to disable variant storage'
+);
+
+SELECT throws_ok(
 	$$SELECT variant.storage_allowed( 'DEFAULT', true )$$
 	, '22023'
 	, 'Enabling storage of DEFAULT variant is not allowed'
@@ -269,7 +274,7 @@ SELECT throws_ok(
 );
 
 SELECT lives_ok(
-	$$SELECT variant.register( 'test storage' )$$
+	$$SELECT variant.register( 'test storage', '{int}' )$$
 	, 'Register test storage variant'
 );
 SELECT is( storage_allowed, false, 'test storage disallows storage' ) FROM _variant.registered__get( 'test storage' ) a;
@@ -317,6 +322,11 @@ SELECT throws_ok(
 	, '2BP01'
 	, 'variant "test storage" is still in use'
 	, 'Not allowed to disable variant storage while in use'
+);
+
+SELECT lives_ok(
+	$$INSERT INTO storage_test VALUES(1)$$
+	, 'Ensure we can store in "test storage"'
 );
 
 SELECT lives_ok(
@@ -376,8 +386,8 @@ CREATE TYPE pg_temp.cmp_out AS(
 	, 'Create cmp_out type'
 );
 SELECT lives_ok(
-	$$SELECT variant.register( 'test no store', '{int}' )$$
-	, 'Register "test no store"'
+	$$SELECT variant.register( 'test no store' )$$
+	, 'Register "test no store" with no types to ensure we ignore them when there are none'
 );
 
 CREATE TEMP VIEW mod AS
@@ -392,12 +402,12 @@ SELECT lives_ok(
 ;
 
 SELECT is(
-	pg_temp.test_cmp_1( 1::int::variant.variant("test variant"), 2::int::variant.variant("test variant") )
+	pg_temp.test_cmp_1( 1::int, 2::int::variant.variant("test variant") )
 	, (true, true, false, false, false)::cmp_out
 	, 'Test results from "test variant"'
 );
 SELECT is(
-	pg_temp.test_cmp_2( 1::int::variant.variant("test no store"), 2::int::variant.variant("test no store") )
+	pg_temp.test_cmp_2( 1::int, 2::int::variant.variant("test no store") )
 	, (true, true, false, false, false)::cmp_out
 	, 'Test results from "test no store"'
 );

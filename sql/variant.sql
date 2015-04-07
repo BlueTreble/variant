@@ -207,8 +207,9 @@ BEGIN
     )
   );
   PERFORM _variant.exec(
-    format( 'CREATE CAST( %s AS variant.variant ) WITH FUNCTION _variant.cast_in( %1$s, int, boolean ) AS ASSIGNMENT'
+    format( 'CREATE CAST( %s AS variant.variant ) WITH FUNCTION _variant.cast_in( %1$s, int, boolean ) AS %s'
       , p_source
+      , CASE (SELECT typcategory FROM pg_type WHERE oid = p_source) WHEN 'A' THEN 'ASSIGNMENT' ELSE 'IMPLICIT' END
     )
   );
 END
@@ -292,7 +293,7 @@ CREATE TABLE _variant._registered(
 CREATE UNIQUE INDEX _registered__u_lcase_variant_name ON _variant._registered( lower( variant_name ) );
 CREATE UNIQUE INDEX _registered__u_quote_variant_name ON _variant._registered( _variant.quote_variant_name( variant_name ) );
 
-INSERT INTO _variant._registered VALUES( -1, 'DEFAULT', false, false, '{}' );
+INSERT INTO _variant._registered VALUES( -1, 'DEFAULT', true, false, '{}' );
 
 CREATE VIEW variant.registered AS
   SELECT variant_typmod, _variant.quote_variant_name(variant_name), variant_enabled, storage_allowed, coalesce( array_length(allowed_types, 1), 0 ) AS types_allowed
