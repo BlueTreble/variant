@@ -278,6 +278,7 @@ CREATE TABLE _variant._registered(
       CONSTRAINT variant_typemod_minimum_value CHECK( variant_typmod >= -1 )
   , variant_name    varchar(100)  NOT NULL
   , variant_enabled boolean       NOT NULL DEFAULT true
+  , storage_allowed boolean       NOT NULL DEFAULT false -- Fix variant.register() if you change the default
   , allowed_types   regtype[]     NOT NULL
     CONSTRAINT allowed_types_may_not_contain_nulls
       /*
@@ -285,13 +286,16 @@ CREATE TABLE _variant._registered(
        * idea, this is required by _variant._tg_check_type_usage.
        */
       CHECK( allowed_types = array_remove(allowed_types, NULL) )
+  , CONSTRAINT storing_default_variant_not_supported
+      CHECK( variant_typmod >= 0 OR NOT storage_allowed )
 );
-CREATE UNIQUE INDEX _registered_u_lcase_variant_name ON _variant._registered( lower( variant_name ) );
+CREATE UNIQUE INDEX _registered__u_lcase_variant_name ON _variant._registered( lower( variant_name ) );
+CREATE UNIQUE INDEX _registered__u_quote_variant_name ON _variant._registered( _variant.quote_variant_name( variant_name ) );
 
-INSERT INTO _variant._registered VALUES( -1, 'DEFAULT', false, '{}' );
+INSERT INTO _variant._registered VALUES( -1, 'DEFAULT', false, false, '{}' );
 
 CREATE VIEW variant.registered AS
-  SELECT variant_typmod, _variant.quote_variant_name(variant_name), variant_enabled, coalesce( array_length(allowed_types, 1), 0 ) AS types_allowed
+  SELECT variant_typmod, _variant.quote_variant_name(variant_name), variant_enabled, storage_allowed, coalesce( array_length(allowed_types, 1), 0 ) AS types_allowed
     FROM _variant._registered
 ;
 CREATE VIEW _variant.stored AS
@@ -308,6 +312,14 @@ CREATE VIEW variant.stored AS
           AS columns_using_variant
     FROM variant.registered r
 ;
+CREATE VIEW variant.stored__bad AS
+  SELECT r.*, attrelid::regclass AS table_name, column_name, format_type(atttypid, variant_typmod) AS type_name
+    FROM _variant.stored s
+      LEFT JOIN variant.registered r USING( variant_typmod )
+    WHERE 
+            NOT storage_allowed
+            OR NOT variant_enabled
+;
 
 CREATE OR REPLACE FUNCTION _variant._tg_check_type_usage(
 ) RETURNS trigger LANGUAGE plpgsql AS $f$
@@ -320,28 +332,62 @@ CREATE OR REPLACE FUNCTION _variant._tg_check_type_usage(
  */
 DECLARE
   v_columns text[];
-  v_new _variant._registered.allowed_types%TYPE;
+  v_new_types _variant._registered.allowed_types%TYPE;
+  v_new_storage _variant._registered.storage_allowed%TYPE;
 BEGIN
+  -- Special cases for DEFAULT variant
+  IF OLD.variant_typmod = -1 THEN
+    IF TG_OP = 'DELETE' THEN
+      RAISE EXCEPTION 'Deleting DEFAULT variant is not allowed';
+    END IF;
+
+    IF EXISTS( SELECT 1 FROM _variant.stored WHERE variant_typmod = -1 ) THEN
+      RAISE WARNING 'There are columns storing a DEFAULT variant. These must be changed to a registered variant immediately.'
+        USING DETAIL = 'Affected columns:' || E'\n\t' || array_to_string(
+            array( SELECT attrelid::regclass || '.' || column_name FROM _variant.stored WHERE variant_typmod = -1 )
+            , E'\n\t'
+          )
+      ;
+    END IF;
+
+    IF NEW.storage_allowed THEN
+      RAISE EXCEPTION 'Enabling storage of DEFAULT variant is not allowed'
+        USING ERRCODE = 'invalid_parameter_value'
+      ;
+    END IF;
+  END IF;
+
   IF TG_OP = 'UPDATE' THEN
-    IF NEW.allowed_types @> OLD.allowed_types THEN
-      -- User didn't remove any types
+    IF NEW.variant_typmod IS DISTINCT FROM OLD.variant_typmod THEN
+      RAISE EXCEPTION 'Changing variant typmods is not allowed'
+        USING ERRCODE = 'invalid_parameter_value'
+      ;
+    END IF;
+
+    IF NEW.allowed_types @> OLD.allowed_types
+      AND NEW.storage_allowed
+    THEN
+      -- User didn't remove any types or disable storage
       RETURN NULL;
     END IF;
 
-    v_new := NEW.allowed_types;
+    v_new_types := NEW.allowed_types;
+    v_new_storage := NEW.storage_allowed;
   ELSE
-    v_new := '{}';
+    v_new_types := '{}';
   END IF;
 
   v_columns := columns_using_variant FROM variant.stored WHERE variant_typmod = OLD.variant_typmod;
-  RAISE DEBUG 'TG_OP: %, OLD.allowed_types %, NEW.allowed_types %, v_columns %'
+  RAISE DEBUG 'TG_OP: %, OLD.allowed_types %, NEW.allowed_types %, OLD.storage_allowed %, NEW.storage_allowed %, v_columns %'
     , TG_WHEN
     , OLD.allowed_types
-    , v_new
+    , v_new_types
+    , OLD.storage_allowed
+    , v_new_storage
     , v_columns
   ;
   IF v_columns IS DISTINCT FROM '{}' THEN
-    RAISE EXCEPTION 'variant % is still in use', OLD.variant_name
+    RAISE EXCEPTION 'variant "%" is still in use', OLD.variant_name
       USING ERRCODE = 'dependent_objects_still_exist'
         , DETAIL = E'in use by ' || array_to_string( v_columns, ', ' )
     ;
@@ -356,16 +402,130 @@ CREATE TRIGGER check_type_usage
   EXECUTE PROCEDURE _variant._tg_check_type_usage()
 ;
 
+CREATE OR REPLACE FUNCTION _variant.stored__bad(
+) RETURNS text[] LANGUAGE sql AS $body$
+SELECT array(
+  SELECT table_name || '.' || column_name || ' ' || type_name
+    FROM variant.stored__bad
+)
+$body$;
+
+CREATE OR REPLACE FUNCTION _variant._verify_storage(
+  p_fix_it boolean
+) RETURNS void LANGUAGE plpgsql AS $body$
+DECLARE
+  v_bad CONSTANT text[] := _variant.stored__bad();
+BEGIN
+  IF v_bad IS DISTINCT FROM '{}' THEN
+    IF p_fix_it THEN
+      UPDATE _variant._registered
+        SET storage_allowed = true
+          , variant_enabled = true
+        WHERE _variant.quote_variant_name( variant_name )
+          IN ( SELECT quote_variant_name FROM variant.stored__bad )
+      ;
+      RAISE WARNING 'Found table columns with variants that were disabled or disallowed storage'
+        USING DETAIL = 'The following variants were enabled and had storage allowed:' || E'\n\t'
+          || array_to_string( v_bad, E'\n\t' )
+      ;
+    ELSE
+      RAISE EXCEPTION 'detected tables containing variants that do not allow storage'
+        USING ERRCODE = 'invalid_parameter_value'
+          , DETAIL = 'Bad table columns and types:' || E'\n\t'
+            || array_to_string( v_bad, E'\n\t' )
+          , HINT = 'Use variant.storage_allowed() to allow storage for a variant'
+      ;
+    END IF;
+  END IF;
+END
+$body$;
+CREATE OR REPLACE FUNCTION _variant._tge_verify_storage_start(
+) RETURNS event_trigger LANGUAGE plpgsql AS $body$
+BEGIN
+  PERFORM _variant._verify_storage( true );
+END
+$body$;
+CREATE OR REPLACE FUNCTION _variant._tge_verify_storage_end(
+) RETURNS event_trigger LANGUAGE plpgsql AS $body$
+BEGIN
+  PERFORM _variant._verify_storage( false );
+END
+$body$;
+
+CREATE OR REPLACE FUNCTION _variant._ensure_storage_check_one(
+  p_warning boolean
+  , p_start_end text
+) RETURNS boolean LANGUAGE plpgsql AS $body$
+DECLARE
+  t_enable CONSTANT text := 'ALTER EVENT TRIGGER %I ENABLE';
+  t_create CONSTANT text := $template$
+CREATE EVENT TRIGGER variant_storage_check_%1$s
+  ON ddl_command_%1$s
+  WHEN tag IN ( 'ALTER DOMAIN', 'ALTER TABLE', 'ALTER VIEW'
+    , 'CREATE DOMAIN', 'CREATE TABLE', 'CREATE TABLE AS', 'CREATE VIEW'
+  )
+  EXECUTE PROCEDURE _variant._tge_verify_storage_%1$s()
+$template$;
+
+  v_enabled "char";
+  v_name name;
+BEGIN
+  IF p_start_end NOT IN ( 'start', 'end' ) THEN
+    RAISE 'something seriously wrong just happened';
+  END IF;
+
+  BEGIN
+    SELECT evtenabled, evtname INTO STRICT v_enabled, v_name
+      FROM pg_event_trigger
+      WHERE evtevent = 'ddl_command_' || p_start_end
+        AND evtfoid = ('_variant._tge_verify_storage_' || p_start_end )::regproc
+    ;
+  EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+      IF p_warning THEN
+        RAISE WARNING 'No ddl_command_% event trigger to verify variant storage; re-creating', p_start_end;
+      END IF;
+      PERFORM _variant.exec( format(t_create, p_start_end) );
+      RETURN true;
+  END;
+
+  IF v_enabled IS DISTINCT FROM 'O' THEN
+    PERFORM _variant.exec( format(t_enable, evtname) );
+    RETURN true;
+  END IF;
+
+  RETURN false;
+END
+$body$;
+CREATE OR REPLACE FUNCTION _variant._ensure_storage_check(
+  p_warning boolean DEFAULT true
+) RETURNS void LANGUAGE plpgsql AS $body$
+BEGIN
+  -- NOTE: Must do it this way or the optimizer gets cute and doesn't call the function both times
+  IF bool_or( _variant._ensure_storage_check_one( p_warning, a ) ) FROM unnest( array[ 'start', 'end' ] ) a
+  THEN
+    -- Since we were missing one or both event triggers fix anything that's now broken
+    PERFORM _variant._verify_storage(true);
+  END IF;
+END
+$body$;
+SELECT _variant._ensure_storage_check( false );
+
 CREATE OR REPLACE FUNCTION variant.register(
   p_variant_name _variant._registered.variant_name%TYPE
-  , p_allowed_types _variant._registered.allowed_types%TYPE
+  , p_allowed_types _variant._registered.allowed_types%TYPE DEFAULT '{}'
+  , p_storage_allowed _variant._registered.storage_allowed%TYPE DEFAULT NULL
 ) RETURNS _variant._registered.variant_typmod%TYPE
 LANGUAGE plpgsql AS $func$
 DECLARE
   c_test_table CONSTANT text := 'test_ability_to_create_table_with_just_registered_variant';
+
+  v_storage_allowed CONSTANT _variant._registered.storage_allowed%TYPE := coalesce( p_storage_allowed, false );
   v_formatted_type text;
   ret _variant._registered.variant_typmod%TYPE;
 BEGIN
+  PERFORM _variant._ensure_storage_check();
+
   IF p_variant_name IS NULL THEN
     RAISE EXCEPTION 'variant_name may not be NULL';
   END IF;
@@ -373,8 +533,8 @@ BEGIN
     RAISE EXCEPTION 'variant_name may not be an empty string';
   END IF;
 
-  INSERT INTO _variant._registered( variant_name, allowed_types )
-    VALUES( p_variant_name, p_allowed_types )
+  INSERT INTO _variant._registered( variant_name, storage_allowed, allowed_types )
+    VALUES( p_variant_name, true, p_allowed_types )
     RETURNING variant_typmod
     INTO ret
   ;
@@ -400,6 +560,13 @@ BEGIN
       , c_test_table
   ));
 
+  -- Now disable storage, which is the default
+  UPDATE _variant._registered
+    SET storage_allowed = v_storage_allowed
+    WHERE variant_typmod = ret
+      -- Don't make a needless update
+      AND storage_allowed IS DISTINCT FROM v_storage_allowed
+  ;
   RETURN ret;
 END
 $func$;
@@ -473,6 +640,29 @@ RETURNS variant.variant LANGUAGE sql IMMUTABLE STRICT AS $f$
 SELECT variant.text_in( $1, _variant.registered__get__typmod($2) )
 $f$;
 
+CREATE OR REPLACE FUNCTION variant.storage_allowed(
+  p_variant_name _variant._registered.variant_name%TYPE
+  , p_storage_allowed _variant._registered.storage_allowed%TYPE
+) RETURNS void LANGUAGE plpgsql AS $body$
+DECLARE
+  v_typmod CONSTANT _variant._registered.variant_typmod%TYPE := _variant.registered__get__typmod( p_variant_name );
+BEGIN
+  PERFORM _variant._ensure_storage_check();
+
+  IF v_typmod = -1 AND p_storage_allowed THEN
+    RAISE EXCEPTION 'Enabling storage of DEFAULT variant is not allowed'
+      USING ERRCODE = 'invalid_parameter_value'
+    ;
+  END IF;
+
+  UPDATE _variant._registered
+    SET storage_allowed = p_storage_allowed
+    WHERE variant_typmod = v_typmod
+      AND storage_allowed IS DISTINCT FROM p_storage_allowed
+  ;
+END
+$body$;
+
 CREATE OR REPLACE FUNCTION variant.allowed_types(
   p_variant_name _variant._registered.variant_name%TYPE
 ) RETURNS TABLE(allowed_type regtype) LANGUAGE sql STABLE AS $f$
@@ -493,6 +683,8 @@ DECLARE
   v_new_allowed _variant._registered.allowed_types%TYPE;
   v_current record;
 BEGIN
+  PERFORM _variant._ensure_storage_check();
+
   -- Lock this record when we get it
   v_current := _variant.registered__get( p_variant_name, true );
 
@@ -525,6 +717,8 @@ DECLARE
   v_new_allowed _variant._registered.allowed_types%TYPE;
   v_current record;
 BEGIN
+  PERFORM _variant._ensure_storage_check();
+
   -- Lock this record when we get it
   v_current := _variant.registered__get( p_variant_name, true );
   IF NOT v_current.allowed_types && p_removed_types THEN

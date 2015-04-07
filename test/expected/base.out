@@ -1,8 +1,9 @@
 \set ECHO none
 
 
+
 ok 1..0
-1..48
+1..65
 ok 1 - cast to text
 ok 2 - Check equality
 ok 3 - Check NULL
@@ -31,7 +32,7 @@ ok 25 - Create table for testing allowed types
 ok 26 - threw 22023: type integer is not allowed in variant.variant(test allowed types)
 ok 27 - Allow use of int
 ok 28 - threw 22023: type smallint is not allowed in variant.variant(test allowed types)
-ok 29 - threw 2BP01: variant test allowed types is still in use
+ok 29 - threw 2BP01: variant "test allowed types" is still in use
 ok 30 - Drop temp table
 ok 31 - remove type
 ok 32 - test valid variant names
@@ -45,9 +46,50 @@ ok 39 - (int,1)::int != NULL
 ok 40 - (int,)::int = NULL is NULL
 ok 41 - (int,1)::int != NULL is NULL
 ok 42 - Verify we are testing all storage options
-ok 43 - Create cmp_out type
-ok 44 - Register "test no store"
-ok 45 - Create test_cmp for "test variant"
-ok 46 - Create test_cmp for "test no store"
-ok 47 - Test results from "test variant"
-ok 48 - Test results from "test no store"
+ok 43 - Not allowed to disable variant storage
+ok 44 - Register test storage variant
+ok 45 - test storage disallows storage
+ok 46 - Verify event trigger
+ok 47 - Drop _end trigger
+ok 48 - Create storage test table with event triggers disabled
+ok 49 - Drop _start trigger
+Verify we get WARNINGs because EVENT TRIGGERs are MIA
+WARNING:  No ddl_command_start event trigger to verify variant storage; re-creating
+CONTEXT:  SQL statement "SELECT bool_or( _variant._ensure_storage_check_one( p_warning, a ) ) FROM unnest( array[ 'start', 'end' ] ) a"
+PL/pgSQL function _variant._ensure_storage_check(boolean) line 4 at IF
+SQL statement "SELECT _variant._ensure_storage_check()"
+PL/pgSQL function variant.storage_allowed(character varying,boolean) line 5 at PERFORM
+SQL statement "SELECT variant.storage_allowed( 'DEFAULT', false )"
+PL/pgSQL function lives_ok(text,text) line 6 at EXECUTE statement
+WARNING:  No ddl_command_end event trigger to verify variant storage; re-creating
+CONTEXT:  SQL statement "SELECT bool_or( _variant._ensure_storage_check_one( p_warning, a ) ) FROM unnest( array[ 'start', 'end' ] ) a"
+PL/pgSQL function _variant._ensure_storage_check(boolean) line 4 at IF
+SQL statement "SELECT _variant._ensure_storage_check()"
+PL/pgSQL function variant.storage_allowed(character varying,boolean) line 5 at PERFORM
+SQL statement "SELECT variant.storage_allowed( 'DEFAULT', false )"
+PL/pgSQL function lives_ok(text,text) line 6 at EXECUTE statement
+WARNING:  Found table columns with variants that were disabled or disallowed storage
+DETAIL:  The following variants were enabled and had storage allowed:
+	storage_test.v variant.variant("test storage")
+CONTEXT:  SQL statement "SELECT _variant._verify_storage(true)"
+PL/pgSQL function _variant._ensure_storage_check(boolean) line 7 at PERFORM
+SQL statement "SELECT _variant._ensure_storage_check()"
+PL/pgSQL function variant.storage_allowed(character varying,boolean) line 5 at PERFORM
+SQL statement "SELECT variant.storage_allowed( 'DEFAULT', false )"
+PL/pgSQL function lives_ok(text,text) line 6 at EXECUTE statement
+ok 50 - Disallow storage on DEFAULT variant
+ok 51 - test storage allows storage after fixup
+ok 52 - No records found in variant.stored__bad
+ok 53 - Can not ALTER TABLE
+ok 54 - Not allowed to disable variant storage while in use
+ok 55 - Can ALTER TABLE to use "test variant"
+ok 56 - Can CREATE VIEW
+ok 57 - Can disallow storage
+ok 58 - test storage disallows storage
+ok 59 - Create test template
+ok 60 - Create cmp_out type
+ok 61 - Register "test no store"
+ok 62 - Create test_cmp for "test variant"
+ok 63 - Create test_cmp for "test no store"
+ok 64 - Test results from "test variant"
+ok 65 - Test results from "test no store"

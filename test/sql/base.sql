@@ -13,11 +13,12 @@ SELECT plan( (
 	+6 -- register__get*
 	+5 -- allowed types
 	+9 -- disallowed types
+	+16 -- storage tests
 	+2 -- typmod tests
 	+ (SELECT count(*) FROM typmod_chars)
 	+4 -- NULL
 	+1 -- Type storage options
-	+6 -- plpgsql
+	+7 -- plpgsql
 )::int );
 
 SELECT is(
@@ -57,7 +58,7 @@ SELECT is(
  */
 SELECT row_eq(
 	'SELECT * FROM variant.registered WHERE variant_typmod = -1'
-	, ROW( -1, 'DEFAULT', false, 0 )::variant.registered
+	, ROW( -1, 'DEFAULT', false, false, 0 )::variant.registered
 	, 'valid variant(DEFAULT)'
 );
 
@@ -65,7 +66,7 @@ SELECT row_eq(
 CREATE TEMP TABLE atypes AS SELECT t::text AS type_name FROM unnest( '{int4,int2}'::regtype[] ) t;
 SELECT lives_ok(
 	$test$CREATE TEMP TABLE test_typmod AS
-				SELECT *, ' registration "TEST" (,/) variant '::text AS variant_name, true AS variant_enabled, '{int4,int2}'::regtype[]
+				SELECT *, ' registration "TEST" (,/) variant '::text AS variant_name, true AS variant_enabled, false AS storage_allowed, '{int4,int2}'::regtype[]
 					FROM variant.register( ' registration "TEST" (,/) variant ', array(SELECT type_name::regtype FROM atypes) ) AS r(variant_typmod)
 	$test$
 	, 'Register variant'
@@ -77,7 +78,7 @@ SELECT bag_eq(
 );
 SELECT bag_eq(
 	$$SELECT * FROM variant.registered WHERE variant_typmod IN (SELECT variant_typmod FROM test_typmod)$$
-	, $$SELECT variant_typmod, _variant.quote_variant_name(variant_name), variant_enabled, 2 FROM test_typmod$$
+	, $$SELECT variant_typmod, _variant.quote_variant_name(variant_name), variant_enabled, storage_allowed, 2 FROM test_typmod$$
 	, 'check variant.registered for newly added variant'
 );
 -- Sanity-check typmod output. Technically a typmod test, but it uses the test variant we register here
@@ -172,7 +173,7 @@ SELECT throws_ok(
 	, 'new row for relation "_registered" violates check constraint "allowed_types_may_not_contain_nulls"'
 );
 SELECT lives_ok(
-	$$SELECT variant.register('test allowed types', '{}')$$
+	$$SELECT variant.register('test allowed types', '{}', true)$$
 	, 'Register allowed types variant'
 );
 SELECT lives_ok(
@@ -197,7 +198,7 @@ SELECT throws_ok(
 SELECT throws_ok(
 	$$SELECT variant.remove_type('test allowed types', 'int')$$
 	, '2BP01'
-	, 'variant test allowed types is still in use'
+	, 'variant "test allowed types" is still in use'
 );
 SELECT lives_ok(
 	$$DROP TABLE test_allowed$$
@@ -212,7 +213,7 @@ SELECT lives_ok(
  * typmod testing
  */
 SELECT lives_ok(
-	$$SELECT variant.register(ch, '{int}') FROM typmod_chars$$
+	$$SELECT variant.register(ch, '{int}', true) FROM typmod_chars$$
 	, 'test valid variant names'
 );
 SELECT throws_ok(
@@ -257,15 +258,90 @@ SELECT bag_eq(
 	, 'Verify we are testing all storage options'
 );
 
+/*
+ * Storage allowed
+ */
+SELECT throws_ok(
+	$$SELECT variant.storage_allowed( 'DEFAULT', true )$$
+	, '22023'
+	, 'Enabling storage of DEFAULT variant is not allowed'
+	, 'Not allowed to disable variant storage'
+);
+
+SELECT lives_ok(
+	$$SELECT variant.register( 'test storage' )$$
+	, 'Register test storage variant'
+);
+SELECT is( storage_allowed, false, 'test storage disallows storage' ) FROM _variant.registered__get( 'test storage' ) a;
+
+SELECT throws_ok(
+	$$CREATE TEMP TABLE storage_test( v variant.variant("test storage") )$$
+	, '22023'
+	, 'detected tables containing variants that do not allow storage'
+	, 'Verify event trigger'
+);
+
+SELECT lives_ok(
+	$$DROP EVENT TRIGGER variant_storage_check_end$$
+	, 'Drop _end trigger'
+);
+SELECT lives_ok(
+	$$CREATE TEMP TABLE storage_test( v variant.variant("test storage") )$$
+	, 'Create storage test table with event triggers disabled'
+);
+SELECT lives_ok(
+	$$DROP EVENT TRIGGER variant_storage_check_start$$
+	, 'Drop _start trigger'
+);
+
+\echo Verify we get WARNINGs because EVENT TRIGGERs are MIA
+SELECT lives_ok(
+	$$SELECT variant.storage_allowed( 'DEFAULT', false )$$
+	, 'Disallow storage on DEFAULT variant'
+);
+SELECT is( storage_allowed, true, 'test storage allows storage after fixup' ) FROM _variant.registered__get( 'test storage' ) a;
+SELECT is_empty(
+	$$SELECT * FROM variant.stored__bad$$
+	, 'No records found in variant.stored__bad'
+);
+
+SELECT throws_ok(
+	$$ALTER TABLE storage_test ALTER v TYPE variant.variant$$
+	, '22023'
+	, 'detected tables containing variants that do not allow storage'
+	, 'Can not ALTER TABLE'
+);
+
+SELECT throws_ok(
+	$$SELECT variant.storage_allowed( 'test storage', false )$$
+	, '2BP01'
+	, 'variant "test storage" is still in use'
+	, 'Not allowed to disable variant storage while in use'
+);
+
+SELECT lives_ok(
+	$$ALTER TABLE storage_test ALTER v TYPE variant.variant("test variant")$$
+	, 'Can ALTER TABLE to use "test variant"'
+);
+SELECT lives_ok(
+	$$CREATE TEMP VIEW storage_test_v AS SELECT * FROM storage_test$$
+	, 'Can CREATE VIEW'
+);
+SELECT lives_ok(
+	$$SELECT variant.storage_allowed( 'test storage', false )$$
+	, 'Can disallow storage'
+);
+SELECT is( storage_allowed, false, 'test storage disallows storage' ) FROM _variant.registered__get( 'test storage' ) a;
 
 /*
  * Test plpgsql
  */
+SELECT lives_ok( $live$
 CREATE TEMP VIEW test_cmp AS
 	SELECT $template$
 CREATE FUNCTION pg_temp.test_cmp_%s(
-	v1 variant.variant(%2$s)
-	, v2 variant.variant(%2$s)
+	p1 variant.variant(%2$s)
+	, p2 variant.variant(%2$s)
 ) RETURNS pg_temp.cmp_out LANGUAGE plpgsql AS $f$
 DECLARE
 	-- Test assignment
@@ -283,7 +359,9 @@ BEGIN
 END
 $f$
 $template$::text AS template
-;
+	$live$
+	, 'Create test template'
+);
 
 SELECT lives_ok(
 	$live$
