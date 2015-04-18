@@ -7,9 +7,6 @@
 
 SET client_min_messages = warning;
 
--- If your extension will create a type you can
--- do somenthing like this
-
 CREATE SCHEMA _variant;
 CREATE SCHEMA variant;
 GRANT USAGE ON SCHEMA variant TO public;
