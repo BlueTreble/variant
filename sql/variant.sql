@@ -23,10 +23,10 @@ BEGIN
 END
 $f$;
 
-CREATE TYPE _variant._variant AS ( original_type text, data text );
+CREATE TYPE variant._variant as ( original_type text, data text );
 
-CREATE TYPE variant.variant;
-CREATE OR REPLACE FUNCTION _variant._variant_in(cstring, Oid, int)
+create type variant.variant;
+create or replace function _variant._variant_in(cstring, Oid, int)
 RETURNS variant.variant
 LANGUAGE c IMMUTABLE STRICT
 AS '$libdir/variant', 'variant_in';
@@ -295,6 +295,10 @@ CREATE UNIQUE INDEX _registered__u_quote_variant_name ON _variant._registered( _
 
 INSERT INTO _variant._registered VALUES( -1, 'DEFAULT', true, false, '{}' );
 
+-- Necessary for internal functions to not be SECDEF
+CREATE VIEW variant._registered AS SELECT * FROM _variant._registered;
+GRANT SELECT ON variant._registered TO public;
+
 CREATE VIEW variant.registered AS
   SELECT variant_typmod, _variant.quote_variant_name(variant_name), variant_enabled, storage_allowed, coalesce( array_length(allowed_types, 1), 0 ) AS types_allowed
     FROM _variant._registered
@@ -411,6 +415,9 @@ SELECT array(
 )
 $body$;
 
+/*
+ * WARNING: This function is called from a SECDEF trigger!
+ */
 CREATE OR REPLACE FUNCTION _variant._verify_storage(
   p_fix_it boolean
 ) RETURNS void LANGUAGE plpgsql AS $body$
@@ -440,14 +447,14 @@ BEGIN
   END IF;
 END
 $body$;
-CREATE OR REPLACE FUNCTION _variant._tge_verify_storage_start(
-) RETURNS event_trigger LANGUAGE plpgsql AS $body$
+CREATE OR REPLACE FUNCTION variant._etg_verify_storage_start(
+) RETURNS event_trigger SECURITY DEFINER LANGUAGE plpgsql AS $body$
 BEGIN
   PERFORM _variant._verify_storage( true );
 END
 $body$;
-CREATE OR REPLACE FUNCTION _variant._tge_verify_storage_end(
-) RETURNS event_trigger LANGUAGE plpgsql AS $body$
+CREATE OR REPLACE FUNCTION variant._etg_verify_storage_end(
+) RETURNS event_trigger SECURITY DEFINER LANGUAGE plpgsql AS $body$
 BEGIN
   PERFORM _variant._verify_storage( false );
 END
@@ -465,7 +472,7 @@ CREATE EVENT TRIGGER variant_storage_check_%1$s
   WHEN tag IN ( 'ALTER DOMAIN', 'ALTER TABLE', 'ALTER VIEW'
     , 'CREATE DOMAIN', 'CREATE TABLE', 'CREATE TABLE AS', 'CREATE VIEW'
   )
-  EXECUTE PROCEDURE _variant._tge_verify_storage_%1$s()
+  EXECUTE PROCEDURE variant._etg_verify_storage_%1$s()
 $template$;
 
   v_enabled "char";
@@ -479,7 +486,7 @@ BEGIN
     SELECT evtenabled, evtname INTO STRICT v_enabled, v_name
       FROM pg_event_trigger
       WHERE evtevent = 'ddl_command_' || p_start_end
-        AND evtfoid = ('_variant._tge_verify_storage_' || p_start_end )::regproc
+        AND evtfoid = ('variant._etg_verify_storage_' || p_start_end )::regproc
     ;
   EXCEPTION
     WHEN NO_DATA_FOUND THEN
@@ -635,10 +642,15 @@ CREATE OR REPLACE FUNCTION _variant.registered__get__typmod(
 ) RETURNS _variant._registered.variant_typmod%TYPE LANGUAGE sql STABLE AS $f$
 SELECT variant_typmod FROM _variant.registered__get( $1 )
 $f$;
+CREATE OR REPLACE FUNCTION variant._registered__get__typmod(
+  _variant._registered.variant_name%TYPE
+) RETURNS _variant._registered.variant_typmod%TYPE SECURITY DEFINER LANGUAGE sql STABLE AS $f$
+SELECT _variant.registered__get__typmod($1)
+$f$;
 
 CREATE OR REPLACE FUNCTION variant.text_in(text, text)
 RETURNS variant.variant LANGUAGE sql IMMUTABLE STRICT AS $f$
-SELECT variant.text_in( $1, _variant.registered__get__typmod($2) )
+SELECT variant.text_in( $1, variant._registered__get__typmod($2) )
 $f$;
 
 CREATE OR REPLACE FUNCTION variant.storage_allowed(

@@ -63,7 +63,7 @@ ALTER TABLE base_data
  * This handles step 4
  */
 SELECT NULL = count(*) FROM ( -- Supress tons of blank lines
-SELECT _variant.exec( format(
+SELECT pg_temp.su( format(
 -- start format string
 $fmt$INSERT INTO base_data
   VALUES( %L, %L, %L, %s, %s, %s, NULL, %L )$fmt$
@@ -125,7 +125,7 @@ ALTER TABLE compare_data
  * This handles step 4
  */
 SELECT NULL = count(*) FROM ( -- Supress tons of blank lines
-SELECT _variant.exec( format(
+SELECT pg_temp.su( format(
 -- start format string
 $fmt$INSERT INTO compare_data
   VALUES( %L, %L, %L, %s, %s, %s, NULL )$fmt$

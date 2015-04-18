@@ -16,6 +16,18 @@ SELECT CASE WHEN count(*) > 1 THEN 'ok 1..0' ELSE 'FAIL' END
     )
 ;
 
+CREATE FUNCTION pg_temp.su(
+    sql text
+) RETURNS void SECURITY DEFINER LANGUAGE sql AS $$
+SELECT _variant.exec(sql)
+$$;
+
+-- Test things as a plain old user
+CREATE ROLE variant_test_role;
+SET ROLE variant_test_role;
+
+
+
 CREATE OR REPLACE FUNCTION pg_temp.exec_text(
 	sql text
 	, VARIADIC v anyarray

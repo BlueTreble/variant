@@ -1,9 +1,9 @@
 \set ECHO none
 BEGIN;
-CREATE TEMP VIEW typmod_chars AS SELECT * FROM unnest( string_to_array('( ) " 99999', ' ') ) AS a(ch);
-
 \i test/helpers/tap_setup.sql
 \i test/helpers/common.sql
+
+CREATE TEMP VIEW typmod_chars AS SELECT * FROM unnest( string_to_array('( ) " 99999', ' ') ) AS a(ch);
 
 SELECT plan( (
 	3 -- Simple cast, equality, NULL
@@ -54,6 +54,7 @@ SELECT is(
 /*
  * variant register
  */
+SET ROLE = DEFAULT; -- Need to be SU/owner
 SELECT row_eq(
 	'SELECT * FROM variant.registered WHERE variant_typmod = -1'
 	, ROW( -1, 'DEFAULT', true, false, 0 )::variant.registered
@@ -62,6 +63,7 @@ SELECT row_eq(
 
 -- type_name is intentionally text because we want our output ordered by text, not OID
 CREATE TEMP TABLE atypes AS SELECT t::text AS type_name FROM unnest( '{int4,int2}'::regtype[] ) t;
+
 SELECT lives_ok(
 	$test$CREATE TEMP TABLE test_typmod AS
 				SELECT *, ' registration "TEST" (,/) variant '::text AS variant_name, true AS variant_enabled, false AS storage_allowed, '{int4,int2}'::regtype[]
@@ -69,6 +71,7 @@ SELECT lives_ok(
 	$test$
 	, 'Register variant'
 );
+
 SELECT bag_eq(
 	$$SELECT * FROM _variant._registered WHERE variant_typmod IN (SELECT variant_typmod FROM test_typmod)$$
 	, $$SELECT * FROM test_typmod$$
@@ -121,7 +124,6 @@ SELECT throws_ok(
 	, '22023'
 	, 'Invalid typmod <>'
 );
-
 /*
  * Allowed types
  *
@@ -162,16 +164,17 @@ SELECT results_eq(
 	, $$SELECT * FROM atypes ORDER BY 1$$
 	, 'Verify newly added types'
 );
+SET ROLE = variant_test_role;
 
 /*
  * Disallowed types
  */
 SELECT throws_ok(
-	$$UPDATE _variant._registered SET allowed_types = allowed_types || array[NULL::regtype]$$
+	$$SELECT pg_temp.su( $su$UPDATE _variant._registered SET allowed_types = allowed_types || array[NULL::regtype]$su$ )$$
 	, 'new row for relation "_registered" violates check constraint "allowed_types_may_not_contain_nulls"'
 );
 SELECT lives_ok(
-	$$SELECT variant.register('test allowed types', '{}', true)$$
+	$$SELECT pg_temp.su( $su$SELECT variant.register('test allowed types', '{}', true)$su$ )$$
 	, 'Register allowed types variant'
 );
 SELECT lives_ok(
@@ -185,7 +188,7 @@ SELECT throws_ok(
 	, 'type integer is not allowed in variant.variant(test allowed types)'
 );
 SELECT lives_ok(
-	$$SELECT variant.add_type('test allowed types', 'int')$$
+	$$SELECT pg_temp.su( $su$SELECT variant.add_type('test allowed types', 'int')$su$ )$$
 	, $$Allow use of int$$
 );
 SELECT throws_ok(
@@ -194,7 +197,7 @@ SELECT throws_ok(
 	, 'type smallint is not allowed in variant.variant(test allowed types)'
 );
 SELECT throws_ok(
-	$$SELECT variant.remove_type('test allowed types', 'int')$$
+	$$SELECT pg_temp.su( $su$SELECT variant.remove_type('test allowed types', 'int')$su$ )$$
 	, '2BP01'
 	, 'variant "test allowed types" is still in use'
 );
@@ -203,7 +206,7 @@ SELECT lives_ok(
 	, 'Drop temp table'
 );
 SELECT lives_ok(
-	$$SELECT variant.remove_type('test allowed types', 'int')$$
+	$$SELECT pg_temp.su( $su$SELECT variant.remove_type('test allowed types', 'int')$su$ )$$
 	, 'remove type'
 );
 
@@ -211,11 +214,11 @@ SELECT lives_ok(
  * typmod testing
  */
 SELECT lives_ok(
-	$$SELECT variant.register(ch, '{int}', true) FROM typmod_chars$$
+	$$SELECT pg_temp.su( $su$SELECT variant.register(ch, '{int}', true) FROM typmod_chars$su$ )$$
 	, 'test valid variant names'
 );
 SELECT throws_ok(
-	$$SELECT variant.register(!)$$
+	$$SELECT pg_temp.su( $su$SELECT variant.register(!)$su$ )$$
 	, '42601'
 );
 SELECT lives_ok(
@@ -226,7 +229,7 @@ SELECT lives_ok(
 				, format('test variant name %s', ch)
 			)
 	FROM typmod_chars c
-		JOIN _variant._registered r ON c.ch = r.variant_name
+		JOIN variant._registered r ON c.ch = r.variant_name
 ;
 
 /*
@@ -245,6 +248,7 @@ SELECT is( 1::int::variant.variant("test variant")::int = NULL, NULL, '(int,1)::
  * positive-size typlens due to alignment reasons, so we ignore ones that align
 * to int.
  */
+SET ROLE = DEFAULT; -- Need to be SU/owner
 SELECT bag_eq(
 	-- Don't use type aliases here!
 	$$SELECT DISTINCT typbyval, typlen
@@ -255,6 +259,7 @@ SELECT bag_eq(
 	, $$SELECT DISTINCT typbyval, typlen FROM pg_type WHERE (typlen <= 8 OR typlen % 4 != 0) AND typname NOT IN( 'cstring', 'unknown' )$$
 	, 'Verify we are testing all storage options'
 );
+SET ROLE = variant_test_role;
 
 /*
  * Test plpgsql
@@ -299,7 +304,7 @@ CREATE TYPE pg_temp.cmp_out AS(
 	, 'Create cmp_out type'
 );
 SELECT lives_ok(
-	$$SELECT variant.register( 'test no store' )$$
+	$$SELECT pg_temp.su( $su$SELECT variant.register( 'test no store' )$su$ )$$
 	, 'Register "test no store" with no types to ensure we ignore them when there are none'
 );
 

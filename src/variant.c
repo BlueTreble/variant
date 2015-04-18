@@ -72,11 +72,11 @@ PG_MODULE_MAGIC;
 /*
  * variant_in: Parse text representation of a variant
  *
- * - Cast to _variant._variant
+ * - Cast to variant._variant
  * - Extract type name and validate
  * 
  * TODO: use type's input function to convert type info to internal format. For
- * now, just store the raw _variant._variant Datum.
+ * now, just store the raw variant._variant Datum.
  */
 PG_FUNCTION_INFO_V1(variant_in);
 Datum
@@ -227,7 +227,7 @@ variant_typmod_in(PG_FUNCTION_ARGS)
 		int							ret;
 		Oid							type = TEXTOID;
 		/* This should arguably be FOR KEY SHARE. See comment in variant_get_variant_name() */
-		char						*cmd = "SELECT variant_typmod, variant_enabled FROM _variant._registered WHERE lower(variant_name) = lower($1)";
+		char						*cmd = "SELECT variant_typmod, variant_enabled FROM variant._registered WHERE lower(variant_name) = lower($1)";
 
 		/* command, nargs, Oid *argument_types, *values, *nulls, read_only, count */
 		if( (ret = SPI_execute_with_args( cmd, 1, &type, &inputDatum, " ", true, 0 )) != SPI_OK_SELECT )
@@ -651,12 +651,12 @@ variant_get_variant_name(int typmod, Oid org_typid, bool ignore_storage)
 	 */
 	if(ignore_storage)
 	{
-		cmd = "SELECT variant_name, variant_enabled, storage_allowed FROM _variant._registered WHERE variant_typmod = $1";
+		cmd = "SELECT variant_name, variant_enabled, storage_allowed FROM variant._registered WHERE variant_typmod = $1";
 		nargs = 1;
 	}
 	else
 	{
-		cmd = "SELECT variant_name, variant_enabled, storage_allowed, allowed_types @> array[ $2 ] FROM _variant._registered WHERE variant_typmod = $1";
+		cmd = "SELECT variant_name, variant_enabled, storage_allowed, allowed_types @> array[ $2 ] FROM variant._registered WHERE variant_typmod = $1";
 		nargs = 2;
 		values[1] = ObjectIdGetDatum(org_typid);
 	}
@@ -1154,7 +1154,7 @@ getIntOid()
 	 * Get OID of our internal data type. This is necessary because record_in and
 	 * record_out need it.
 	 */
-	if ( (ret = SPI_execute("SELECT '_variant._variant'::regtype::oid", true, 1)) != SPI_OK_SELECT )
+	if ( (ret = SPI_execute("SELECT 'variant._variant'::regtype::oid", true, 1)) != SPI_OK_SELECT )
 		elog( ERROR, "SPI_execute returned %s", SPI_result_code_string(ret));
 
 	/* Don't need to copy the tuple because Oid is pass by value */
