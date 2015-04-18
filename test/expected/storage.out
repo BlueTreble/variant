@@ -1,0 +1,54 @@
+\set ECHO none
+ok 1..0
+1..20
+ok 1 - Can not drop _start trigger
+ok 2 - Can not drop _end trigger
+ok 3 - Not allowed to disable variant storage
+ok 4 - Not allowed to disable variant storage
+ok 5 - Register test storage variant
+ok 6 - test storage disallows storage
+ok 7 - Verify event trigger
+ok 8 - Drop extension
+
+
+
+ok 9 - Register test variant
+ok 10 - Register test storage variant
+ok 11 - test storage disallows storage
+ok 12 - Drop _end trigger
+ok 13 - Create storage test table with event triggers disabled
+ok 14 - Drop _start trigger
+Verify we get WARNINGs because EVENT TRIGGERs are MIA
+WARNING:  No ddl_command_start event trigger to verify variant storage; re-creating
+CONTEXT:  SQL statement "SELECT bool_or( _variant._ensure_storage_check_one( p_warning, a ) ) FROM unnest( array[ 'start', 'end' ] ) a"
+PL/pgSQL function _variant._ensure_storage_check(boolean) line 4 at IF
+SQL statement "SELECT _variant._ensure_storage_check()"
+PL/pgSQL function storage_allowed(character varying,boolean) line 5 at PERFORM
+SQL statement "SELECT variant.storage_allowed( 'DEFAULT', false )"
+PL/pgSQL function lives_ok(text,text) line 6 at EXECUTE statement
+WARNING:  No ddl_command_end event trigger to verify variant storage; re-creating
+CONTEXT:  SQL statement "SELECT bool_or( _variant._ensure_storage_check_one( p_warning, a ) ) FROM unnest( array[ 'start', 'end' ] ) a"
+PL/pgSQL function _variant._ensure_storage_check(boolean) line 4 at IF
+SQL statement "SELECT _variant._ensure_storage_check()"
+PL/pgSQL function storage_allowed(character varying,boolean) line 5 at PERFORM
+SQL statement "SELECT variant.storage_allowed( 'DEFAULT', false )"
+PL/pgSQL function lives_ok(text,text) line 6 at EXECUTE statement
+WARNING:  Found table columns with variants that were disabled or disallowed storage
+DETAIL:  The following variants were enabled and had storage allowed:
+	storage_test.v variant("test storage")
+CONTEXT:  SQL statement "SELECT _variant._verify_storage(true)"
+PL/pgSQL function _variant._ensure_storage_check(boolean) line 7 at PERFORM
+SQL statement "SELECT _variant._ensure_storage_check()"
+PL/pgSQL function storage_allowed(character varying,boolean) line 5 at PERFORM
+SQL statement "SELECT variant.storage_allowed( 'DEFAULT', false )"
+PL/pgSQL function lives_ok(text,text) line 6 at EXECUTE statement
+ok 15 - Disallow storage on DEFAULT variant
+ok 16 - test storage allows storage after fixup
+ok 17 - No records found in variant.stored__bad
+ok 18 - Can not ALTER TABLE
+ok 19 - Not allowed to disable variant storage while in use
+ok 20 - Ensure we can store in "test storage"
+ok 21 - Can ALTER TABLE to use "test variant"
+ok 22 - Can CREATE VIEW
+ok 23 - Can disallow storage
+ok 24 - test storage disallows storage

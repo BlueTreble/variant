@@ -1,4 +1,5 @@
-\i sql/variant.sql
+CREATE EXTENSION variant;
+SET search_path = variant, public;
 
 CREATE TEMP TABLE test_variant_typmod AS
     SELECT *

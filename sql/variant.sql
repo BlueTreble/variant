@@ -7,9 +7,12 @@
 
 SET client_min_messages = warning;
 
-CREATE SCHEMA _variant;
-CREATE SCHEMA variant;
+/*
+ * Extension is configured to go into the variant schema, which Postgres
+ * creates for us. We just need to fix the permissions.
+ */
 GRANT USAGE ON SCHEMA variant TO public;
+CREATE SCHEMA _variant;
 
 CREATE OR REPLACE FUNCTION _variant.exec(
   sql text
