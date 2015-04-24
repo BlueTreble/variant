@@ -28,7 +28,7 @@ See "Building" below for more details or if you run into a problem.
 
 Current Status
 ==============
-You can see the curren status of this extension at http://pgxn-tester.org/distributions/variant
+You can see the current status of *released* versions of this extension on [PGXN-tester](http://pgxn-tester.org/distributions/variant).
 
 Travis-CI status: [![Build Status](https://travis-ci.org/decibel/variant.png)](https://travis-ci.org/decibel/variant)
 
