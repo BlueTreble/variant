@@ -134,10 +134,11 @@ Once we can restrict registered variants to only using particular types, it woul
 
 Support
 -------
+You can see the current status of *released* versions of this extension on [PGXN-tester](http://pgxn-tester.org/distributions/variant).
 
-  Current test status can be found at http://pgxn-tester.org/distributions/variant.
+Travis-CI status: [![Build Status](https://travis-ci.org/decibel/variant.png)](https://travis-ci.org/decibel/variant)
 
-  Please report issues at <https://github.com/decibel/variant/issues>.
+Please report issues at <https://github.com/decibel/variant/issues>.
 
 Author
 ------
