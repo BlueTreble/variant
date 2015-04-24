@@ -44,7 +44,7 @@ SELECT is( base_variant_b, base_variant, 'Verify text_in(text_out()) works for '
 -- Step 7
 SELECT is(
     variant.original_type(base_variant)
-    , formatted_type
+    , formatted_type::regtype
   )
   FROM base_data
 ;

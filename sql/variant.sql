@@ -71,7 +71,7 @@ CREATE OR REPLACE FUNCTION _variant.quote_variant_name(text)
 RETURNS text LANGUAGE c IMMUTABLE STRICT
 AS '$libdir/variant', 'quote_variant_name';
 CREATE OR REPLACE FUNCTION variant.original_type(variant.variant)
-RETURNS text LANGUAGE c IMMUTABLE STRICT
+RETURNS regtype LANGUAGE c IMMUTABLE STRICT
 AS '$libdir/variant', 'variant_type_out';
 
 SELECT NULL = count(*) FROM ( -- Supress tons of blank lines

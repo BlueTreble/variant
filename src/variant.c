@@ -335,13 +335,12 @@ PG_FUNCTION_INFO_V1(variant_type_out);
 Datum
 variant_type_out(PG_FUNCTION_ARGS)
 {
-	VariantCache	*cache;
+	VariantInt		vi;
 
 	Assert(fcinfo->flinfo->fn_strict); /* Must not be callable on NULL input */
-	make_variant_int(PG_GETARG_VARIANT(0), fcinfo, IOFunc_output);
+	vi = make_variant_int(PG_GETARG_VARIANT(0), fcinfo, IOFunc_output);
 
-	cache = GetCache(fcinfo);
-	PG_RETURN_TEXT_P(cstring_to_text(cache->formatted_name));
+	PG_RETURN_OID(vi->typid);
 }
 
 /*
