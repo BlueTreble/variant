@@ -1,24 +1,25 @@
 \set ECHO none
 ok 1..0
-1..21
+1..26
 ok 1 - Reset role
-ok 2 - Can not drop _start trigger
-ok 3 - Can not drop _end trigger
-ok 4 - Not allowed to disable variant storage
+ok 2 - Verify event triggers are correct
+ok 3 - Can not drop _start trigger
+ok 4 - Can not drop _end trigger
 ok 5 - Not allowed to disable variant storage
-ok 6 - Register test storage variant
-ok 7 - test storage disallows storage
-ok 8 - Verify event trigger
-ok 9 - Drop extension
+ok 6 - Not allowed to disable variant storage
+ok 7 - Register test storage variant
+ok 8 - test storage disallows storage
+ok 9 - Verify event trigger
+ok 10 - Drop extension
 
 
 
-ok 10 - Register test variant
-ok 11 - Register test storage variant
-ok 12 - test storage disallows storage
-ok 13 - Drop _end trigger
-ok 14 - Create storage test table with event triggers disabled
-ok 15 - Drop _start trigger
+ok 11 - Register test variant
+ok 12 - Register test storage variant
+ok 13 - test storage disallows storage
+ok 14 - Drop _end trigger
+ok 15 - Create storage test table with event triggers disabled
+ok 16 - Drop _start trigger
 Verify we get WARNINGs because EVENT TRIGGERs are MIA
 WARNING:  No ddl_command_start event trigger to verify variant storage; re-creating
 CONTEXT:  SQL statement "SELECT bool_or( _variant._ensure_storage_check_one( p_warning, a ) ) FROM unnest( array[ 'start', 'end' ] ) a"
@@ -43,13 +44,13 @@ SQL statement "SELECT _variant._ensure_storage_check()"
 PL/pgSQL function storage_allowed(character varying,boolean) line 5 at PERFORM
 SQL statement "SELECT variant.storage_allowed( 'DEFAULT', false )"
 PL/pgSQL function lives_ok(text,text) line 6 at EXECUTE statement
-ok 16 - Disallow storage on DEFAULT variant
-ok 17 - test storage allows storage after fixup
-ok 18 - No records found in variant.stored__bad
-ok 19 - Can not ALTER TABLE
-ok 20 - Not allowed to disable variant storage while in use
-ok 21 - Ensure we can store in "test storage"
-ok 22 - Can ALTER TABLE to use "test variant"
-ok 23 - Can CREATE VIEW
-ok 24 - Can disallow storage
-ok 25 - test storage disallows storage
+ok 17 - Disallow storage on DEFAULT variant
+ok 18 - test storage allows storage after fixup
+ok 19 - No records found in variant.stored__bad
+ok 20 - Can not ALTER TABLE
+ok 21 - Not allowed to disable variant storage while in use
+ok 22 - Ensure we can store in "test storage"
+ok 23 - Can ALTER TABLE to use "test variant"
+ok 24 - Can CREATE VIEW
+ok 25 - Can disallow storage
+ok 26 - test storage disallows storage

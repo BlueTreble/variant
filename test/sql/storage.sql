@@ -7,8 +7,11 @@ BEGIN;
 SELECT plan( (
     0
     + 1 -- Reset role
+    + 1 -- Event triggers
     + 2 -- can't drop event triggers
-	+18 -- storage tests
+    + 5 -- Storage allowed
+    + 12 -- Not extension
+	+ 5 -- storage OK
 )::int );
 
 -- Need to run all this stuff as a superuser
@@ -16,6 +19,20 @@ SELECT lives_ok(
     --$$SELECT pg_temp.reset_role()$$
     $$SET ROLE = DEFAULT$$
     , 'Reset role'
+);
+
+
+/*
+ * Verify event triggers are setup on proper events
+ */
+SELECT bag_eq(
+    $$SELECT evtname, evtfoid, evttags FROM pg_event_trigger WHERE evtname LIKE 'variant_storage_check_%'$$
+    , $$SELECT 'variant_storage_check_' || suffix AS evtname
+                , ('variant._etg_verify_storage_' || suffix)::regproc AS evtfoid
+                , ' {"ALTER DOMAIN","ALTER TABLE","CREATE DOMAIN","CREATE TABLE","CREATE TABLE AS"}'::text[] AS evttags
+            FROM unnest( array[ 'start', 'end' ] ) AS suffix
+    $$
+    , 'Verify event triggers are correct'
 );
 
 
@@ -126,6 +143,9 @@ SELECT throws_ok(
 	, 'Not allowed to disable variant storage while in use'
 );
 
+/*
+ * Storage OK
+ */
 SELECT lives_ok(
 	$$INSERT INTO storage_test VALUES(1)$$
 	, 'Ensure we can store in "test storage"'
@@ -145,4 +165,4 @@ SELECT lives_ok(
 );
 SELECT is( storage_allowed, false, 'test storage disallows storage' ) FROM _variant.registered__get( 'test storage' ) a;
 
-
+SELECT finish();
