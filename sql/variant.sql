@@ -306,8 +306,10 @@ CREATE VIEW variant.registered AS
 CREATE VIEW _variant.stored AS
   SELECT atttypmod AS variant_typmod, quote_ident(attname) AS column_name, a.*
     FROM pg_attribute a
+      JOIN pg_class c ON c.oid = a.attrelid
     WHERE NOT attisdropped
       AND atttypid = 'variant.variant'::regtype
+      AND c.relkind != 'v' -- Views don't have storage
       -- NOTE: We intentionally look at all temp tables, not just our own
 ;
 
@@ -469,8 +471,8 @@ DECLARE
   t_create CONSTANT text := $template$
 CREATE EVENT TRIGGER variant_storage_check_%1$s
   ON ddl_command_%1$s
-  WHEN tag IN ( 'ALTER DOMAIN', 'ALTER TABLE', 'ALTER VIEW'
-    , 'CREATE DOMAIN', 'CREATE TABLE', 'CREATE TABLE AS', 'CREATE VIEW'
+  WHEN tag IN ( 'ALTER DOMAIN', 'ALTER TABLE'
+    , 'CREATE DOMAIN', 'CREATE TABLE', 'CREATE TABLE AS'
   )
   EXECUTE PROCEDURE variant._etg_verify_storage_%1$s()
 $template$;
