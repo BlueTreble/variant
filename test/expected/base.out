@@ -1,6 +1,6 @@
 \set ECHO none
 ok 1..0
-1..49
+1..52
 ok 1 - cast to text
 ok 2 - Check equality
 ok 3 - Check NULL
@@ -43,10 +43,13 @@ ok 39 - (int,1)::int != NULL
 ok 40 - (int,)::int = NULL is NULL
 ok 41 - (int,1)::int != NULL is NULL
 ok 42 - Verify we are testing all storage options
-ok 43 - Create test template
-ok 44 - Create cmp_out type
-ok 45 - Register "test no store" with no types to ensure we ignore them when there are none
-ok 46 - Create test_cmp for "test variant"
-ok 47 - Create test_cmp for "test no store"
-ok 48 - Test results from "test variant"
-ok 49 - Test results from "test no store"
+ok 43 - Test array equality
+ok 44 - Create test view
+ok 45 - Test row equality
+ok 46 - Create test template
+ok 47 - Create cmp_out type
+ok 48 - Register "test no store" with no types to ensure we allow any type when NOT storage AND allowed_types is empty
+ok 49 - Create test_cmp for "test variant"
+ok 50 - Create test_cmp for "test no store"
+ok 51 - Test results from "test variant"
+ok 52 - Test results from "test no store"

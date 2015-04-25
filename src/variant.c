@@ -14,6 +14,7 @@
 #include "variant.h"
 #include "fmgr.h"
 #include "lib/stringinfo.h"
+#include "access/hash.h"
 #include "access/htup_details.h"
 #include "nodes/nodeFuncs.h"
 #include "parser/parse_type.h"
@@ -454,7 +455,29 @@ variant_image_eq(PG_FUNCTION_ARGS)
 	PG_FREE_IF_COPY(l, 0);
 	PG_FREE_IF_COPY(r, 1);
 
-	PG_RETURN_BOOL( cmp = 0 ? true : false);
+	PG_RETURN_BOOL( cmp == 0 ? true : false);
+}
+
+PG_FUNCTION_INFO_V1(variant_hash);
+Datum
+variant_hash(PG_FUNCTION_ARGS)
+{
+	Variant	v = (Variant) PG_DETOAST_DATUM_PACKED(PG_GETARG_DATUM(0));
+	char	   *data;
+	int			len;
+	Datum		result;
+
+	Assert(fcinfo->flinfo->fn_strict); /* Must be strict */
+
+	data = VARDATA_ANY(v);
+	len = VARSIZE_ANY_EXHDR(v);
+
+	result = hash_any((unsigned char *) data, len);
+
+	/* Avoid leaking memory for toasted inputs */
+	PG_FREE_IF_COPY(v, 0);
+
+	return result;
 }
 
 /*

@@ -62,11 +62,15 @@ CREATE TYPE variant.variant(
 );
 
 -- Can only create this after type is fully created
+-- See also second definition at bottom of file
 CREATE OR REPLACE FUNCTION variant.text_in(text)
 RETURNS variant.variant LANGUAGE sql IMMUTABLE STRICT AS $f$
 SELECT variant.text_in( $1, -1 )
 $f$;
 
+CREATE OR REPLACE FUNCTION _variant.variant_hash(variant.variant)
+RETURNS int LANGUAGE c IMMUTABLE STRICT
+AS '$libdir/variant', 'variant_hash';
 CREATE OR REPLACE FUNCTION _variant.quote_variant_name(text)
 RETURNS text LANGUAGE c IMMUTABLE STRICT
 AS '$libdir/variant', 'quote_variant_name';
@@ -81,7 +85,7 @@ CREATE OR REPLACE FUNCTION _variant.variant_%1$s(variant.variant, variant.varian
   $$
   , op
 ) )
-FROM unnest(string_to_array('lt le eq ne ge gt', ' ')) AS op
+FROM unnest(string_to_array('image_eq lt le eq ne ge gt', ' ')) AS op
 ) a;
 
 CREATE OPERATOR < (
@@ -126,6 +130,20 @@ CREATE OPERATOR > (
   , COMMUTATOR = <
   , NEGATOR = <=
 );
+CREATE OPERATOR *= (
+  PROCEDURE = _variant.variant_image_eq
+  , LEFTARG = variant.variant
+  , RIGHTARG = variant.variant
+  , COMMUTATOR = *=
+  -- TODO , NEGATOR = *!=
+);
+
+CREATE OPERATOR CLASS hash__variant_ops
+  DEFAULT FOR TYPE variant.variant
+  USING hash AS
+    OPERATOR 1 *=
+    , FUNCTION 1 _variant.variant_hash(variant.variant)
+;
 
 CREATE OR REPLACE VIEW _variant.allowed_types AS
   SELECT t.oid::regtype AS type_name

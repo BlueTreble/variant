@@ -17,6 +17,7 @@ SELECT plan( (
 	+ (SELECT count(*) FROM typmod_chars)
 	+4 -- NULL
 	+1 -- Type storage options
+	+3 -- Hash equality support
 	+7 -- plpgsql
 )::int );
 
@@ -260,6 +261,34 @@ SELECT bag_eq(
 	, 'Verify we are testing all storage options'
 );
 SET ROLE = variant_test_role;
+
+
+/*
+ * Test hash equality support
+ *
+ * Since this is here mostly to support things like variant[]=variant[] and
+ * record(variant) = record(variant), that's how we test it.
+ */
+
+SELECT is(
+	array[ 1::int::variant.variant ]
+	, array[ 1::int::variant.variant ]
+	, 'Test array equality'
+);
+SELECT lives_ok(
+	$view$
+CREATE TEMP VIEW test_row AS
+	SELECT 1::int::variant.variant
+	$view$
+	, 'Create test view'
+);
+SELECT is(
+			row( t.* )::test_row
+			, row( t.* )::test_row
+			, 'Test row equality'
+		)
+	FROM test_row t
+;
 
 /*
  * Test plpgsql
