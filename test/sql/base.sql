@@ -305,7 +305,7 @@ CREATE TYPE pg_temp.cmp_out AS(
 );
 SELECT lives_ok(
 	$$SELECT pg_temp.su( $su$SELECT variant.register( 'test no store' )$su$ )$$
-	, 'Register "test no store" with no types to ensure we ignore them when there are none'
+	, 'Register "test no store" with no types to ensure we allow any type when NOT storage AND allowed_types is empty'
 );
 
 CREATE TEMP VIEW mod AS
