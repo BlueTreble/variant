@@ -100,7 +100,7 @@ SELECT lives_ok(
 	, 'Register test variant'
 );
 SELECT lives_ok(
-	$$SELECT variant.register( 'test storage', '{int}' )$$
+	$$SELECT variant.register( 'test storage', '{int,text,boolean}' )$$
 	, 'Register test storage variant'
 );
 SELECT is( storage_allowed, false, 'test storage disallows storage' ) FROM _variant.registered__get( 'test storage' ) a;
@@ -147,9 +147,11 @@ SELECT throws_ok(
  * Storage OK
  */
 SELECT lives_ok(
-	$$INSERT INTO storage_test VALUES(1)$$
+	$$INSERT INTO storage_test VALUES(1), (-1), ('a'::text)$$
 	, 'Ensure we can store in "test storage"'
 );
+
+SELECT * FROM storage_test WHERE v > 0;
 
 SELECT lives_ok(
 	$$ALTER TABLE storage_test ALTER v TYPE variant.variant("test variant")$$
@@ -166,3 +168,4 @@ SELECT lives_ok(
 SELECT is( storage_allowed, false, 'test storage disallows storage' ) FROM _variant.registered__get( 'test storage' ) a;
 
 SELECT finish();
+ROLLBACK;

@@ -753,6 +753,222 @@ variant_get_variant_name(int typmod, Oid org_typid, bool ignore_storage)
 }
 
 /*
+ * Execute an arbitrary operator on a set of variants. The tricky part is that
+ * due to casting we could end up calling ourselves recursively if we don't
+ * take special steps to exclude all variant-based operators from possible
+ * operators for our two original types.
+ */
+variant_op(FunctionCallInfo fcinfo)
+{
+	VariantInt	li, ri;
+	OpExpr			fn_expr = fcinfo->flinfo->fn_expr;
+	Oid					funcOid = fcinfo->flinfo->fn_oid;
+	Oid					rettype;
+	Form_pg_operator operform;
+	Oid					actual_arg_types[2];
+	Oid					declared_arg_types[2];
+	int					nargs;
+	List				*args;
+	OpExpr	  	NewExpr;
+
+	/*
+	 * Sanity checking
+	 */
+	if( !fcinfo->flinfo )
+		ereport( ERROR,
+						( errcode(ERRCODE_INVALID_PARAMETER_VALUE),
+							errmsg( "variant_op() called without FmgrInfo" ),
+							errhint( "This shouldn't happen; did you use DirectFunctionCall*() by mistake?" )
+						)
+				);
+	if( !IsA(fn_expr, OpExpr) )
+		ereport( ERROR,
+						( errcode(ERRCODE_INVALID_PARAMETER_VALUE),
+							errmsg( "variant_op() called from invalid context" ),
+							errdetail( "context: %s", nodeToString(fn_expr) )
+						)
+					);
+
+	if( PG_NARGS() != 2 ||
+			get_call_expr_argtype(fn_expr, 0) != ourTypId ||
+			get_call_expr_argtype(fn_expr, 1) != ourTypId
+			)
+		ereport( ERROR,
+						( errcode(ERRCODE_INVALID_PARAMETER_VALUE),
+							errmsg( "variant_op() must be called with 2 variant arguments" )
+						)
+					);
+	rettype = exprType(fn_expr);
+
+	/*
+	 * We don't care about IO function but must specify something
+	 *
+	 * TODO: Improve caching so it will handle more than just one type :(
+	 */
+	li = make_variant_int(PG_GETARG_VARIANT(0), fcinfo, IOFunc_input);
+	ri = make_variant_int(PG_GETARG_VARIANT(1), fcinfo, IOFunc_input);
+
+	/* Find the new operator */
+	operform = find_oper(funcOid, fn_expr, li->typid, ri->typid, fcinfo->flinfo->retset, rettype);
+
+	/* For now we only support binary operators */
+	args = list_make2(ltree, rtree);
+	actual_arg_types[0] = li->typid;
+	actual_arg_types[1] = ri->typid;
+	declared_arg_types[0] = opform->oprleft;
+	declared_arg_types[1] = opform->oprright;
+	nargs = 2;
+
+	/* perform the necessary typecasting of arguments */
+	make_fn_arguments(NULL, args, actual_arg_types, declared_arg_types);
+
+	/* and build the expression node */
+	NewExpr = makeNode(OpExpr);
+	NewExpr->opno = oprid(tup);
+	NewExpr->opfuncid = opform->oprcode;
+	NewExpr->opresulttype = rettype;
+	NewExpr->opretset = retset; /* We've already verified it matches */
+	/* Assume same collation as we were given */
+	NewExpr->opcollid = fn_extra->opcollid;
+	NewExpr->inputcollid = fn_extra->inputcollid;
+	NewExpr->args = args;
+	NewExpr->location = fn_extra->location;
+
+
+}
+
+/*
+ * Find a suitable operator that won't recurse back to us.
+ *
+ * This is stolen from oper() with some bits from make_op()
+ */
+static Form_pg_operator
+find_oper(Oid funcOid, OpExpr fn_expr, Oid ltypeId, Oid rtypeId, bool retset, Oid rettype)
+{
+	Form_pg_operator operform;
+	HeapTuple		opertup;
+	char	   		*oprname;
+	List				*opname;
+	bool				key_ok;
+	Oid					ourTypId = getTypOid();
+	FuncCandidateList clist;
+	FuncDetailCode fdresult = FUNCDETAIL_NOTFOUND;
+	Oid					myOperOid, newOperOid;
+
+	myOperOid = fn_expr->opno;
+
+	/*
+	 * Figure out what our operator name is. We intentionally do NOT pull out the
+	 * schema.
+	 */
+	opertup = SearchSysCache1(OPEROID, ObjectIdGetDatum(myOperOid));
+	Assert(HeapTupleIsValid(opertup)); /* Better be able to find ourselves... */
+	operform = (Form_pg_operator) GETSTRUCT(opertup);
+	*oprname = NameStr(operform->oprname);
+	opname = list_make1(makeString(oprname));
+
+	/*
+	 * Try to find the mapping in the lookaside cache. Note that since we're
+	 * using custom logic we'll never put an entry in the cache.
+	 */
+	if(make_oper_cache_key(NULL, &key, opname, li->typid, ri->typid, -1))
+		newOperOid = find_oper_cache_entry(&key);
+
+	/*
+	 * Try for an "exact" match
+	 */
+	if(!OidIsValid(newOperOid))
+		newOperOid = binary_oper_exact(opname, li->typid, ri->typid);
+	
+	/*
+	 * If we found something that's just going to come back here then keep
+	 * looking.
+	 */
+	if (OidIsValid(newOperOid) &&
+			!oper_is_ok(newOperOid, funcOid, retset))
+		newOperOid = InvalidOid;
+
+	if(!OidIsValid(newOperOid))
+	{
+		FuncCandidateList clist;
+		
+		/* TODO: Deal with prefix and postfix operators */
+		clist = OpernameGetCandidates(opname, 'b', false);
+		
+		if (clist != NULL)
+		{
+			ListCell   *lc;
+
+			/* Remove any candidates that would come back to this function */
+			foreach(lc, clist)
+			{
+				FuncCandidateList c = (FuncCandidateList) lfirst(lc);
+
+				if(!oper_is_ok(c->oid, funcOid, retset))
+				{
+					clist = list_delete_cell(clist, lc, prev);
+					pfree(c);
+					continue;		/* prev mustn't advance */
+				}
+
+				prev = lc;
+			}
+
+			Oid			inputOids[2];
+			inputOids[0] = ltypeId;
+			inputOids[1] = rtypeId;
+			fdresult = oper_select_candidate(2, inputOids, clist, &newOperOid);
+		}
+	}
+
+	if(OidIsValid(newOperOid))
+		tup = SearchSysCache1(OPEROID, ObjectIdGetDatum(newOperOid));
+
+	if(!HeapTupleIsValid(tup))
+		op_error(fn_expr, opname, 'b', li->typid, ri->typid, fdresult, fn_expr->location );
+
+	opform = (Form_pg_operator) GETSTRUCT(tup);
+
+	/* Check it's not a shell */
+	if (!RegProcedureIsValid(opform->oprcode))
+		ereport(ERROR,
+				(errcode(ERRCODE_UNDEFINED_FUNCTION),
+				 errmsg("operator is only a shell: %s",
+						op_signature_string(opname,
+											opform->oprkind,
+											opform->oprleft,
+											opform->oprright)),
+				 parser_errposition(fn_expr, fn_expr->location)));
+
+	/*
+	 * enforce consistency with polymorphic argument and return types,
+	 * possibly adjusting return type or declared_arg_types (which will be
+	 * used as the cast destination by make_fn_arguments)
+	 */
+	rettype = enforce_generic_type_consistency(actual_arg_types,
+											   declared_arg_types,
+											   nargs,
+											   opform->oprresult,
+											   false);
+
+	return opform;
+}
+
+static bool
+oper_is_ok(Oid operOid, Oid funcOid, bool retset)
+{
+		HeapTuple	tup = SearchSysCache1(OPEROID, ObjectIdGetDatum(newOperOid));
+		if (HeapTupleIsValid(tup))
+		{
+			Form_pg_operator op = (Form_pg_operator) GETSTRUCT(tup);
+			return (op->oprcode != funcOid &&
+							get_func_retset(opform->oprcode) == retset);
+		}
+
+		return false;
+}
+
+/*
  * variant_cmp_int: Compare two variants
  */
 static int
@@ -820,7 +1036,7 @@ variant_cmp_int(FunctionCallInfo fcinfo)
 
 		do_pop = _SPI_conn();
 
-		cmd = "SELECT CASE WHEN $1 = $2 THEN 0 WHEN $1 < $2 THEN -1 ELSE 1 END::int";
+		cmd = "SELECT CASE WHEN $1 < $2 THEN -1 WHEN $1 > $2 THEN 1 ELSE 0 END::int";
 		types[0] = li->typid;
 		values[0] = li->data;
 		nulls[0] = li->isnull;
@@ -1161,6 +1377,19 @@ quote_variant_name_cstring(const char *variant_name)
 	return out;
 }
 
+#define getTypOid()	getType("variant.variant")
+static Oid
+getType(*char typname)
+{
+	/*
+	 * Theoretically should be able to statically cache this, but I'm not sure that's safe.
+	 */
+	Oid			oid;
+	int32		typmod;
+
+	parseTypeString(typname, *ourOid, &typmod, false);
+	return oid;
+}
 
 Oid
 getIntOid()
@@ -1175,6 +1404,8 @@ getIntOid()
 	/*
 	 * Get OID of our internal data type. This is necessary because record_in and
 	 * record_out need it.
+	 *
+	 * TODO: Call to_regtype or parseTypeString directly
 	 */
 	if ( (ret = SPI_execute("SELECT 'variant._variant'::regtype::oid", true, 1)) != SPI_OK_SELECT )
 		elog( ERROR, "SPI_execute returned %s", SPI_result_code_string(ret));
