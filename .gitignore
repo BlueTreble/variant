@@ -19,3 +19,4 @@ regression.out
 
 # Misc crap
 tmp/
+.DS_Store
