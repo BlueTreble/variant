@@ -8,7 +8,9 @@ DOCS         = $(wildcard doc/*.md)
 TESTS        = $(wildcard test/sql/*.sql)
 REGRESS      = $(patsubst test/sql/%.sql,%,$(TESTS))
 REGRESS_OPTS = --inputdir=test --load-language=plpgsql
-MODULES      = $(patsubst %.c,%,$(wildcard src/*.c))
+#MODULES      = $(patsubst %.c,%,$(wildcard src/*.c))
+MODULE_big	 = variant
+OBJS		 = src/variant.o src/find_oper.o
 PG_CONFIG    = pg_config
 
 EXTRA_CLEAN  = $(wildcard $(EXTENSION)-*.zip)
