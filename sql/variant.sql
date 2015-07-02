@@ -25,8 +25,8 @@ $f$;
 
 CREATE TYPE variant._variant as ( original_type text, data text );
 
-create type variant.variant;
-create or replace function _variant._variant_in(cstring, Oid, int)
+CREATE TYPE variant.variant;
+CREATE OR REPLACE FUNCTION _variant._variant_in(cstring, Oid, int)
 RETURNS variant.variant
 LANGUAGE c IMMUTABLE STRICT
 AS '$libdir/variant', 'variant_in';
