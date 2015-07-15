@@ -33,13 +33,13 @@
     "tags": [ "variant", "type", "variable data type" ],
 
     "resources": {
-        "homepage": "http://github.com/decibel/variant/",
+        "homepage": "http://github.com/BlueTreble/variant/",
         "bugtracker": {
-            "web": "http://github.com/decibel/variant/issues"
+            "web": "http://github.com/BlueTreble/variant/issues"
         },
         "repository": {
-            "url": "git://github.com/decibel/variant.git",
-            "web": "http://github.com/decibel/variant/",
+            "url": "git://github.com/BlueTreble/variant.git",
+            "web": "http://github.com/BlueTreble/variant/",
             "type": "git"
         }
     },
