@@ -86,46 +86,46 @@ CREATE OR REPLACE FUNCTION _variant.variant_%1$s(variant.variant, variant.varian
   $$
   , op
 ) )
-FROM unnest(string_to_array('image_eq lt le eq ne ge gt', ' ')) AS op
+FROM unnest(string_to_array('image_eq lt le eq ne ge gt op', ' ')) AS op
 ) a;
 
 CREATE OPERATOR < (
-  PROCEDURE = _variant.variant_lt
+  PROCEDURE = _variant.variant_op
   , LEFTARG = variant.variant
   , RIGHTARG = variant.variant
   , COMMUTATOR = >
   , NEGATOR = >=
 );
 CREATE OPERATOR <= (
-  PROCEDURE = _variant.variant_le
+  PROCEDURE = _variant.variant_op
   , LEFTARG = variant.variant
   , RIGHTARG = variant.variant
   , COMMUTATOR = >=
   , NEGATOR = >
 );
 CREATE OPERATOR = (
-  PROCEDURE = _variant.variant_eq
+  PROCEDURE = _variant.variant_op
   , LEFTARG = variant.variant
   , RIGHTARG = variant.variant
   , COMMUTATOR = =
   , NEGATOR = !=
 );
 CREATE OPERATOR != (
-  PROCEDURE = _variant.variant_ne
+  PROCEDURE = _variant.variant_op
   , LEFTARG = variant.variant
   , RIGHTARG = variant.variant
   , COMMUTATOR = !=
   , NEGATOR = =
 );
 CREATE OPERATOR >= (
-  PROCEDURE = _variant.variant_ge
+  PROCEDURE = _variant.variant_op
   , LEFTARG = variant.variant
   , RIGHTARG = variant.variant
   , COMMUTATOR = <=
   , NEGATOR = <
 );
 CREATE OPERATOR > (
-  PROCEDURE = _variant.variant_gt
+  PROCEDURE = _variant.variant_op
   , LEFTARG = variant.variant
   , RIGHTARG = variant.variant
   , COMMUTATOR = <
