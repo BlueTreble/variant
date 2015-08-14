@@ -1,5 +1,5 @@
 # variant extension
 comment = 'Variant data type for PostgreSQL'
-default_version = '1.0.0-beta3'
+default_version = '1.0.1'
 relocatable = false
 schema = 'variant'

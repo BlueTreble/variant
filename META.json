@@ -2,7 +2,7 @@
     "name": "variant",
     "abstract": "Variant data type for PostgreSQL",
     "description": "A data type that allows storing data from any other type and remembering what the original type was",
-    "version": "1.0.0-beta3",
+    "version": "1.0.1",
     "maintainer": "Jim Nasby <jim.nasby@BlueTreble.com>",
     "license": {
         "BSD 2 Clause": "http://opensource.org/licenses/bsd-license.php"
@@ -13,7 +13,7 @@
             "abstract": "Variant data type for PostgreSQL",
             "file": "sql/variant.sql",
             "docfile": "doc/variant.md",
-            "version": "1.0.0-beta3"
+            "version": "1.0.1"
         }
     },
 
@@ -33,13 +33,13 @@
     "tags": [ "variant", "type", "variable data type" ],
 
     "resources": {
-        "homepage": "http://github.com/decibel/variant/",
+        "homepage": "http://github.com/BlueTreble/variant/",
         "bugtracker": {
-            "web": "http://github.com/decibel/variant/issues"
+            "web": "http://github.com/BlueTreble/variant/issues"
         },
         "repository": {
-            "url": "git://github.com/decibel/variant.git",
-            "web": "http://github.com/decibel/variant/",
+            "url": "git://github.com/BlueTreble/variant.git",
+            "web": "http://github.com/BlueTreble/variant/",
             "type": "git"
         }
     },
