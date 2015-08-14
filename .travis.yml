@@ -6,13 +6,14 @@ before_install:
   - wget https://gist.github.com/petere/5893799/raw/apt.postgresql.org.sh
   - wget https://gist.github.com/petere/6023944/raw/pg-travis-test.sh
   - sudo sh ./apt.postgresql.org.sh
-  - sudo apt-get update
+  - ls -la /var/lib/apt/lists/apt.postgresql.org*
+  - cat /var/lib/apt/lists/apt.postgresql.org_pub_repos_apt_dists_precise-pgdg_main_binary-i386_Packages
   - sudo apt-get autoremove
   - sudo apt-get install -f
   - sudo apt-get -fV check
   - sudo apt-get install -fV libatk-wrapper-java-jni postgresql-client-common libgtk2.0-0 libpq-dev
   - sudo apt-get install -fV --ignore-hold libatk-wrapper-java-jni postgresql-client-common libgtk2.0-0 libpq-dev
-  - sudo apt-get -V --ignore-hold install postgresql-9.5 postgresql-server-dev-9.5 postgresql-common
+  - sudo apt-get -V --ignore-hold install postgresql-9.5 postgresql-server-dev-9.5 postgresql-common libatk-wrapper-java-jni postgresql-client-common libgtk2.0-0 libpq-dev
 env:
   - PGVERSION=9.3
   - PGVERSION=9.4
