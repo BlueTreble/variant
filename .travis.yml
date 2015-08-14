@@ -9,6 +9,8 @@ before_install:
   - ls -la /var/lib/apt/lists/apt.postgresql.org*
   - sudo sh -c "echo deb http://apt.postgresql.org/pub/repos/apt/ precise-pgdg main $PGVERSION >> /etc/apt/sources.list.d/pgdg.list"
   - cat /etc/apt/sources.list.d/pgdg.list
+  - sudo apt-cache policy postgresql-$PGVERSION
+  - sudo apt-cache policy libpq-dev
   - sudo apt-get autoremove
   - sudo apt-get install -f
   - sudo apt-get -fV check
