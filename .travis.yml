@@ -14,16 +14,14 @@ before_install:
   - sudo sh -c "echo deb http://apt.postgresql.org/pub/repos/apt/ precise-pgdg $PGVERSION > /etc/apt/sources.list.d/pgdg.list"
   - cat /etc/apt/sources.list.d/pgdg.list
   - sudo apt-cache policy libpq-dev
-  - sudo apt-cache policy libpq-dev=9.5\*
+  - sudo apt-cache policy libpq-dev=9.5.\*
   - sudo apt-get autoremove
   - sudo apt-get install -f
   - sudo apt-get -fV check
-  - sudo apt-get install -fV libatk-wrapper-java-jni postgresql-client-common libgtk2.0-0 libpq-dev\*
+  - sudo apt-get install -fV libatk-wrapper-java-jni postgresql-client-common libgtk2.0-0 libpq-dev=9.5\*
   - sudo apt-get install -fV --ignore-hold libatk-wrapper-java-jni postgresql-client-common libgtk2.0-0 libpq-dev=9.5\*
-  - sudo apt-get -V --ignore-hold install postgresql-9.5 postgresql-server-dev-9.5 postgresql-common libatk-wrapper-java-jni postgresql-client-common libgtk2.0-0 libpq-dev\*
+  - sudo apt-get -V --ignore-hold install postgresql-9.5 postgresql-server-dev-9.5 postgresql-common libatk-wrapper-java-jni postgresql-client-common libgtk2.0-0 libpq-dev=9.5\*
 env:
-  - PGVERSION=9.3
   - PGVERSION=9.4
   - PGVERSION=9.5
-  - PGVERSION=9.6
 script: bash ./pg-travis-test.sh
