@@ -9,8 +9,7 @@ before_install:
   - sudo apt-get update
   - sudo apt-get autoremove
   - sudo apt-get install -f
-  - sudo apt-get install libatk-wrapper-java-jni postgresql-client-common libgtk2.0-0 libpq-dev
-  - sudo apt-get install libpq-dev
+  - sudo apt-get install -f libatk-wrapper-java-jni postgresql-client-common libgtk2.0-0 libpq-dev
 env:
   - PGVERSION=9.3
   - PGVERSION=9.4
