@@ -6,14 +6,14 @@ before_install:
   - wget https://gist.github.com/petere/6023944/raw/pg-travis-test.sh
   - sudo sh ./apt.postgresql.org.sh
   - ls -la /var/lib/apt/lists/apt.postgresql.org*
-  - sudo sh -c "echo deb http://apt.postgresql.org/pub/repos/apt/ precise-pgdg main $PGVERSION > /etc/apt/sources.list.d/pgdg.list"
+  - sudo sh -c "echo deb http://apt.postgresql.org/pub/repos/apt/ precise-pgdg main $PGVERSION >> /etc/apt/sources.list.d/pgdg.list"
   - sudo apt-get update
   - cat /etc/apt/sources.list.d/pgdg.list
   - sudo apt-cache policy postgresql-$PGVERSION
   - sudo apt-cache policy libpq-dev
   - sudo apt-cache policy libpq-dev=9.5\*
   - apt-cache showpkg libpq-dev
-  - sudo sh -c "echo deb http://apt.postgresql.org/pub/repos/apt/ precise-pgdg $PGVERSION > /etc/apt/sources.list.d/pgdg.list"
+    #  - sudo sh -c "echo deb http://apt.postgresql.org/pub/repos/apt/ precise-pgdg $PGVERSION > /etc/apt/sources.list.d/pgdg.list"
   - sudo apt-get update
   - apt-cache showpkg libpq-dev
 env:
