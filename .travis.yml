@@ -11,8 +11,11 @@ before_install:
   - cat /etc/apt/sources.list.d/pgdg.list
   - sudo apt-cache policy postgresql-$PGVERSION
   - sudo apt-cache policy libpq-dev
+  - sudo apt-cache policy libpq-dev-9.5
   - sudo sh -c "echo deb http://apt.postgresql.org/pub/repos/apt/ precise-pgdg main $PGVERSION > /etc/apt/sources.list.d/pgdg.list"
+  - cat /etc/apt/sources.list.d/pgdg.list
   - sudo apt-cache policy libpq-dev
+  - sudo apt-cache policy libpq-dev-9.5
   - sudo apt-get autoremove
   - sudo apt-get install -f
   - sudo apt-get -fV check
