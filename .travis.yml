@@ -4,7 +4,6 @@ before_install:
   - wget https://gist.github.com/petere/6023944/raw/pg-travis-test.sh
   - sudo sh ./apt.postgresql.org.sh
   - sudo apt-get update
-  - sudo apt-get upgrade
 env:
   - PGVERSION=9.3
   - PGVERSION=9.4
