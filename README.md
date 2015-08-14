@@ -30,7 +30,7 @@ Current Status
 ==============
 You can see the current status of *released* versions of this extension on [PGXN-tester](http://pgxn-tester.org/distributions/variant).
 
-Travis-CI status: [![Build Status](https://travis-ci.org/decibel/variant.png)](https://travis-ci.org/decibel/variant)
+Travis-CI status: [![Build Status](https://travis-ci.org/BlueTreble/variant.svg)](https://travis-ci.org/BlueTreble/variant)
 
 Building
 ========
